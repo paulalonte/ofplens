@@ -6,9 +6,18 @@ export function RootLayout() {
     <div className="flex min-h-dvh flex-col bg-slate-50 text-slate-900 dark:bg-slate-950 dark:text-slate-100">
       <header className="border-b border-slate-200 dark:border-slate-800">
         <div className="mx-auto flex max-w-5xl items-center justify-between gap-4 px-4 py-3">
-          <Link to="/" className="font-semibold tracking-tight">
-            OFP Lens
-          </Link>
+          <nav aria-label="Main" className="flex items-center gap-5">
+            <Link to="/" className="font-semibold tracking-tight">
+              OFP Lens
+            </Link>
+            <Link
+              to="/settings"
+              className="text-sm text-slate-600 hover:text-slate-900 dark:text-slate-400 dark:hover:text-slate-100"
+              activeProps={{ className: 'font-semibold text-slate-900 dark:text-slate-100' }}
+            >
+              Settings
+            </Link>
+          </nav>
           <HealthStatus />
         </div>
       </header>
