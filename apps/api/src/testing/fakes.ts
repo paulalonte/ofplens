@@ -24,11 +24,18 @@ export function createInMemoryPilotRepository(
   };
 }
 
-/** In-memory stand-in for the flight plan repository: idempotent on the SimBrief request id. */
+/**
+ * In-memory stand-in for the flight plan repository: idempotent on the SimBrief request id,
+ * newest first, cursor = id of the previous page's last item. The Postgres behaviour itself
+ * is covered by the integration tests.
+ */
 export function createInMemoryFlightPlanRepository(): FlightPlanRepository & {
   imported: Map<string, ImportFlightPlanInput & { id: string }>;
 } {
   const imported = new Map<string, ImportFlightPlanInput & { id: string }>();
+  const importedAt = '2026-11-09T20:00:00Z';
+  const byId = (id: string) => [...imported.values()].find((p) => p.id === id);
+
   return {
     imported,
     import: (input) => {
@@ -37,6 +44,42 @@ export function createInMemoryFlightPlanRepository(): FlightPlanRepository & {
       const id = crypto.randomUUID();
       imported.set(input.plan.simbriefRequestId, { ...input, id });
       return Promise.resolve({ id, created: true });
+    },
+    list: ({ simbriefUsername, limit, cursor }) => {
+      const all = [...imported.values()]
+        .filter((p) => p.simbriefUsername === simbriefUsername)
+        .sort(
+          (a, b) =>
+            b.plan.generatedAt.localeCompare(a.plan.generatedAt) || b.id.localeCompare(a.id),
+        );
+      const start = cursor === undefined ? 0 : all.findIndex((p) => p.id === cursor) + 1;
+      const page = all.slice(start, start + limit);
+      return Promise.resolve({
+        items: page.map(({ id, plan }) => ({
+          id,
+          simbriefRequestId: plan.simbriefRequestId,
+          generatedAt: plan.generatedAt,
+          importedAt,
+          callsign: plan.flight.callsign,
+          aircraftIcao: plan.aircraft.icao,
+          originIcao: plan.origin.icao,
+          destinationIcao: plan.destination.icao,
+          alternateIcao: plan.alternate?.icao ?? null,
+          out: plan.times.out,
+          blockTimeS: plan.times.blockTimeS,
+          units: plan.units,
+        })),
+        nextCursor: start + limit < all.length ? (page.at(-1)?.id ?? null) : null,
+      });
+    },
+    get: (id) => {
+      const stored = byId(id);
+      return Promise.resolve(stored ? { id, importedAt, plan: stored.plan } : null);
+    },
+    delete: (id) => {
+      const stored = byId(id);
+      if (stored) imported.delete(stored.plan.simbriefRequestId);
+      return Promise.resolve(stored !== undefined);
     },
   };
 }

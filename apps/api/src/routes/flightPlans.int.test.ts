@@ -6,6 +6,7 @@ import {
   type DbConnection,
 } from '@ofplens/db';
 import { countRows, createTestDatabase, type TestDatabase } from '@ofplens/db/testing';
+import { parseOfp } from '@ofplens/ofp';
 import { loadFixture } from '@ofplens/ofp/testing';
 import { afterAll, afterEach, beforeAll, describe, expect, it } from 'vitest';
 import { buildApp, type App } from '../app';
@@ -81,5 +82,29 @@ describe('importing through the API into Postgres', () => {
 
     expect(res.statusCode).toBe(201);
     expect(await planCount()).toBe(before + 1);
+  });
+
+  it('lists, opens and deletes stored plans; the stored plan equals the parsed one', async () => {
+    const a = await startApp('eddb-eddm-c750-kgs');
+    const imported = await a.inject({ method: 'POST', url: '/api/flight-plans/import' });
+    const { id } = imported.json<{ id: string }>();
+
+    const list = await a.inject({ method: 'GET', url: '/api/flight-plans' });
+    const items = list.json<{ items: { id: string; callsign: string }[] }>().items;
+    // Newest first: the EDDB plan was generated before the other two fixtures.
+    expect(items.map((i) => i.callsign)).toEqual(['DLH814', 'UAL1234', 'N70P']);
+
+    const detail = await a.inject({ method: 'GET', url: `/api/flight-plans/${id}` });
+    expect(detail.statusCode).toBe(200);
+    expect(detail.json<{ plan: unknown }>().plan).toEqual(
+      parseOfp(loadFixture('eddb-eddm-c750-kgs')),
+    );
+
+    const deleted = await a.inject({ method: 'DELETE', url: `/api/flight-plans/${id}` });
+    expect(deleted.statusCode).toBe(204);
+    expect((await a.inject({ method: 'GET', url: `/api/flight-plans/${id}` })).statusCode).toBe(
+      404,
+    );
+    expect(await countRows(conn.db, 'waypoints')).toBe(58); // 30 + 28 left
   });
 });
