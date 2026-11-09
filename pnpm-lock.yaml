@@ -205,6 +205,9 @@ importers:
       '@ofplens/db':
         specifier: workspace:*
         version: link:../../packages/db
+      '@ofplens/ofp':
+        specifier: workspace:*
+        version: link:../../packages/ofp
       fastify:
         specifier: 5.12.8
         version: 5.12.8

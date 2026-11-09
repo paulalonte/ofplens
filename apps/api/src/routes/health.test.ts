@@ -1,5 +1,6 @@
 import { afterEach, describe, expect, it } from 'vitest';
 import { buildApp, type App } from '../app';
+import { testDeps } from '../testing/fakes';
 
 let app: App | undefined;
 afterEach(async () => {
@@ -9,7 +10,7 @@ afterEach(async () => {
 
 describe('GET /api/health', () => {
   it('returns 200 when the database answers', async () => {
-    app = await buildApp({ pingDb: () => Promise.resolve() });
+    app = await buildApp(testDeps());
 
     const res = await app.inject({ method: 'GET', url: '/api/health' });
 
@@ -18,7 +19,7 @@ describe('GET /api/health', () => {
   });
 
   it('returns 503 when the database rejects', async () => {
-    app = await buildApp({ pingDb: () => Promise.reject(new Error('ECONNREFUSED')) });
+    app = await buildApp(testDeps({ pingDb: () => Promise.reject(new Error('ECONNREFUSED')) }));
 
     const res = await app.inject({ method: 'GET', url: '/api/health' });
 
@@ -27,7 +28,7 @@ describe('GET /api/health', () => {
   });
 
   it('returns 503 when the database does not answer in time', async () => {
-    app = await buildApp({ pingDb: () => new Promise(() => {}), dbTimeoutMs: 20 });
+    app = await buildApp(testDeps({ pingDb: () => new Promise(() => {}), dbTimeoutMs: 20 }));
 
     const res = await app.inject({ method: 'GET', url: '/api/health' });
 

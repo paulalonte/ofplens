@@ -1,8 +1,9 @@
 import { sql } from 'drizzle-orm';
 import { drizzle, type PostgresJsDatabase } from 'drizzle-orm/postgres-js';
 import postgres from 'postgres';
+import * as schema from './schema';
 
-export type Database = PostgresJsDatabase;
+export type Database = PostgresJsDatabase<typeof schema>;
 
 export interface DbConnection {
   db: Database;
@@ -23,7 +24,7 @@ export function createDb(url: string, options: CreateDbOptions = {}): DbConnecti
     connect_timeout: options.connectTimeoutS ?? 5,
     onnotice: () => {},
   });
-  const db = drizzle(client);
+  const db = drizzle(client, { schema });
   return { db, close: () => client.end({ timeout: 5 }) };
 }
 

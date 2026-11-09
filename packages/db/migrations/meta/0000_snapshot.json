@@ -1,0 +1,85 @@
+{
+  "id": "67b3ca10-abbd-4a1c-a5d2-8d1802b2895e",
+  "prevId": "00000000-0000-0000-0000-000000000000",
+  "version": "7",
+  "dialect": "postgresql",
+  "tables": {
+    "public.pilots": {
+      "name": "pilots",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "uuid",
+          "primaryKey": true,
+          "notNull": true,
+          "default": "gen_random_uuid()"
+        },
+        "simbrief_username": {
+          "name": "simbrief_username",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "simbrief_pilot_id": {
+          "name": "simbrief_pilot_id",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "weight_unit": {
+          "name": "weight_unit",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "'kgs'"
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        },
+        "updated_at": {
+          "name": "updated_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {},
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {
+        "pilots_simbrief_username_unique": {
+          "name": "pilots_simbrief_username_unique",
+          "nullsNotDistinct": false,
+          "columns": [
+            "simbrief_username"
+          ]
+        }
+      },
+      "policies": {},
+      "checkConstraints": {
+        "pilots_weight_unit_check": {
+          "name": "pilots_weight_unit_check",
+          "value": "\"pilots\".\"weight_unit\" in ('kgs', 'lbs')"
+        }
+      },
+      "isRLSEnabled": false
+    }
+  },
+  "enums": {},
+  "schemas": {},
+  "sequences": {},
+  "roles": {},
+  "policies": {},
+  "views": {},
+  "_meta": {
+    "columns": {},
+    "schemas": {},
+    "tables": {}
+  }
+}

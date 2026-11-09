@@ -1,3 +1,4 @@
+import type { PilotRepository } from '@ofplens/db';
 import Fastify, { type FastifyServerOptions } from 'fastify';
 import {
   serializerCompiler,
@@ -6,9 +7,11 @@ import {
 } from 'fastify-type-provider-zod';
 import { registerErrorHandling } from './plugins/errors';
 import { healthRoutes } from './routes/health';
+import { pilotRoutes } from './routes/pilot';
 
 export interface AppDeps {
   pingDb: () => Promise<void>;
+  pilots: PilotRepository;
   dbTimeoutMs?: number;
   logger?: FastifyServerOptions['logger'];
 }
@@ -25,6 +28,7 @@ export async function buildApp(deps: AppDeps) {
     pingDb: deps.pingDb,
     ...(deps.dbTimeoutMs !== undefined && { dbTimeoutMs: deps.dbTimeoutMs }),
   });
+  await app.register(pilotRoutes, { pilots: deps.pilots });
 
   return app;
 }
