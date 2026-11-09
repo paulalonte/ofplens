@@ -1,9 +1,8 @@
 import type { PilotRepository } from '@ofplens/db';
-import { FlightPlanSummary, OfpParseError, parseOfp, SimbriefUsername } from '@ofplens/ofp';
+import { FlightPlanSummary, SimbriefUsername } from '@ofplens/ofp';
 import type { FastifyPluginCallbackZod } from 'fastify-type-provider-zod';
 import { z } from 'zod';
-import { AppError } from '../errors';
-import type { SimbriefClient } from '../simbrief';
+import { fetchLatestPlan, usernameRequired, type SimbriefClient } from '../simbrief';
 
 export interface SimbriefRouteOptions {
   pilots: PilotRepository;
@@ -31,29 +30,10 @@ export const simbriefRoutes: FastifyPluginCallbackZod<SimbriefRouteOptions> = (
     },
     async (request) => {
       const username = request.query.username ?? (await pilots.get())?.simbriefUsername;
-      if (!username) {
-        throw new AppError(
-          400,
-          'USERNAME_REQUIRED',
-          'Set your SimBrief username in Settings first.',
-        );
-      }
+      if (!username) throw usernameRequired();
 
-      // SimbriefNotFoundError / SimbriefUpstreamError are AppErrors: they map to 404 / 502.
-      const raw = await simbrief.fetchLatestOfp(username);
-
-      try {
-        return parseOfp(raw);
-      } catch (err) {
-        if (!(err instanceof OfpParseError)) throw err;
-        request.log.error({ issues: err.issues }, 'SimBrief OFP failed validation');
-        throw new AppError(
-          422,
-          'OFP_INVALID',
-          `Your latest SimBrief plan could not be read: ${err.message}`,
-          { cause: err },
-        );
-      }
+      const { plan } = await fetchLatestPlan(simbrief, username, request.log);
+      return plan;
     },
   );
 

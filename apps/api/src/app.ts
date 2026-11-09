@@ -1,4 +1,4 @@
-import type { PilotRepository } from '@ofplens/db';
+import type { FlightPlanRepository, PilotRepository } from '@ofplens/db';
 import Fastify, { type FastifyServerOptions } from 'fastify';
 import {
   serializerCompiler,
@@ -6,6 +6,7 @@ import {
   type ZodTypeProvider,
 } from 'fastify-type-provider-zod';
 import { registerErrorHandling } from './plugins/errors';
+import { flightPlanRoutes } from './routes/flightPlans';
 import { healthRoutes } from './routes/health';
 import { pilotRoutes } from './routes/pilot';
 import { simbriefRoutes } from './routes/simbrief';
@@ -14,6 +15,7 @@ import { createSimbriefClient, type SimbriefClient } from './simbrief';
 export interface AppDeps {
   pingDb: () => Promise<void>;
   pilots: PilotRepository;
+  flightPlans: FlightPlanRepository;
   /** Defaults to the real SimBrief client, logging through the app's logger. */
   simbrief?: SimbriefClient;
   dbTimeoutMs?: number;
@@ -33,9 +35,12 @@ export async function buildApp(deps: AppDeps) {
     ...(deps.dbTimeoutMs !== undefined && { dbTimeoutMs: deps.dbTimeoutMs }),
   });
   await app.register(pilotRoutes, { pilots: deps.pilots });
-  await app.register(simbriefRoutes, {
+  const simbrief = deps.simbrief ?? createSimbriefClient({ log: app.log });
+  await app.register(simbriefRoutes, { pilots: deps.pilots, simbrief });
+  await app.register(flightPlanRoutes, {
     pilots: deps.pilots,
-    simbrief: deps.simbrief ?? createSimbriefClient({ log: app.log }),
+    flightPlans: deps.flightPlans,
+    simbrief,
   });
 
   return app;

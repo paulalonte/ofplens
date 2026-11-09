@@ -1,4 +1,4 @@
-import { createDb, createPilotRepository, pingDb } from '@ofplens/db';
+import { createDb, createFlightPlanRepository, createPilotRepository, pingDb } from '@ofplens/db';
 import { buildApp } from './app';
 import { loadEnv } from './env';
 
@@ -8,6 +8,7 @@ const { db, close: closeDb } = createDb(env.DATABASE_URL);
 const app = await buildApp({
   pingDb: () => pingDb(db),
   pilots: createPilotRepository(db),
+  flightPlans: createFlightPlanRepository(db),
   logger: { level: env.LOG_LEVEL },
 });
 app.addHook('onClose', closeDb);

@@ -64,6 +64,25 @@ export async function truncateAll(db: Database): Promise<void> {
   `);
 }
 
+const APP_TABLES = [
+  'pilots',
+  'flight_plans',
+  'flight_plan_fuel',
+  'flight_plan_weights',
+  'waypoints',
+  'weather_reports',
+] as const;
+export type AppTable = (typeof APP_TABLES)[number];
+
+/** Number of rows in one of the app's tables. */
+export async function countRows(db: Database, table: AppTable): Promise<number> {
+  if (!APP_TABLES.includes(table)) throw new Error(`Unknown table ${String(table)}`);
+  const [row] = await db.execute<{ n: number }>(
+    sql`select count(*)::int as n from ${sql.identifier(table)}`,
+  );
+  return row?.n ?? 0;
+}
+
 /** Drops test databases left behind by crashed runs. Called once before the integration tests. */
 export async function dropLeftoverTestDatabases(): Promise<string[]> {
   const serverUrl = testDatabaseServerUrl();

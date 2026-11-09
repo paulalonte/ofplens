@@ -279,6 +279,9 @@ importers:
 
   packages/db:
     dependencies:
+      '@ofplens/ofp':
+        specifier: workspace:*
+        version: link:../ofp
       drizzle-orm:
         specifier: 0.45.4
         version: 0.45.4(postgres@3.4.9)
