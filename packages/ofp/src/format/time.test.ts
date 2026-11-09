@@ -91,7 +91,7 @@ describe('with real plans', () => {
   });
 
   it('shows the KSFO departure on the previous local day and the KJFK arrival on the same day', () => {
-    const plan = parseOfp(loadFixture('ksfo-kjfk-b738-lbs'));
+    const plan = parseOfp(loadFixture('ksfo-kjfk-b739-lbs'));
     const { out, in: inTime } = plan.times;
 
     expect(formatZuluDate(out)).toBe('10 NOV 2026');

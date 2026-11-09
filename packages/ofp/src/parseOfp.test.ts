@@ -12,7 +12,7 @@ describe('parseOfp on every captured fixture', () => {
     expect(FIXTURE_NAMES).toEqual([
       'eddb-eddm-c750-kgs',
       'eddf-lepa-a339-noalt',
-      'ksfo-kjfk-b738-lbs',
+      'ksfo-kjfk-b739-lbs',
     ]);
   });
 
@@ -118,8 +118,8 @@ describe('eddb-eddm-c750-kgs (bizjet, kg, one alternate)', () => {
   });
 });
 
-describe('ksfo-kjfk-b738-lbs (airline, lbs, crosses midnight UTC and timezones)', () => {
-  const plan = parseFixture('ksfo-kjfk-b738-lbs');
+describe('ksfo-kjfk-b739-lbs (airline, lbs, crosses midnight UTC and timezones)', () => {
+  const plan = parseFixture('ksfo-kjfk-b739-lbs');
 
   it('keeps weights in lbs and maps the airline callsign', () => {
     expect(plan.units).toBe('lbs');
