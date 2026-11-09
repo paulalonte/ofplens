@@ -281,7 +281,11 @@ importers:
         specifier: 0.31.11
         version: 0.31.11
 
-  packages/ofp: {}
+  packages/ofp:
+    dependencies:
+      zod:
+        specifier: 4.6.7
+        version: 4.6.7
 
 packages:
 

@@ -50,7 +50,7 @@ come after the MVP is usable.
 
 ### OFP-06 · `packages/ofp`: Zod schema + `parseOfp()`
 - Zod schema for only the fields we use, coercing numeric strings and epoch times.
-- `parseOfp(raw) → FlightPlanSummary` (header, times, fuel, weights, waypoints, OFP weather, `raw`).
+- `parseOfp(raw) → FlightPlanSummary` (header, times, fuel, weights, waypoints, OFP weather). The raw OFP is not part of the summary; the import keeps it separately for `raw_ofp`.
 - Clear error type when the input is not a valid OFP.
 - **Done when:** unit tests pass for every fixture, including the one without an alternate, plus one malformed input.
 

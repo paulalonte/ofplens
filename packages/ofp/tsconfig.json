@@ -1,4 +1,8 @@
 {
   "extends": "../../tsconfig.base.json",
+  "compilerOptions": {
+    // Node types are only for tests reading fixtures from disk; src stays runtime-neutral.
+    "types": ["node"]
+  },
   "include": ["src"]
 }

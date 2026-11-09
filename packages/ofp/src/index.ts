@@ -1,6 +1,3 @@
-// OFP Zod schema and parseOfp() land in OFP-06.
-
-/** Weight unit as SimBrief reports it in params.units. */
-export type WeightUnit = 'kgs' | 'lbs';
-
-export const WEIGHT_UNITS = ['kgs', 'lbs'] as const satisfies readonly WeightUnit[];
+export { OfpParseError, parseOfp } from './parseOfp';
+export { OfpSchema, WEIGHT_UNITS, type Ofp, type WeightUnit } from './schema';
+export type { Airport, FlightPlanSummary, Waypoint } from './summary';
