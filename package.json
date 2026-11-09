@@ -7,7 +7,8 @@
     "node": ">=24"
   },
   "scripts": {
-    "dev": "pnpm --parallel --filter './apps/*' dev",
+    "dev": "pnpm db:up && pnpm db:migrate && pnpm dev:apps",
+    "dev:apps": "pnpm --parallel --filter './apps/*' dev",
     "db:up": "docker compose up -d --wait",
     "db:down": "docker compose down",
     "db:generate": "pnpm --filter @ofplens/db db:generate",

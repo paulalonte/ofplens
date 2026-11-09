@@ -11,21 +11,21 @@ history in Postgres. **For flight simulation (X-Plane 12) only.** The plan is in
 - `cp .env.example .env` on a fresh clone. The root `.env` is shared by the API, Vite's
   proxy and drizzle-kit.
 - Postgres runs in Docker on host port **5433**, not 5432 (a native Postgres may own 5432).
-- `pnpm db:up && pnpm db:migrate` before `pnpm dev`, and again after pulling new migrations.
-  The API does not migrate on start.
+- Docker Desktop must be running: `pnpm dev` starts Postgres and applies migrations itself.
 
 ## Commands
 
-| Command                                | What it does                                                             |
-| -------------------------------------- | ------------------------------------------------------------------------ |
-| `pnpm dev`                             | Web (http://localhost:5173) and API (:3000) in parallel                  |
-| `pnpm db:up` / `pnpm db:down`          | Start (and wait for) / stop the Postgres container                       |
-| `pnpm db:generate` / `pnpm db:migrate` | Create a migration from the Drizzle schema / apply it                    |
-| `pnpm test`                            | All Vitest tests (projects: `web` in jsdom, `node` for api and packages) |
-| `pnpm test --project web`              | Only the web tests (no `--` with pnpm; it is passed on literally)        |
-| `pnpm lint` / `pnpm typecheck`         | ESLint (type-aware) / `tsc --noEmit` in every workspace                  |
-| `pnpm format` / `pnpm format:check`    | Prettier                                                                 |
-| `pnpm fixture:capture <name>`          | Save your latest SimBrief OFP (pilot ID redacted) to `fixtures/ofp/`     |
+| Command                                | What it does                                                                                                                |
+| -------------------------------------- | --------------------------------------------------------------------------------------------------------------------------- |
+| `pnpm dev`                             | Start Postgres, apply migrations, then web (http://localhost:5173) and API (:3000)                                          |
+| `pnpm dev:apps`                        | Only web and API (Postgres already up and migrated)                                                                         |
+| `pnpm db:up` / `pnpm db:down`          | Start (and wait for) / stop the Postgres container                                                                          |
+| `pnpm db:generate` / `pnpm db:migrate` | Create a migration from the Drizzle schema / apply it                                                                       |
+| `pnpm test`                            | All Vitest tests: `web` (jsdom), `node` (api, packages), `integration` (`*.int.test.ts`, real Postgres: needs `pnpm db:up`) |
+| `pnpm test --project web`              | Only the web tests (no `--` with pnpm; it is passed on literally)                                                           |
+| `pnpm lint` / `pnpm typecheck`         | ESLint (type-aware) / `tsc --noEmit` in every workspace                                                                     |
+| `pnpm format` / `pnpm format:check`    | Prettier                                                                                                                    |
+| `pnpm fixture:capture <name>`          | Save your latest SimBrief OFP (pilot ID redacted) to `fixtures/ofp/`                                                        |
 
 Before saying a change is done, run `pnpm format:check && pnpm lint && pnpm typecheck && pnpm test`
 (the same steps CI runs, plus `pnpm --filter @ofplens/web build`).
@@ -55,7 +55,10 @@ there is no build step between packages.
 - **Weights** are stored in the OFP's own unit; convert only for display via one shared helper.
 - The browser only calls `/api`; the API proxies SimBrief, weather and the LLM.
 - Imports: `import type` for types (lint-enforced), relative imports without file extensions.
-- Tests sit next to the code as `*.test.ts(x)`. API routes are tested with `app.inject()` and
+- Tests sit next to the code as `*.test.ts(x)`. Database tests are `*.int.test.ts` and use
+  `createTestDatabase()` from `@ofplens/db/testing`: a fresh, migrated database per file.
+  Never point tests at the dev database.
+- API routes are tested with `app.inject()` and
   injected dependencies (e.g. `pingDb`), not a live server.
 - Every page shows that the app is for simulation use only.
 

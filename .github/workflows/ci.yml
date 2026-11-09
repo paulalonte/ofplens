@@ -17,6 +17,26 @@ jobs:
     name: Lint, typecheck, test, build
     runs-on: ubuntu-latest
     timeout-minutes: 15
+
+    # Real Postgres for the integration tests (*.int.test.ts); each test file creates its own database.
+    services:
+      postgres:
+        image: postgres:16-alpine
+        env:
+          POSTGRES_USER: ofplens
+          POSTGRES_PASSWORD: ofplens
+          POSTGRES_DB: ofplens
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U ofplens -d ofplens"
+          --health-interval 2s
+          --health-timeout 3s
+          --health-retries 15
+
+    env:
+      TEST_DATABASE_URL: postgres://ofplens:ofplens@localhost:5432/ofplens
+
     steps:
       - uses: actions/checkout@v7
 
