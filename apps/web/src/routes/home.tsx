@@ -1,16 +1,31 @@
-import { Link } from '@tanstack/react-router';
+import { Link, useNavigate } from '@tanstack/react-router';
 import type { ReactNode } from 'react';
 import { ApiError } from '../api/client';
+import { useFlightPlans, useImportLatestPlan } from '../api/flightPlans';
 import { usePilot } from '../api/pilot';
-import { useLatestPlan } from '../api/simbrief';
-import { BriefingPage } from '../features/briefing/BriefingPage';
 import { SAMPLE_NAMES } from '../features/briefing/samples';
+import { PlanList } from '../features/history/PlanList';
+
+const RECENT = 5;
 
 export function HomePage() {
   const pilot = usePilot();
-  const latest = useLatestPlan();
+  const recent = useFlightPlans();
+  const importLatest = useImportLatestPlan();
+  const navigate = useNavigate();
   const username = pilot.data?.simbriefUsername;
-  const loading = latest.fetchStatus === 'fetching';
+  const recentItems = recent.data?.pages[0]?.items.slice(0, RECENT) ?? [];
+
+  function load() {
+    importLatest.mutate(undefined, {
+      onSuccess: ({ id, created }) =>
+        void navigate({
+          to: '/plans/$planId',
+          params: { planId: id },
+          search: { imported: created ? 'new' : 'existing' },
+        }),
+    });
+  }
 
   return (
     <div className="space-y-8">
@@ -31,12 +46,12 @@ export function HomePage() {
         </div>
         <button
           type="button"
-          onClick={() => void latest.refetch()}
-          disabled={!username || loading}
-          aria-busy={loading}
+          onClick={load}
+          disabled={!username || importLatest.isPending}
+          aria-busy={importLatest.isPending}
           className="rounded-md bg-slate-900 px-4 py-2 font-medium text-white disabled:opacity-50 dark:bg-slate-100 dark:text-slate-900"
         >
-          {loading ? 'Loading…' : latest.data ? 'Reload latest plan' : 'Load latest plan'}
+          {importLatest.isPending ? 'Loading…' : 'Load latest plan'}
         </button>
       </section>
 
@@ -52,27 +67,34 @@ export function HomePage() {
         </Callout>
       )}
 
-      {latest.isError && !loading && <LoadError error={latest.error} />}
+      {importLatest.isError && <LoadError error={importLatest.error} />}
 
-      {latest.data ? (
-        <div className={loading ? 'opacity-60 transition-opacity' : undefined}>
-          <BriefingPage
-            key={latest.data.simbriefRequestId}
-            plan={latest.data}
-            {...(pilot.data && { preferredUnit: pilot.data.weightUnit })}
-          />
-        </div>
-      ) : (
-        username &&
-        !latest.isError &&
-        !loading && (
-          <p className="text-slate-600 dark:text-slate-400">
-            Generate a flight on SimBrief, then load it here.
-          </p>
-        )
+      {username && (
+        <section aria-labelledby="recent-heading" className="space-y-3">
+          <div className="flex items-baseline justify-between">
+            <h2 id="recent-heading" className="text-lg font-semibold">
+              Recent plans
+            </h2>
+            {recentItems.length > 0 && (
+              <Link to="/history" className="text-sm underline">
+                All plans
+              </Link>
+            )}
+          </div>
+          {recent.isPending ? (
+            <p className="text-slate-500">Loading…</p>
+          ) : recentItems.length > 0 ? (
+            <PlanList items={recentItems} />
+          ) : (
+            <p className="text-slate-600 dark:text-slate-400">
+              Generate a flight on SimBrief, then load it here. Each plan you load is saved to your
+              history.
+            </p>
+          )}
+        </section>
       )}
 
-      {SAMPLE_NAMES.length > 0 && !latest.data && (
+      {SAMPLE_NAMES.length > 0 && (
         <nav
           aria-label="Sample plans"
           className="space-y-2 border-t border-slate-200 pt-6 dark:border-slate-800"
