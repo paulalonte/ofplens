@@ -55,7 +55,7 @@ come after the MVP is usable.
 - **Done when:** unit tests pass for every fixture, including the one without an alternate, plus one malformed input.
 
 ### OFP-07 · Formatting helpers
-- `formatWeight(value, fromUnit, toUnit)`, `formatDuration(seconds)`, `formatZulu(date)` / `formatLocal(date, tz)`.
+- `formatWeight(value, fromUnit, toUnit)`, `formatDuration(seconds)`, `formatZulu(iso)` / `formatLocal(iso, utcOffsetMin)` (the airport's offset from the OFP, not a timezone name), plus `localDayOffset`, `formatZuluDate` and `formatUtcOffset`.
 - Live in `packages/ofp` so web and API share them.
 - **Done when:** unit tests cover kg↔lbs rounding, durations over 10 h, and UTC/local around midnight.
 
