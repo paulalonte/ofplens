@@ -5,3 +5,5 @@ coverage/
 docs/
 # drizzle-kit output
 packages/db/migrations/
+# Captured SimBrief OFPs; keep byte-for-byte as fetched (redacted)
+fixtures/

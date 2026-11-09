@@ -23,6 +23,7 @@ history in Postgres. **For flight simulation (X-Plane 12) only.** The plan is in
 | `pnpm test --project web`              | Only the web tests (no `--` with pnpm; it is passed on literally)        |
 | `pnpm lint` / `pnpm typecheck`         | ESLint (type-aware) / `tsc --noEmit` in every workspace                  |
 | `pnpm format` / `pnpm format:check`    | Prettier                                                                 |
+| `pnpm fixture:capture <name>`          | Save your latest SimBrief OFP (pilot ID redacted) to `fixtures/ofp/`     |
 
 Before saying a change is done, run `pnpm format:check && pnpm lint && pnpm typecheck && pnpm test`
 (the same steps CI runs, plus `pnpm --filter @ofplens/web build`).
