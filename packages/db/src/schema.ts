@@ -1,5 +1,18 @@
 import { sql } from 'drizzle-orm';
-import { check, pgTable, text, timestamp, uuid } from 'drizzle-orm/pg-core';
+import {
+  bigint,
+  char,
+  check,
+  doublePrecision,
+  index,
+  integer,
+  jsonb,
+  pgTable,
+  text,
+  timestamp,
+  unique,
+  uuid,
+} from 'drizzle-orm/pg-core';
 
 /**
  * Drizzle table definitions. `pnpm db:generate` turns changes here into SQL migrations in
@@ -27,3 +40,166 @@ export const pilots = pgTable(
 );
 
 export type PilotRow = typeof pilots.$inferSelect;
+
+const timestamptz = (name: string) => timestamp(name, { withTimezone: true });
+
+/**
+ * One row per imported SimBrief OFP. Holds every field of FlightPlanSummary that is not a list,
+ * so a plan read back from the DB equals the parsed one. Weights and fuel live in the plan's own
+ * `units`; times are UTC. `raw_ofp` keeps the full OFP so plans can be re-parsed later.
+ */
+export const flightPlans = pgTable(
+  'flight_plans',
+  {
+    id: uuid('id').primaryKey().defaultRandom(),
+    pilotId: uuid('pilot_id')
+      .notNull()
+      .references(() => pilots.id, { onDelete: 'cascade' }),
+    /** SimBrief's params.request_id: the idempotent import key. */
+    simbriefRequestId: text('simbrief_request_id').notNull().unique(),
+    generatedAt: timestamptz('generated_at').notNull(),
+    airac: text('airac'),
+    units: text('units', { enum: ['kgs', 'lbs'] }).notNull(),
+
+    airlineIcao: text('airline_icao'),
+    flightNumber: text('flight_number'),
+    callsign: text('callsign'),
+    aircraftIcao: text('aircraft_icao').notNull(),
+    aircraftReg: text('aircraft_reg'),
+    aircraftName: text('aircraft_name'),
+
+    originIcao: char('origin_icao', { length: 4 }).notNull(),
+    originIata: text('origin_iata'),
+    originName: text('origin_name').notNull(),
+    originRunway: text('origin_runway'),
+    originUtcOffsetMin: integer('origin_utc_offset_min').notNull(),
+
+    destinationIcao: char('destination_icao', { length: 4 }).notNull(),
+    destinationIata: text('destination_iata'),
+    destinationName: text('destination_name').notNull(),
+    destinationRunway: text('destination_runway'),
+    destinationUtcOffsetMin: integer('destination_utc_offset_min').notNull(),
+
+    /** All alternate_* columns are null together when the plan has no alternate. */
+    alternateIcao: char('alternate_icao', { length: 4 }),
+    alternateIata: text('alternate_iata'),
+    alternateName: text('alternate_name'),
+    alternateRunway: text('alternate_runway'),
+    alternateUtcOffsetMin: integer('alternate_utc_offset_min'),
+
+    route: text('route').notNull(),
+    cruiseAltitudeFt: integer('cruise_altitude_ft').notNull(),
+    costIndex: integer('cost_index'),
+    routeDistanceNm: integer('route_distance_nm').notNull(),
+
+    /** SimBrief's computed (est_*) gate and runway times, not the entered schedule. */
+    estOut: timestamptz('est_out').notNull(),
+    estOff: timestamptz('est_off').notNull(),
+    estOn: timestamptz('est_on').notNull(),
+    estIn: timestamptz('est_in').notNull(),
+    blockTimeS: integer('block_time_s').notNull(),
+    airTimeS: integer('air_time_s').notNull(),
+
+    rawOfp: jsonb('raw_ofp').notNull(),
+    importedAt: timestamptz('imported_at').notNull().defaultNow(),
+  },
+  (t) => [
+    check('flight_plans_units_check', sql`${t.units} in ('kgs', 'lbs')`),
+    check(
+      'flight_plans_alternate_complete_check',
+      sql`(${t.alternateIcao} is null) = (${t.alternateName} is null) and (${t.alternateIcao} is null) = (${t.alternateUtcOffsetMin} is null)`,
+    ),
+    // History: newest first per pilot, with id as the cursor tie-breaker.
+    index('flight_plans_pilot_generated_idx').on(t.pilotId, t.generatedAt.desc(), t.id.desc()),
+    index('flight_plans_route_idx').on(t.originIcao, t.destinationIcao),
+  ],
+);
+
+export const flightPlanFuel = pgTable('flight_plan_fuel', {
+  flightPlanId: uuid('flight_plan_id')
+    .primaryKey()
+    .references(() => flightPlans.id, { onDelete: 'cascade' }),
+  ramp: integer('ramp').notNull(),
+  taxi: integer('taxi').notNull(),
+  trip: integer('trip').notNull(),
+  contingency: integer('contingency').notNull(),
+  alternate: integer('alternate').notNull(),
+  finalReserve: integer('final_reserve').notNull(),
+  extra: integer('extra').notNull(),
+  /** Planned fuel at landing. */
+  landing: integer('landing').notNull(),
+});
+
+export const flightPlanWeights = pgTable('flight_plan_weights', {
+  flightPlanId: uuid('flight_plan_id')
+    .primaryKey()
+    .references(() => flightPlans.id, { onDelete: 'cascade' }),
+  paxCount: integer('pax_count').notNull(),
+  cargo: integer('cargo').notNull(),
+  payload: integer('payload').notNull(),
+  zfw: integer('zfw').notNull(),
+  tow: integer('tow').notNull(),
+  ldw: integer('ldw').notNull(),
+});
+
+export const waypoints = pgTable(
+  'waypoints',
+  {
+    id: bigint('id', { mode: 'number' }).primaryKey().generatedAlwaysAsIdentity(),
+    flightPlanId: uuid('flight_plan_id')
+      .notNull()
+      .references(() => flightPlans.id, { onDelete: 'cascade' }),
+    seq: integer('seq').notNull(),
+    ident: text('ident').notNull(),
+    name: text('name'),
+    /** wpt, vor, ndb, apt, ltlg (TOC/TOD are ltlg) ... */
+    type: text('type').notNull(),
+    /** CLB, CRZ, DSC */
+    stage: text('stage'),
+    via: text('via'),
+    lat: doublePrecision('lat').notNull(),
+    lon: doublePrecision('lon').notNull(),
+    altitudeFt: integer('altitude_ft').notNull(),
+    windDirDeg: integer('wind_dir_deg').notNull(),
+    windSpeedKt: integer('wind_speed_kt').notNull(),
+    oatC: integer('oat_c').notNull(),
+    /** Cumulative time from takeoff. */
+    elapsedS: integer('elapsed_s').notNull(),
+    fuelOnBoard: integer('fuel_on_board').notNull(),
+  },
+  (t) => [unique('waypoints_plan_seq_unique').on(t.flightPlanId, t.seq)],
+);
+
+/** METAR/TAF snapshots: from the OFP at import (source 'ofp'), later fetched live (phase 4). */
+export const weatherReports = pgTable(
+  'weather_reports',
+  {
+    id: bigint('id', { mode: 'number' }).primaryKey().generatedAlwaysAsIdentity(),
+    flightPlanId: uuid('flight_plan_id')
+      .notNull()
+      .references(() => flightPlans.id, { onDelete: 'cascade' }),
+    stationIcao: char('station_icao', { length: 4 }).notNull(),
+    role: text('role', { enum: ['origin', 'destination', 'alternate', 'enroute'] }).notNull(),
+    kind: text('kind', { enum: ['metar', 'taf'] }).notNull(),
+    source: text('source', { enum: ['ofp', 'live'] }).notNull(),
+    rawText: text('raw_text').notNull(),
+    /** VFR, MVFR, IFR, LIFR (phase 4). */
+    flightCategory: text('flight_category'),
+    /** Decoded wind, visibility, ceiling, weather (phase 4). */
+    parsed: jsonb('parsed'),
+    observedAt: timestamptz('observed_at'),
+    fetchedAt: timestamptz('fetched_at').notNull().defaultNow(),
+  },
+  (t) => [
+    check(
+      'weather_reports_role_check',
+      sql`${t.role} in ('origin', 'destination', 'alternate', 'enroute')`,
+    ),
+    check('weather_reports_kind_check', sql`${t.kind} in ('metar', 'taf')`),
+    check('weather_reports_source_check', sql`${t.source} in ('ofp', 'live')`),
+    index('weather_reports_plan_idx').on(t.flightPlanId, t.stationIcao, t.fetchedAt.desc()),
+  ],
+);
+
+export type FlightPlanRow = typeof flightPlans.$inferSelect;
+export type NewFlightPlanRow = typeof flightPlans.$inferInsert;
