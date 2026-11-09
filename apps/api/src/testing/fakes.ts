@@ -1,4 +1,9 @@
-import type { PilotRepository, PilotSettingsRecord } from '@ofplens/db';
+import type {
+  FlightPlanRepository,
+  ImportFlightPlanInput,
+  PilotRepository,
+  PilotSettingsRecord,
+} from '@ofplens/db';
 import type { AppDeps } from '../app';
 import type { SimbriefClient } from '../simbrief';
 
@@ -15,6 +20,23 @@ export function createInMemoryPilotRepository(
       current = { ...settings };
       saved.push(current);
       return Promise.resolve(current);
+    },
+  };
+}
+
+/** In-memory stand-in for the flight plan repository: idempotent on the SimBrief request id. */
+export function createInMemoryFlightPlanRepository(): FlightPlanRepository & {
+  imported: Map<string, ImportFlightPlanInput & { id: string }>;
+} {
+  const imported = new Map<string, ImportFlightPlanInput & { id: string }>();
+  return {
+    imported,
+    import: (input) => {
+      const existing = imported.get(input.plan.simbriefRequestId);
+      if (existing) return Promise.resolve({ id: existing.id, created: false });
+      const id = crypto.randomUUID();
+      imported.set(input.plan.simbriefRequestId, { ...input, id });
+      return Promise.resolve({ id, created: true });
     },
   };
 }
@@ -44,6 +66,7 @@ export function testDeps(overrides: Partial<AppDeps> = {}): AppDeps {
   return {
     pingDb: () => Promise.resolve(),
     pilots: createInMemoryPilotRepository(),
+    flightPlans: createInMemoryFlightPlanRepository(),
     simbrief: createFakeSimbrief(),
     ...overrides,
   };
