@@ -45,7 +45,7 @@ come after the MVP is usable.
 ### OFP-05 · Capture fixtures and confirm the field mapping
 - Generate and save at least 3 real OFPs (JSON v2) in `fixtures/ofp/`: one in kgs, one in lbs, one **without an alternate**.
 - Redact personal fields (pilot id, name) if the repo will ever be public.
-- Go through the "OFP field mapping" table in PLAN.md and mark each path confirmed or corrected. Note the real types: SimBrief sends most numbers as strings and times as Unix epoch seconds.
+- Go through the "OFP field mapping" table in PLAN.md and mark each path confirmed or corrected. Note the real types: in JSON v2, numbers are strings, times are ISO strings and durations are `HH:MM:SS`.
 - **Done when:** fixtures are committed and the mapping table in PLAN.md is confirmed.
 
 ### OFP-06 · `packages/ofp`: Zod schema + `parseOfp()`
@@ -86,8 +86,8 @@ come after the MVP is usable.
 - **Done when:** migrations run on a fresh DB and the username survives an API restart.
 
 ### OFP-11 · SimBrief client
-- Fetch the latest OFP by username (check the endpoint and `json=v2` against the SimBrief docs first).
-- 10 s timeout, one retry on network errors, `client` identifier in the URL as the docs ask.
+- Fetch the latest OFP with `xml.fetcher.php?username=…&json=v2` (or `userid=`), as confirmed in OFP-05.
+- 10 s timeout, one retry on network errors. An unknown user returns HTTP 400 with `fetch.status` "Error: Unknown UserID".
 - Map "user not found / no plan" to a typed `NotFound` error; other failures to `UpstreamError`.
 - **Done when:** unit tests with a mocked HTTP layer cover success, unknown user, timeout and retry.
 

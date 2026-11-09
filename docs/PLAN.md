@@ -325,24 +325,45 @@ CREATE INDEX briefings_plan_idx ON briefings (flight_plan_id, created_at DESC);
 - Import is idempotent: `INSERT … ON CONFLICT (simbrief_request_id) DO NOTHING`, all child rows in one transaction.
 - Lat/lon as plain doubles is enough until phase 6. If route-geometry queries get heavy, consider PostGIS then, not before.
 
-**OFP field mapping (verify against a real OFP before coding)**
+**OFP field mapping (checked against real OFPs in OFP-05)**
 
-These are the JSON v2 paths as I expect them; save one real OFP into `fixtures/ofp/` and confirm each before writing the Zod schema.
+Checked against `fixtures/ofp/*.json`, fetched with `xml.fetcher.php?userid=…&json=v2`.
+✅ = path as expected, ⚠️ = corrected.
 
-| Column | Expected OFP path |
-| --- | --- |
-| simbrief\_request\_id, airac, units | params.request\_id, params.airac, params.units |
-| generated\_at | params.time\_generated |
-| flight\_number, airline\_icao, route | general.flight\_number, general.icao\_airline, general.route |
-| cruise\_altitude\_ft, cost\_index | general.initial\_altitude, general.costindex |
-| origin / destination / alternate | origin.icao\_code, destination.icao\_code, alternate.icao\_code (+ plan\_rwy) |
-| aircraft\_icao, aircraft\_reg | aircraft.icaocode, aircraft.reg |
-| sched\_out / off / on / in | times.est\_out, times.est\_off, times.est\_on, times.est\_in |
-| block\_time\_s, air\_time\_s | times.est\_block, times.est\_time\_enroute |
-| fuel | fuel.plan\_ramp, taxi, enroute\_burn, contingency, alternate\_burn, reserve, extra, plan\_landing |
-| weights | weights.pax\_count, cargo, payload, est\_zfw, est\_tow, est\_ldw |
-| waypoints | navlog.fix\[\]: ident, name, type, stage, pos\_lat, pos\_long, altitude\_feet, wind\_dir, wind\_spd, oat, time\_total, fuel\_plan\_onboard |
-| weather (OFP) | origin.metar / taf, destination.metar / taf, alternate.metar / taf |
+**Formats in JSON v2.** These differ from `json=1`, so always request `json=v2`.
+
+- Every number is a **string** (`"2432"`, `"52.362247"`). Coerce in the Zod schema.
+- Timestamps are **ISO 8601 UTC strings** (`"2026-11-09T14:00:00Z"`). `json=1` sends Unix seconds instead.
+- Durations are **`"HH:MM:SS"` strings** (`"01:07:31"`). `json=1` sends seconds instead.
+- Empty values are `""`, and lists are always arrays. `json=1` sends `{}` for empty values and a bare object when a list has one item.
+- `navlog` is a **flat array**, not `navlog.fix[]`.
+- `alternate` is an **array**, because SimBrief allows several alternates.
+
+| Column | OFP path (JSON v2) | |
+| --- | --- | --- |
+| simbrief\_request\_id, airac, units | params.request\_id, params.airac, params.units (`"kgs"` / `"lbs"`) | ✅ |
+| generated\_at | params.time\_generated (ISO string) | ✅ |
+| flight\_number, airline\_icao, route | general.flight\_number, general.icao\_airline, general.route | ✅ |
+| callsign | atc.callsign | ⚠️ was unmapped |
+| cruise\_altitude\_ft, cost\_index | general.initial\_altitude, general.costindex | ✅ |
+| route\_distance\_nm | general.route\_distance | ⚠️ was unmapped |
+| origin / destination | origin.icao\_code, destination.icao\_code (+ plan\_rwy) | ✅ |
+| alternate | **alternate\[0\]**.icao\_code (+ plan\_rwy). With no alternate, `alternate` and `alternate_navlog` are `[]` and `fuel.alternate_burn` is `"0"` | ⚠️ |
+| aircraft\_icao, aircraft\_reg | aircraft.icaocode (also icao\_code), aircraft.reg | ✅ |
+| sched\_out / off / on / in | times.est\_out, est\_off, est\_on, est\_in (ISO strings) | ✅ see note |
+| block\_time\_s, air\_time\_s | times.est\_block, times.est\_time\_enroute (`"HH:MM:SS"`, convert to seconds) | ⚠️ format |
+| local time offsets | times.orig\_timezone, times.dest\_timezone (`"+01:00:00"`) | ⚠️ was unmapped |
+| fuel | fuel.plan\_ramp, taxi, enroute\_burn, contingency, alternate\_burn, reserve, extra, plan\_landing | ✅ |
+| weights | weights.pax\_count, cargo, payload, est\_zfw, est\_tow, est\_ldw | ✅ |
+| waypoints | **navlog\[\]**: ident, name, type, stage, pos\_lat, pos\_long, altitude\_feet, wind\_dir, wind\_spd, oat, time\_total (`"HH:MM:SS"`), fuel\_plan\_onboard | ⚠️ path, format |
+| weather (OFP) | origin.metar / taf, destination.metar / taf, alternate\[0\].metar / taf | ⚠️ alternate |
+
+**Notes from the real data**
+
+- `times` also has `sched_out/off/on/in`: the schedule entered in SimBrief, which can differ from the computed `est_*` (for example `sched_in` 15:20Z vs `est_in` 15:07Z). The columns take `est_*`. Consider renaming them `est_*` in OFP-14 so the name matches the source.
+- Use the OFP's own timezone offsets for "local" times. The pilot's browser timezone may not match the airports'.
+- The navlog does not start at the origin airport. The first fix is the first SID waypoint, and the last is the destination (`type: "apt"`). Fix types seen so far: `apt`, `ltlg`, `ndb`, `vor`, `wpt`. Top of climb and top of descent are not their own type. They are `type: "ltlg"` (a lat/long point) with `ident` `TOC` / `TOD`, and TOD carries `stage: "CRZ"`.
+- Personal data: the pilot ID appears in `params.user_id`, `crew.pilot_id`, `fetch.userid`, `api_params.pid` and `offset_length`. `pnpm fixture:capture` replaces it with `0000000` before saving.
 
 ## API design
 
@@ -366,7 +387,7 @@ A small REST API under `/api`. The browser never calls SimBrief, aviationweather
 
 - Request and response bodies validated with Zod; shared types exported from `packages/ofp` and `packages/agent`.
 - Errors as `{ error: { code, message } }` with proper status codes; SimBrief's "user not found / no plan yet" maps to 404 with a clear message.
-- Outbound calls get a timeout (about 10 s), one retry on network errors, and a `client` identifier in the SimBrief URL as their docs ask.
+- Outbound calls get a timeout (about 10 s) and one retry on network errors. SimBrief's docs do not ask for a client identifier. Fetch by `userid` (Pilot ID, stable) or `username`. An unknown user returns HTTP 400 with `{"fetch":{"status":"Error: Unknown UserID"}}`.
 - Live weather is cached per station for a few minutes to avoid hammering the source.
 
 ## Agent design
