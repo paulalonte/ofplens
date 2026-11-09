@@ -87,7 +87,7 @@ come after the MVP is usable.
 
 ### OFP-11 · SimBrief client
 - Fetch the latest OFP with `xml.fetcher.php?username=…&json=v2` (or `userid=`), as confirmed in OFP-05.
-- 10 s timeout, one retry on network errors. An unknown user returns HTTP 400 with `fetch.status` "Error: Unknown UserID".
+- 10 s timeout, one retry on network errors and 5xx (not after a timeout, which would double the wait). An unknown user returns HTTP 400 with `fetch.status` "Error: Unknown UserID".
 - Map "user not found / no plan" to a typed `NotFound` error; other failures to `UpstreamError`.
 - **Done when:** unit tests with a mocked HTTP layer cover success, unknown user, timeout and retry.
 
