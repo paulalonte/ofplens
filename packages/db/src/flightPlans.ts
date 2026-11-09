@@ -1,5 +1,5 @@
-import type { Airport, FlightPlanSummary } from '@ofplens/ofp';
-import { eq } from 'drizzle-orm';
+import type { Airport, FlightPlanListItem, FlightPlanSummary } from '@ofplens/ofp';
+import { and, asc, desc, eq, sql } from 'drizzle-orm';
 import type { Database } from './client';
 import {
   flightPlanFuel,
@@ -8,6 +8,7 @@ import {
   pilots,
   waypoints,
   weatherReports,
+  type FlightPlanRow,
   type NewFlightPlanRow,
 } from './schema';
 
@@ -32,6 +33,33 @@ export class PilotNotFoundError extends Error {
   }
 }
 
+export class InvalidCursorError extends Error {
+  constructor() {
+    super('That page cursor is not valid. Start again from the first page.');
+    this.name = 'InvalidCursorError';
+  }
+}
+
+export interface ListFlightPlansInput {
+  /** Whose history; an unknown username simply has no plans. */
+  simbriefUsername: string;
+  limit: number;
+  /** `nextCursor` from the previous page; omit for the first page. */
+  cursor?: string | undefined;
+}
+
+export interface FlightPlanPage {
+  items: FlightPlanListItem[];
+  /** Pass back as `cursor` for the next page; null on the last page. */
+  nextCursor: string | null;
+}
+
+export interface StoredFlightPlan {
+  id: string;
+  importedAt: string;
+  plan: FlightPlanSummary;
+}
+
 export interface FlightPlanRepository {
   /**
    * Stores a parsed plan with its fuel, weights, waypoints and OFP weather in one transaction.
@@ -39,6 +67,12 @@ export interface FlightPlanRepository {
    * returns the existing id, even when two imports race.
    */
   import(input: ImportFlightPlanInput): Promise<ImportFlightPlanResult>;
+  /** Newest SimBrief plan first (by generation time, then id), one page at a time. */
+  list(input: ListFlightPlansInput): Promise<FlightPlanPage>;
+  /** The stored plan rebuilt as the same FlightPlanSummary parseOfp produced, or null. */
+  get(id: string): Promise<StoredFlightPlan | null>;
+  /** Deletes the plan and everything under it. false when there was no such plan. */
+  delete(id: string): Promise<boolean>;
 }
 
 export function createFlightPlanRepository(db: Database): FlightPlanRepository {
@@ -78,6 +112,196 @@ export function createFlightPlanRepository(db: Database): FlightPlanRepository {
 
         return { id: flightPlanId, created: true };
       }),
+
+    async list({ simbriefUsername, limit, cursor }) {
+      const after = cursor === undefined ? undefined : decodeCursor(cursor);
+      const rows = await db
+        .select({
+          id: flightPlans.id,
+          simbriefRequestId: flightPlans.simbriefRequestId,
+          generatedAt: flightPlans.generatedAt,
+          importedAt: flightPlans.importedAt,
+          callsign: flightPlans.callsign,
+          aircraftIcao: flightPlans.aircraftIcao,
+          originIcao: flightPlans.originIcao,
+          destinationIcao: flightPlans.destinationIcao,
+          alternateIcao: flightPlans.alternateIcao,
+          estOut: flightPlans.estOut,
+          blockTimeS: flightPlans.blockTimeS,
+          units: flightPlans.units,
+        })
+        .from(flightPlans)
+        .innerJoin(pilots, eq(pilots.id, flightPlans.pilotId))
+        .where(
+          and(
+            eq(pilots.simbriefUsername, simbriefUsername),
+            // Keyset pagination: strictly after the last row of the previous page.
+            after &&
+              sql`(${flightPlans.generatedAt}, ${flightPlans.id}) < (${after.generatedAt}::timestamptz, ${after.id}::uuid)`,
+          ),
+        )
+        .orderBy(desc(flightPlans.generatedAt), desc(flightPlans.id))
+        .limit(limit + 1);
+
+      const page = rows.slice(0, limit);
+      const last = page.at(-1);
+      return {
+        items: page.map(({ estOut, generatedAt, importedAt, ...row }) => ({
+          ...row,
+          generatedAt: toIso(generatedAt),
+          importedAt: toIso(importedAt),
+          out: toIso(estOut),
+        })),
+        nextCursor: rows.length > limit && last ? encodeCursor(last.generatedAt, last.id) : null,
+      };
+    },
+
+    async get(id) {
+      const [row] = await db
+        .select({ plan: flightPlans, fuel: flightPlanFuel, weights: flightPlanWeights })
+        .from(flightPlans)
+        .innerJoin(flightPlanFuel, eq(flightPlanFuel.flightPlanId, flightPlans.id))
+        .innerJoin(flightPlanWeights, eq(flightPlanWeights.flightPlanId, flightPlans.id))
+        .where(eq(flightPlans.id, id));
+      if (!row) return null;
+
+      const [fixes, reports] = await Promise.all([
+        db
+          .select()
+          .from(waypoints)
+          .where(eq(waypoints.flightPlanId, id))
+          .orderBy(asc(waypoints.seq)),
+        db
+          .select()
+          .from(weatherReports)
+          .where(and(eq(weatherReports.flightPlanId, id), eq(weatherReports.source, 'ofp'))),
+      ]);
+
+      return {
+        id,
+        importedAt: toIso(row.plan.importedAt),
+        plan: toSummary(row.plan, row.fuel, row.weights, fixes, reports),
+      };
+    },
+
+    async delete(id) {
+      const deleted = await db
+        .delete(flightPlans)
+        .where(eq(flightPlans.id, id))
+        .returning({ id: flightPlans.id });
+      return deleted.length > 0;
+    },
+  };
+}
+
+/** Timestamps leave the DB as ISO strings without milliseconds, matching parseOfp's output. */
+function toIso(date: Date): string {
+  return date.toISOString().replace(/\.000Z$/, 'Z');
+}
+
+/** Opaque page cursor: base64url of "<generatedAt ISO>|<id>" of the page's last row. */
+function encodeCursor(generatedAt: Date, id: string): string {
+  return Buffer.from(`${generatedAt.toISOString()}|${id}`).toString('base64url');
+}
+
+function decodeCursor(cursor: string): { generatedAt: string; id: string } {
+  const [iso, id, ...rest] = Buffer.from(cursor, 'base64url').toString('utf8').split('|');
+  const generatedAt = new Date(iso ?? '');
+  const uuid = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+  if (rest.length > 0 || !id || !uuid.test(id) || Number.isNaN(generatedAt.getTime())) {
+    throw new InvalidCursorError();
+  }
+  // As an ISO string: raw SQL parameters go to the driver unconverted.
+  return { generatedAt: generatedAt.toISOString(), id };
+}
+
+type FuelRow = typeof flightPlanFuel.$inferSelect;
+type WeightsRow = typeof flightPlanWeights.$inferSelect;
+type WaypointRow = typeof waypoints.$inferSelect;
+type WeatherRow = typeof weatherReports.$inferSelect;
+
+/** The inverse of toPlanRow + child inserts: rebuilds exactly what parseOfp returned. */
+function toSummary(
+  p: FlightPlanRow,
+  fuel: FuelRow,
+  weights: WeightsRow,
+  fixes: WaypointRow[],
+  reports: WeatherRow[],
+): FlightPlanSummary {
+  const report = (role: WeatherRow['role'], kind: WeatherRow['kind']) =>
+    reports.find((r) => r.role === role && r.kind === kind)?.rawText ?? null;
+
+  const airport = (
+    role: 'origin' | 'destination' | 'alternate',
+    icao: string,
+    iata: string | null,
+    name: string,
+    runway: string | null,
+    utcOffsetMin: number,
+  ): Airport => ({
+    icao,
+    iata,
+    name,
+    runway,
+    utcOffsetMin,
+    metar: report(role, 'metar'),
+    taf: report(role, 'taf'),
+  });
+
+  const { flightPlanId: _fuelPlanId, ...fuelValues } = fuel;
+  const { flightPlanId: _weightsPlanId, ...weightValues } = weights;
+
+  return {
+    simbriefRequestId: p.simbriefRequestId,
+    generatedAt: toIso(p.generatedAt),
+    airac: p.airac,
+    units: p.units,
+    flight: { airlineIcao: p.airlineIcao, flightNumber: p.flightNumber, callsign: p.callsign },
+    aircraft: { icao: p.aircraftIcao, reg: p.aircraftReg, name: p.aircraftName },
+    origin: airport(
+      'origin',
+      p.originIcao,
+      p.originIata,
+      p.originName,
+      p.originRunway,
+      p.originUtcOffsetMin,
+    ),
+    destination: airport(
+      'destination',
+      p.destinationIcao,
+      p.destinationIata,
+      p.destinationName,
+      p.destinationRunway,
+      p.destinationUtcOffsetMin,
+    ),
+    alternate:
+      p.alternateIcao !== null && p.alternateName !== null && p.alternateUtcOffsetMin !== null
+        ? airport(
+            'alternate',
+            p.alternateIcao,
+            p.alternateIata,
+            p.alternateName,
+            p.alternateRunway,
+            p.alternateUtcOffsetMin,
+          )
+        : null,
+    route: {
+      text: p.route,
+      cruiseAltitudeFt: p.cruiseAltitudeFt,
+      costIndex: p.costIndex,
+      distanceNm: p.routeDistanceNm,
+    },
+    times: {
+      out: toIso(p.estOut),
+      off: toIso(p.estOff),
+      on: toIso(p.estOn),
+      in: toIso(p.estIn),
+      blockTimeS: p.blockTimeS,
+      airTimeS: p.airTimeS,
+    },
+    fuel: fuelValues,
+    weights: weightValues,
+    waypoints: fixes.map(({ id: _id, flightPlanId: _plan, ...w }) => w),
   };
 }
 

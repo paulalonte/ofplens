@@ -2,9 +2,9 @@ import { parseOfp } from '@ofplens/ofp';
 import { loadFixture } from '@ofplens/ofp/testing';
 import { eq, sql } from 'drizzle-orm';
 import { afterAll, beforeAll, beforeEach, describe, expect, it } from 'vitest';
-import { createFlightPlanRepository, PilotNotFoundError } from './flightPlans';
+import { createFlightPlanRepository, InvalidCursorError, PilotNotFoundError } from './flightPlans';
 import { createPilotRepository } from './pilots';
-import { flightPlans, weatherReports } from './schema';
+import { flightPlans, pilots, weatherReports } from './schema';
 import { createTestDatabase, truncateAll, type TestDatabase } from './testing';
 
 let testDb: TestDatabase;
@@ -142,5 +142,157 @@ describe('flight plan import (Postgres)', () => {
       }),
     ).rejects.toBeInstanceOf(PilotNotFoundError);
     expect(await counts()).toMatchObject({ plans: 0 });
+  });
+});
+
+describe('reading a stored plan back (Postgres)', () => {
+  it.each(['eddb-eddm-c750-kgs', 'ksfo-kjfk-b739-lbs', 'eddf-lepa-a339-noalt'])(
+    '%s comes back exactly as parseOfp produced it',
+    async (fixture) => {
+      const repo = createFlightPlanRepository(testDb.db);
+      const { id } = await repo.import(input(fixture));
+
+      const stored = await repo.get(id);
+
+      expect(stored).toEqual({
+        id,
+        importedAt: expect.stringMatching(/^\d{4}-\d\d-\d\dT\d\d:\d\d:\d\d(\.\d{3})?Z$/),
+        plan: parseOfp(loadFixture(fixture)),
+      });
+    },
+  );
+
+  it('returns null for an id that does not exist', async () => {
+    await expect(
+      createFlightPlanRepository(testDb.db).get('00000000-0000-4000-8000-000000000000'),
+    ).resolves.toBeNull();
+  });
+});
+
+describe('listing plans (Postgres)', () => {
+  /** A stored copy of a fixture with its own request id and generation time. */
+  async function importAt(generatedAt: string, requestId: string, fixture = 'eddb-eddm-c750-kgs') {
+    const base = input(fixture);
+    const plan = { ...base.plan, simbriefRequestId: requestId, generatedAt };
+    return createFlightPlanRepository(testDb.db).import({ ...base, plan });
+  }
+
+  it('is empty before anything is imported', async () => {
+    await expect(
+      createFlightPlanRepository(testDb.db).list({ simbriefUsername: 'jetpilot', limit: 10 }),
+    ).resolves.toEqual({ items: [], nextCursor: null });
+  });
+
+  it('lists newest first with what the history page shows', async () => {
+    const repo = createFlightPlanRepository(testDb.db);
+    await repo.import(input('eddb-eddm-c750-kgs')); // generated 13:28:39Z
+    const { id } = await repo.import(input('ksfo-kjfk-b739-lbs')); // generated later
+
+    const { items } = await repo.list({ simbriefUsername: 'jetpilot', limit: 10 });
+
+    expect(items.map((i) => i.callsign)).toEqual(['UAL1234', 'N70P']);
+    expect(items[0]).toEqual({
+      id,
+      simbriefRequestId: '193019508',
+      generatedAt: expect.any(String),
+      importedAt: expect.any(String),
+      callsign: 'UAL1234',
+      aircraftIcao: 'B739',
+      originIcao: 'KSFO',
+      destinationIcao: 'KJFK',
+      alternateIcao: 'KEWR',
+      out: '2026-11-10T01:00:00Z',
+      blockTimeS: 19078,
+      units: 'lbs',
+    });
+  });
+
+  it('pages through every plan exactly once, even when two share a timestamp', async () => {
+    const repo = createFlightPlanRepository(testDb.db);
+    await importAt('2026-11-01T10:00:00Z', 'r1');
+    await importAt('2026-11-02T10:00:00Z', 'r2');
+    await importAt('2026-11-03T10:00:00Z', 'r3a');
+    await importAt('2026-11-03T10:00:00Z', 'r3b'); // same second as r3a: id breaks the tie
+    await importAt('2026-11-04T10:00:00Z', 'r4');
+
+    const seen: string[] = [];
+    const pageSizes: number[] = [];
+    let cursor: string | undefined;
+    do {
+      const page = await repo.list({ simbriefUsername: 'jetpilot', limit: 2, cursor });
+      seen.push(...page.items.map((i) => i.simbriefRequestId));
+      pageSizes.push(page.items.length);
+      cursor = page.nextCursor ?? undefined;
+    } while (cursor);
+
+    expect(pageSizes).toEqual([2, 2, 1]);
+    expect(seen).toHaveLength(5);
+    expect(new Set(seen).size).toBe(5);
+    expect(seen[0]).toBe('r4');
+    expect(seen.slice(1, 3).sort()).toEqual(['r3a', 'r3b']);
+    expect(seen.slice(3)).toEqual(['r2', 'r1']);
+  });
+
+  it('has no next page when the last page is exactly full', async () => {
+    await importAt('2026-11-01T10:00:00Z', 'r1');
+    await importAt('2026-11-02T10:00:00Z', 'r2');
+
+    const page = await createFlightPlanRepository(testDb.db).list({
+      simbriefUsername: 'jetpilot',
+      limit: 2,
+    });
+
+    expect(page.items).toHaveLength(2);
+    expect(page.nextCursor).toBeNull();
+  });
+
+  it('only lists the given pilot’s plans', async () => {
+    await importAt('2026-11-01T10:00:00Z', 'mine');
+    await testDb.db.insert(pilots).values({ simbriefUsername: 'someoneelse' });
+    const repo = createFlightPlanRepository(testDb.db);
+    const theirs = input('ksfo-kjfk-b739-lbs');
+    await repo.import({ ...theirs, simbriefUsername: 'someoneelse' });
+
+    const { items } = await repo.list({ simbriefUsername: 'jetpilot', limit: 10 });
+
+    expect(items.map((i) => i.simbriefRequestId)).toEqual(['mine']);
+  });
+
+  it.each(['nonsense', Buffer.from('2026-11-01T10:00:00Z|not-a-uuid').toString('base64url'), ''])(
+    'rejects an invalid cursor %#',
+    async (cursor) => {
+      await expect(
+        createFlightPlanRepository(testDb.db).list({
+          simbriefUsername: 'jetpilot',
+          limit: 2,
+          cursor,
+        }),
+      ).rejects.toBeInstanceOf(InvalidCursorError);
+    },
+  );
+});
+
+describe('deleting a plan (Postgres)', () => {
+  it('removes the plan and everything under it, once', async () => {
+    const repo = createFlightPlanRepository(testDb.db);
+    const { id } = await repo.import(input('eddb-eddm-c750-kgs'));
+    await repo.import(input('ksfo-kjfk-b739-lbs'));
+
+    await expect(repo.delete(id)).resolves.toBe(true);
+
+    await expect(repo.get(id)).resolves.toBeNull();
+    expect(await counts()).toEqual({ plans: 1, fuel: 1, weights: 1, waypoints: 30, weather: 6 });
+    await expect(repo.delete(id)).resolves.toBe(false);
+  });
+
+  it('lets a deleted plan be imported again', async () => {
+    const repo = createFlightPlanRepository(testDb.db);
+    const first = await repo.import(input('eddb-eddm-c750-kgs'));
+    await repo.delete(first.id);
+
+    const again = await repo.import(input('eddb-eddm-c750-kgs'));
+
+    expect(again.created).toBe(true);
+    expect(again.id).not.toBe(first.id);
   });
 });
