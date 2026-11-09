@@ -7,6 +7,11 @@
     "node": ">=24"
   },
   "scripts": {
+    "dev": "pnpm --filter @ofplens/api dev",
+    "db:up": "docker compose up -d --wait",
+    "db:down": "docker compose down",
+    "db:generate": "pnpm --filter @ofplens/db db:generate",
+    "db:migrate": "pnpm --filter @ofplens/db db:migrate",
     "lint": "eslint .",
     "typecheck": "tsc --noEmit -p tsconfig.json && pnpm -r typecheck",
     "test": "vitest run",

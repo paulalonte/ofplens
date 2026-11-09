@@ -1,2 +1,1 @@
-// Drizzle client and schema land in OFP-02 / OFP-10.
-export {};
+export { createDb, pingDb, type CreateDbOptions, type Database, type DbConnection } from './client';

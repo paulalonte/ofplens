@@ -1,0 +1,24 @@
+import { describe, expect, it } from 'vitest';
+import { loadEnv } from './env';
+
+const DATABASE_URL = 'postgres://ofplens:ofplens@localhost:5432/ofplens';
+
+describe('loadEnv', () => {
+  it('applies defaults', () => {
+    expect(loadEnv({ DATABASE_URL })).toEqual({
+      DATABASE_URL,
+      HOST: '127.0.0.1',
+      PORT: 3000,
+      LOG_LEVEL: 'info',
+    });
+  });
+
+  it('coerces PORT from a string', () => {
+    expect(loadEnv({ DATABASE_URL, PORT: '4000' }).PORT).toBe(4000);
+  });
+
+  it('rejects a missing or non-Postgres DATABASE_URL', () => {
+    expect(() => loadEnv({})).toThrow(/DATABASE_URL/);
+    expect(() => loadEnv({ DATABASE_URL: 'mysql://localhost/x' })).toThrow(/DATABASE_URL/);
+  });
+});

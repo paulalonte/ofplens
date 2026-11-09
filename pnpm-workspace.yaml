@@ -33,3 +33,6 @@ minimumReleaseAgeExclude:
   - rolldown@1.2.18
   - typescript-eslint@8.72.2
   - vite@8.3.7
+
+allowBuilds:
+  esbuild: true
