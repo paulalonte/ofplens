@@ -8,10 +8,14 @@ import {
 import { registerErrorHandling } from './plugins/errors';
 import { healthRoutes } from './routes/health';
 import { pilotRoutes } from './routes/pilot';
+import { simbriefRoutes } from './routes/simbrief';
+import { createSimbriefClient, type SimbriefClient } from './simbrief';
 
 export interface AppDeps {
   pingDb: () => Promise<void>;
   pilots: PilotRepository;
+  /** Defaults to the real SimBrief client, logging through the app's logger. */
+  simbrief?: SimbriefClient;
   dbTimeoutMs?: number;
   logger?: FastifyServerOptions['logger'];
 }
@@ -29,6 +33,10 @@ export async function buildApp(deps: AppDeps) {
     ...(deps.dbTimeoutMs !== undefined && { dbTimeoutMs: deps.dbTimeoutMs }),
   });
   await app.register(pilotRoutes, { pilots: deps.pilots });
+  await app.register(simbriefRoutes, {
+    pilots: deps.pilots,
+    simbrief: deps.simbrief ?? createSimbriefClient({ log: app.log }),
+  });
 
   return app;
 }

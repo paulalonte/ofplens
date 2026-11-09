@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { OfpParseError, parseOfp } from './parseOfp';
-import type { FlightPlanSummary } from './summary';
+import { FlightPlanSummary } from './summary';
 import { FIXTURE_NAMES, loadFixture } from './testing/fixtures';
 
 function parseFixture(name: string): FlightPlanSummary {
@@ -21,6 +21,10 @@ describe('parseOfp on every captured fixture', () => {
 
     it('survives a JSON round trip unchanged (no Dates, no undefined)', () => {
       expect(JSON.parse(JSON.stringify(plan))).toEqual(plan);
+    });
+
+    it('matches the FlightPlanSummary schema exactly (no extra or missing keys)', () => {
+      expect(FlightPlanSummary.strict().parse(plan)).toEqual(plan);
     });
 
     it('numbers waypoints from 0 and ends at the destination airport', () => {
