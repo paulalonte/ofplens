@@ -11,6 +11,8 @@ history in Postgres. **For flight simulation (X-Plane 12) only.** The plan is in
 - `cp .env.example .env` on a fresh clone. The root `.env` is shared by the API, Vite's
   proxy and drizzle-kit.
 - Postgres runs in Docker on host port **5433**, not 5432 (a native Postgres may own 5432).
+- `pnpm db:up && pnpm db:migrate` before `pnpm dev`, and again after pulling new migrations.
+  The API does not migrate on start.
 
 ## Commands
 

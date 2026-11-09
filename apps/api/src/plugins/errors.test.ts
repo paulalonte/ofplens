@@ -1,6 +1,7 @@
 import { afterEach, describe, expect, it } from 'vitest';
 import { z } from 'zod';
 import { buildApp, type App } from '../app';
+import { testDeps } from '../testing/fakes';
 import { AppError } from '../errors';
 
 let app: App | undefined;
@@ -10,7 +11,7 @@ afterEach(async () => {
 });
 
 async function appWithTestRoutes(): Promise<App> {
-  const a = await buildApp({ pingDb: () => Promise.resolve() });
+  const a = await buildApp(testDeps());
   a.get('/boom/app-error', () => {
     throw new AppError(404, 'PLAN_NOT_FOUND', 'No such flight plan');
   });
