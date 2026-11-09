@@ -11,6 +11,13 @@ export function RootLayout() {
               OFP Lens
             </Link>
             <Link
+              to="/history"
+              className="text-sm text-slate-600 hover:text-slate-900 dark:text-slate-400 dark:hover:text-slate-100"
+              activeProps={{ className: 'font-semibold text-slate-900 dark:text-slate-100' }}
+            >
+              History
+            </Link>
+            <Link
               to="/settings"
               className="text-sm text-slate-600 hover:text-slate-900 dark:text-slate-400 dark:hover:text-slate-100"
               activeProps={{ className: 'font-semibold text-slate-900 dark:text-slate-100' }}

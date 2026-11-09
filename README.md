@@ -10,12 +10,12 @@ the weather printed at dispatch and the full navigation log, in kg or lb.
 **Status:** MVP in progress. The roadmap is in [docs/PLAN.md](docs/PLAN.md); work is tracked
 ticket by ticket in [docs/TICKETS.md](docs/TICKETS.md).
 
-| Works today                                                              | Coming next                                      |
-| ------------------------------------------------------------------------ | ------------------------------------------------ |
-| Briefing page: header, times, fuel, payload, OFP weather, navigation log | Flight history and detail pages (OFP-16, OFP-17) |
-| Settings: SimBrief username and kg/lb preference, saved in Postgres      | Live weather (phase 4)                           |
-| One-click **Load latest plan** from SimBrief                             | AI weather and hazard briefing (phases 5–7)      |
-| API to import a plan into Postgres, once per plan                        | Deployment to AWS (3b)                           |
+| Works today                                                                     | Coming next                                 |
+| ------------------------------------------------------------------------------- | ------------------------------------------- |
+| Briefing page: header, times, fuel, payload, OFP weather, navigation log        | Deployment to AWS (3b)                      |
+| Settings: SimBrief username and kg/lb preference, saved in Postgres             | Live weather (phase 4)                      |
+| One-click **Load latest plan**: fetched from SimBrief and saved to your history | AI weather and hazard briefing (phases 5–7) |
+| **History** of every plan you loaded, newest first; open or delete any of them  | MCP server for Claude (phase 8)             |
 
 ## What you need
 
@@ -61,7 +61,7 @@ pnpm dev
 ```
 
 Open **http://localhost:5173**, go to **Settings**, enter your SimBrief username, then press
-**Load latest plan** on the home page.
+**Load latest plan** on the home page. Every plan you load is saved under **History**.
 
 ### Every day after that
 
@@ -149,12 +149,15 @@ checks, with its own Postgres, on every pull request.
 
 All errors come back as `{ "error": { "code", "message" } }`.
 
-| Method    | Path                       | Does                                                            |
-| --------- | -------------------------- | --------------------------------------------------------------- |
-| GET       | `/api/health`              | API and database status                                         |
-| GET / PUT | `/api/pilot`               | Read / save the SimBrief username and kg/lb preference          |
-| GET       | `/api/simbrief/latest`     | Fetch and parse your latest SimBrief plan (nothing saved)       |
-| POST      | `/api/flight-plans/import` | Fetch your latest plan and save it (201 new, 200 already saved) |
+| Method    | Path                               | Does                                                            |
+| --------- | ---------------------------------- | --------------------------------------------------------------- |
+| GET       | `/api/health`                      | API and database status                                         |
+| GET / PUT | `/api/pilot`                       | Read / save the SimBrief username and kg/lb preference          |
+| GET       | `/api/simbrief/latest`             | Fetch and parse your latest SimBrief plan (nothing saved)       |
+| POST      | `/api/flight-plans/import`         | Fetch your latest plan and save it (201 new, 200 already saved) |
+| GET       | `/api/flight-plans?cursor=&limit=` | Your saved plans, newest first, a page at a time                |
+| GET       | `/api/flight-plans/:id`            | One saved plan, in the briefing's shape                         |
+| DELETE    | `/api/flight-plans/:id`            | Delete a saved plan                                             |
 
 ## Project layout
 
