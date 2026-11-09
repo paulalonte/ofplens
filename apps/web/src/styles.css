@@ -1,1 +1,6 @@
 @import 'tailwindcss';
+
+/* Native controls (radio buttons, scrollbars, ...) follow the light or dark theme. */
+:root {
+  color-scheme: light dark;
+}

@@ -12,8 +12,14 @@ import { WeatherCard } from './WeatherCard';
  * The pilot briefing for one flight plan. Purely presentational: every number comes from
  * the parsed OFP, formatted by @ofplens/ofp.
  */
-export function BriefingPage({ plan }: { plan: FlightPlanSummary }) {
-  const [displayUnit, setDisplayUnit] = useState<WeightUnit>(plan.units);
+interface Props {
+  plan: FlightPlanSummary;
+  /** The pilot's preferred unit from Settings; defaults to the plan's own unit. */
+  preferredUnit?: WeightUnit;
+}
+
+export function BriefingPage({ plan, preferredUnit }: Props) {
+  const [displayUnit, setDisplayUnit] = useState<WeightUnit>(preferredUnit ?? plan.units);
 
   return (
     <article className="space-y-6">

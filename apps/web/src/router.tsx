@@ -1,6 +1,13 @@
-import { createRootRoute, createRoute, createRouter } from '@tanstack/react-router';
+import {
+  createRootRoute,
+  createRoute,
+  createRouter,
+  type RouterHistory,
+} from '@tanstack/react-router';
+import { usePilot } from './api/pilot';
 import { BriefingPage } from './features/briefing/BriefingPage';
 import { loadSamplePlan } from './features/briefing/samples';
+import { SettingsPage } from './features/settings/SettingsPage';
 import { HomePage } from './routes/home';
 import { RootLayout } from './routes/root';
 import { SampleError, SamplePending } from './routes/sample';
@@ -13,21 +20,35 @@ const homeRoute = createRoute({
   component: HomePage,
 });
 
+const settingsRoute = createRoute({
+  getParentRoute: () => rootRoute,
+  path: '/settings',
+  component: SettingsPage,
+});
+
 /** Development-only briefing built from a captured OFP in fixtures/ofp. */
 const sampleRoute = createRoute({
   getParentRoute: () => rootRoute,
   path: '/sample/$name',
   loader: ({ params }) => loadSamplePlan(params.name),
   component: function SamplePage() {
-    return <BriefingPage plan={sampleRoute.useLoaderData()} />;
+    const plan = sampleRoute.useLoaderData();
+    const pilot = usePilot();
+    return (
+      <BriefingPage plan={plan} {...(pilot.data && { preferredUnit: pilot.data.weightUnit })} />
+    );
   },
   pendingComponent: SamplePending,
   errorComponent: SampleError,
 });
 
-const routeTree = rootRoute.addChildren([homeRoute, sampleRoute]);
+export const routeTree = rootRoute.addChildren([homeRoute, settingsRoute, sampleRoute]);
 
-export const router = createRouter({ routeTree, defaultPreload: 'intent' });
+export function createAppRouter(history?: RouterHistory) {
+  return createRouter({ routeTree, defaultPreload: 'intent', ...(history && { history }) });
+}
+
+export const router = createAppRouter();
 
 declare module '@tanstack/react-router' {
   interface Register {
