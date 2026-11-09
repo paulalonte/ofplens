@@ -13,6 +13,7 @@
     "db:down": "docker compose down",
     "db:generate": "pnpm --filter @ofplens/db db:generate",
     "db:migrate": "pnpm --filter @ofplens/db db:migrate",
+    "db:studio": "pnpm --filter @ofplens/db db:studio",
     "lint": "eslint .",
     "typecheck": "tsc --noEmit -p tsconfig.json && pnpm -r typecheck",
     "test": "vitest run",
