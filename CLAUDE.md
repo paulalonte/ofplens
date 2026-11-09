@@ -21,6 +21,7 @@ history in Postgres. **For flight simulation (X-Plane 12) only.** The plan is in
 | `pnpm dev:apps`                        | Only web and API (Postgres already up and migrated)                                                                         |
 | `pnpm db:up` / `pnpm db:down`          | Start (and wait for) / stop the Postgres container                                                                          |
 | `pnpm db:generate` / `pnpm db:migrate` | Create a migration from the Drizzle schema / apply it                                                                       |
+| `pnpm db:studio`                       | Browse the dev database in Drizzle Studio                                                                                   |
 | `pnpm test`                            | All Vitest tests: `web` (jsdom), `node` (api, packages), `integration` (`*.int.test.ts`, real Postgres: needs `pnpm db:up`) |
 | `pnpm test --project web`              | Only the web tests (no `--` with pnpm; it is passed on literally)                                                           |
 | `pnpm lint` / `pnpm typecheck`         | ESLint (type-aware) / `tsc --noEmit` in every workspace                                                                     |
