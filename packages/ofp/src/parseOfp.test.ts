@@ -106,6 +106,7 @@ describe('eddb-eddm-c750-kgs (bizjet, kg, one alternate)', () => {
       name: 'DB069',
       type: 'wpt',
       stage: 'CLB',
+      via: 'LURO4B',
       lat: 52.497892,
       lon: 13.991903,
       altitudeFt: 13600,

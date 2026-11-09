@@ -1,5 +1,6 @@
-export { convertWeight, formatWeight, weightUnitLabel } from './weight';
+export { convertWeight, formatWeight, formatWeightNumber, weightUnitLabel } from './weight';
 export {
+  addSeconds,
   formatDuration,
   formatLocal,
   formatUtcOffset,

@@ -2,9 +2,11 @@ import type { FlightPlanSummary, WeightUnit } from '@ofplens/ofp';
 import { useState } from 'react';
 import { BriefingHeader } from './BriefingHeader';
 import { FuelCard } from './FuelCard';
+import { NavlogCard } from './NavlogCard';
 import { PayloadCard } from './PayloadCard';
 import { TimesCard } from './TimesCard';
 import { UnitToggle } from './UnitToggle';
+import { WeatherCard } from './WeatherCard';
 
 /**
  * The pilot briefing for one flight plan. Purely presentational: every number comes from
@@ -25,6 +27,9 @@ export function BriefingPage({ plan }: { plan: FlightPlanSummary }) {
         <FuelCard plan={plan} displayUnit={displayUnit} />
         <PayloadCard plan={plan} displayUnit={displayUnit} />
       </div>
+
+      <WeatherCard plan={plan} />
+      <NavlogCard plan={plan} displayUnit={displayUnit} />
 
       <p className="text-xs text-slate-500 dark:text-slate-400">
         Planned in {plan.units === 'kgs' ? 'kilograms' : 'pounds'}

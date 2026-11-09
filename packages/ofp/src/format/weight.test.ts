@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { convertWeight, formatWeight, weightUnitLabel } from './weight';
+import { convertWeight, formatWeight, formatWeightNumber, weightUnitLabel } from './weight';
 
 describe('convertWeight', () => {
   it('leaves values alone when the unit does not change', () => {
@@ -38,6 +38,11 @@ describe('formatWeight', () => {
   it('converts when a display unit is given', () => {
     expect(formatWeight(2432, 'kgs', 'lbs')).toBe('5,362 lb');
     expect(formatWeight(35608, 'lbs', 'kgs')).toBe('16,152 kg');
+  });
+
+  it('can print the number without a unit, for tables', () => {
+    expect(formatWeightNumber(2236, 'kgs')).toBe('2,236');
+    expect(formatWeightNumber(2236, 'kgs', 'lbs')).toBe('4,930');
   });
 
   it('exposes the unit labels', () => {

@@ -1,13 +1,8 @@
-import { parseOfp, type FlightPlanSummary } from '@ofplens/ofp';
-import { loadFixture } from '@ofplens/ofp/testing';
 import { render, screen, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { describe, expect, it } from 'vitest';
+import { fixturePlan as plan } from '../../test/plans';
 import { BriefingPage } from './BriefingPage';
-
-function plan(name: string): FlightPlanSummary {
-  return parseOfp(loadFixture(name));
-}
 
 /** The value shown next to a label inside a named card. */
 function value(card: string, label: string): string {

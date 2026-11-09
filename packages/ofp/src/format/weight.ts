@@ -19,7 +19,12 @@ export function convertWeight(value: number, from: WeightUnit, to: WeightUnit): 
 
 /** "2,432 kg", or "5,362 lb" when shown in pounds. */
 export function formatWeight(value: number, from: WeightUnit, to: WeightUnit = from): string {
-  return `${grouping.format(convertWeight(value, from, to))} ${UNIT_LABEL[to]}`;
+  return `${formatWeightNumber(value, from, to)} ${UNIT_LABEL[to]}`;
+}
+
+/** The number alone, for tables whose header carries the unit: "2,432". */
+export function formatWeightNumber(value: number, from: WeightUnit, to: WeightUnit = from): string {
+  return grouping.format(convertWeight(value, from, to));
 }
 
 /** Short label for a unit: "kg" or "lb". */
