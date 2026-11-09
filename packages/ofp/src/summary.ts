@@ -82,6 +82,8 @@ export interface Waypoint {
   type: string;
   /** CLB, CRZ or DSC. */
   stage: string | null;
+  /** Airway, procedure or DCT used to reach this fix. */
+  via: string | null;
   lat: number;
   lon: number;
   altitudeFt: number;

@@ -98,6 +98,7 @@ function toSummary(ofp: Ofp): FlightPlanSummary {
       name: fix.name,
       type: fix.type,
       stage: fix.stage,
+      via: fix.via_airway,
       lat: fix.pos_lat,
       lon: fix.pos_long,
       altitudeFt: fix.altitude_feet,

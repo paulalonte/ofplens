@@ -25,6 +25,7 @@ const OfpFix = z.object({
   name: optText,
   type: text,
   stage: optText,
+  via_airway: optText,
   pos_lat: num.pipe(z.number().min(-90).max(90)),
   pos_long: num.pipe(z.number().min(-180).max(180)),
   altitude_feet: int,

@@ -24,6 +24,13 @@ function clock(ms: number): string {
   return `${pad2(d.getUTCHours())}:${pad2(d.getUTCMinutes())}`;
 }
 
+/** The instant `seconds` after `iso`, as an ISO UTC string. Used for ETAs: takeoff + elapsed. */
+export function addSeconds(iso: string, seconds: number): string {
+  const ms = Date.parse(iso);
+  if (Number.isNaN(ms)) throw new RangeError(`Not a valid timestamp: ${iso}`);
+  return new Date(ms + seconds * 1000).toISOString().replace('.000Z', 'Z');
+}
+
 /** "14:00Z" */
 export function formatZulu(iso: string): string {
   return `${clock(toMs(iso))}Z`;

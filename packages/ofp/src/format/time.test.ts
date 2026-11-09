@@ -2,6 +2,7 @@ import { describe, expect, it } from 'vitest';
 import { parseOfp } from '../parseOfp';
 import { loadFixture } from '../testing/fixtures';
 import {
+  addSeconds,
   formatDuration,
   formatLocal,
   formatUtcOffset,
@@ -9,6 +10,13 @@ import {
   formatZuluDate,
   localDayOffset,
 } from './time';
+
+describe('addSeconds', () => {
+  it('adds elapsed time to a timestamp, across midnight', () => {
+    expect(addSeconds('2026-11-09T14:10:00Z', 245)).toBe('2026-11-09T14:14:05Z');
+    expect(addSeconds('2026-11-09T23:50:00Z', 1200)).toBe('2026-11-10T00:10:00Z');
+  });
+});
 
 describe('formatZulu', () => {
   it('prints HH:MMZ rounded to the nearest minute', () => {
