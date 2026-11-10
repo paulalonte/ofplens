@@ -1,6 +1,6 @@
 import { screen } from '@testing-library/react';
 import { describe, expect, it, vi } from 'vitest';
-import { jsonResponse, renderWithQuery } from '../../test/render';
+import { jsonResponse, renderWithQuery } from '../test/render';
 import { HealthStatus } from './HealthStatus';
 
 function stubFetch(impl: () => Promise<Response>) {

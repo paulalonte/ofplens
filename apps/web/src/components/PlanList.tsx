@@ -8,7 +8,7 @@ export function PlanList({ items }: { items: FlightPlanListItem[] }) {
       {items.map((item) => (
         <li key={item.id}>
           <Link
-            to="/plans/$planId"
+            to="/history/$planId"
             params={{ planId: item.id }}
             className="grid grid-cols-[1fr_auto] items-baseline gap-x-4 gap-y-1 px-4 py-3 hover:bg-slate-50 sm:grid-cols-[9rem_6rem_1fr_5rem_4rem] dark:hover:bg-slate-800/60"
           >

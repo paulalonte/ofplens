@@ -1,4 +1,4 @@
-import { useHealth } from './useHealth';
+import { useHealth } from '../api/health';
 
 type Tone = 'ok' | 'warn' | 'bad' | 'idle';
 

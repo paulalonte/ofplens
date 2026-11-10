@@ -21,7 +21,7 @@ describe('Saved plan page', () => {
       'GET /api/pilot': pilot('lbs'),
       [`GET /api/flight-plans/${PLAN_IDS.kgs}`]: storedPlan('eddb-eddm-c750-kgs', PLAN_IDS.kgs),
     });
-    await renderApp(`/plans/${PLAN_IDS.kgs}`);
+    await renderApp(`/history/${PLAN_IDS.kgs}`);
 
     expect(await screen.findByRole('heading', { level: 1, name: 'N70P' })).toBeInTheDocument();
     expect(await screen.findByText('5,362 lb')).toBeInTheDocument(); // block fuel 2,432 kg
@@ -40,7 +40,7 @@ describe('Saved plan page', () => {
           'That flight plan does not exist (it may have been deleted).',
         ),
     });
-    await renderApp(`/plans/${PLAN_IDS.kgs}`);
+    await renderApp(`/history/${PLAN_IDS.kgs}`);
 
     expect(await screen.findByRole('heading', { name: 'Plan not found' })).toBeInTheDocument();
     expect(screen.getByRole('link', { name: 'Back to history' })).toHaveAttribute(
@@ -57,7 +57,7 @@ describe('Saved plan page', () => {
       [`GET /api/flight-plans/${PLAN_IDS.kgs}`]: storedPlan('eddb-eddm-c750-kgs', PLAN_IDS.kgs),
       [`DELETE /api/flight-plans/${PLAN_IDS.kgs}`]: () => new Response(null, { status: 204 }),
     });
-    const { router } = await renderApp(`/plans/${PLAN_IDS.kgs}`);
+    const { router } = await renderApp(`/history/${PLAN_IDS.kgs}`);
 
     await user.click(await screen.findByRole('button', { name: 'Delete plan' }));
     expect(screen.getByText('Delete this plan from your history?')).toBeInTheDocument();
@@ -74,7 +74,7 @@ describe('Saved plan page', () => {
       'GET /api/pilot': pilot(),
       [`GET /api/flight-plans/${PLAN_IDS.kgs}`]: storedPlan('eddb-eddm-c750-kgs', PLAN_IDS.kgs),
     });
-    await renderApp(`/plans/${PLAN_IDS.kgs}`);
+    await renderApp(`/history/${PLAN_IDS.kgs}`);
 
     await user.click(await screen.findByRole('button', { name: 'Delete plan' }));
     await user.click(screen.getByRole('button', { name: 'Cancel' }));

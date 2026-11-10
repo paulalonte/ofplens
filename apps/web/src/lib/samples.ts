@@ -6,7 +6,7 @@ import { parseOfp, type FlightPlanSummary } from '@ofplens/ofp';
  * `import.meta.env.DEV` is false, so the fixtures are not bundled.
  */
 const modules: Record<string, () => Promise<{ default: unknown }>> = import.meta.env.DEV
-  ? import.meta.glob<{ default: unknown }>('../../../../../fixtures/ofp/*.json')
+  ? import.meta.glob<{ default: unknown }>('../../../../fixtures/ofp/*.json')
   : {};
 
 const byName = new Map(

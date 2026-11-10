@@ -7,7 +7,7 @@ import {
   type Waypoint,
   type WeightUnit,
 } from '@ofplens/ofp';
-import { Card } from '../../components/Card';
+import { Card } from '../Card';
 
 interface Props {
   plan: FlightPlanSummary;

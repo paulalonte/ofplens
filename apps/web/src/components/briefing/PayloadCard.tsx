@@ -1,5 +1,5 @@
 import { formatWeight, type FlightPlanSummary, type WeightUnit } from '@ofplens/ofp';
-import { Card, Row } from '../../components/Card';
+import { Card, Row } from '../Card';
 
 interface Props {
   plan: FlightPlanSummary;
