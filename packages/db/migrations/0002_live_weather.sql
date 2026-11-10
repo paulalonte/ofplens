@@ -1,0 +1,2 @@
+ALTER TABLE "flight_plans" ADD COLUMN "live_weather_checked_at" timestamp with time zone;--> statement-breakpoint
+CREATE UNIQUE INDEX "weather_reports_live_unique" ON "weather_reports" USING btree ("flight_plan_id","station_icao","role","kind","observed_at") WHERE "weather_reports"."source" = 'live';

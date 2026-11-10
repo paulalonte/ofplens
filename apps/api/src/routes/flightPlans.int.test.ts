@@ -2,6 +2,7 @@ import {
   createDb,
   createFlightPlanRepository,
   createPilotRepository,
+  createWeatherRepository,
   pingDb,
   type DbConnection,
 } from '@ofplens/db';
@@ -38,6 +39,7 @@ async function startApp(fixture: string) {
     pingDb: () => pingDb(conn.db),
     pilots: createPilotRepository(conn.db),
     flightPlans: createFlightPlanRepository(conn.db),
+    weatherReports: createWeatherRepository(conn.db),
     simbrief: createFakeSimbrief(() => loadFixture(fixture)),
   });
   return app;

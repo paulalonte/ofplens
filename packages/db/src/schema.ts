@@ -11,6 +11,7 @@ import {
   text,
   timestamp,
   unique,
+  uniqueIndex,
   uuid,
 } from 'drizzle-orm/pg-core';
 
@@ -102,6 +103,8 @@ export const flightPlans = pgTable(
 
     rawOfp: jsonb('raw_ofp').notNull(),
     importedAt: timestamptz('imported_at').notNull().defaultNow(),
+    /** Last successful live weather refresh (phase 4), even when no report was new. */
+    liveWeatherCheckedAt: timestamptz('live_weather_checked_at'),
   },
   (t) => [
     check('flight_plans_units_check', sql`${t.units} in ('kgs', 'lbs')`),
@@ -198,6 +201,10 @@ export const weatherReports = pgTable(
     check('weather_reports_kind_check', sql`${t.kind} in ('metar', 'taf')`),
     check('weather_reports_source_check', sql`${t.source} in ('ofp', 'live')`),
     index('weather_reports_plan_idx').on(t.flightPlanId, t.stationIcao, t.fetchedAt.desc()),
+    // A live report is stored once per plan: refreshing again does not duplicate it.
+    uniqueIndex('weather_reports_live_unique')
+      .on(t.flightPlanId, t.stationIcao, t.role, t.kind, t.observedAt)
+      .where(sql`${t.source} = 'live'`),
   ],
 );
 

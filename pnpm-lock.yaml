@@ -208,6 +208,9 @@ importers:
       '@ofplens/ofp':
         specifier: workspace:*
         version: link:../../packages/ofp
+      '@ofplens/weather':
+        specifier: workspace:*
+        version: link:../../packages/weather
       fastify:
         specifier: 5.12.8
         version: 5.12.8

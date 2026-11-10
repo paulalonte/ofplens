@@ -1,4 +1,9 @@
-import type { FlightPlanRepository, PilotRepository } from '@ofplens/db';
+import type { FlightPlanRepository, PilotRepository, WeatherRepository } from '@ofplens/db';
+import {
+  createCachedWeatherClient,
+  createWeatherClient,
+  type WeatherClient,
+} from '@ofplens/weather';
 import Fastify, { type FastifyServerOptions } from 'fastify';
 import {
   serializerCompiler,
@@ -10,12 +15,16 @@ import { flightPlanRoutes } from './routes/flightPlans';
 import { healthRoutes } from './routes/health';
 import { pilotRoutes } from './routes/pilot';
 import { simbriefRoutes } from './routes/simbrief';
+import { weatherRoutes } from './routes/weather';
 import { createSimbriefClient, type SimbriefClient } from './simbrief';
 
 export interface AppDeps {
   pingDb: () => Promise<void>;
   pilots: PilotRepository;
   flightPlans: FlightPlanRepository;
+  weatherReports: WeatherRepository;
+  /** Defaults to aviationweather.gov behind a 5-minute per-station cache. */
+  weather?: WeatherClient;
   /** Defaults to the real SimBrief client, logging through the app's logger. */
   simbrief?: SimbriefClient;
   /** Base URL for the default SimBrief client (end-to-end tests point it at a fake). */
@@ -48,6 +57,10 @@ export async function buildApp(deps: AppDeps) {
     pilots: deps.pilots,
     flightPlans: deps.flightPlans,
     simbrief,
+  });
+  await app.register(weatherRoutes, {
+    weatherReports: deps.weatherReports,
+    weather: deps.weather ?? createCachedWeatherClient(createWeatherClient({ log: app.log })),
   });
 
   return app;

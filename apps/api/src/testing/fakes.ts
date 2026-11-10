@@ -3,7 +3,14 @@ import type {
   ImportFlightPlanInput,
   PilotRepository,
   PilotSettingsRecord,
+  WeatherRepository,
 } from '@ofplens/db';
+import {
+  WeatherUnavailableError,
+  type LiveMetar,
+  type LiveTaf,
+  type WeatherClient,
+} from '@ofplens/weather';
 import type { AppDeps } from '../app';
 import type { SimbriefClient } from '../simbrief';
 
@@ -104,12 +111,47 @@ export function createFakeSimbrief(
   };
 }
 
+/** Weather reads go to Postgres in the integration tests; route unit tests only need a stub. */
+export function createNoWeatherRepository(): WeatherRepository {
+  return {
+    forPlan: () => Promise.resolve(null),
+    saveLive: () => Promise.reject(new Error('saveLive was not expected in this test')),
+  };
+}
+
+/** A weather client answering from fixed reports, counting how often each kind is fetched. */
+export function createFakeWeatherClient(
+  metars: LiveMetar[] = [],
+  tafs: LiveTaf[] = [],
+): WeatherClient & { calls: { metar: string[][]; taf: string[][] }; fail: boolean } {
+  const pick = <R extends { icao: string }>(all: R[], icaos: readonly string[]) =>
+    new Map(all.filter((r) => icaos.includes(r.icao)).map((r) => [r.icao, r]));
+  const fake = {
+    calls: { metar: [] as string[][], taf: [] as string[][] },
+    fail: false,
+    fetchMetars(icaos: readonly string[]) {
+      fake.calls.metar.push([...icaos]);
+      return fake.fail ? Promise.reject(unavailable()) : Promise.resolve(pick(metars, icaos));
+    },
+    fetchTafs(icaos: readonly string[]) {
+      fake.calls.taf.push([...icaos]);
+      return fake.fail ? Promise.reject(unavailable()) : Promise.resolve(pick(tafs, icaos));
+    },
+  };
+  return fake;
+}
+
+const unavailable = () =>
+  new WeatherUnavailableError('aviationweather.gov returned HTTP 503 (after one retry)');
+
 /** Dependencies for buildApp() in route tests: a healthy DB, empty repositories, no SimBrief. */
 export function testDeps(overrides: Partial<AppDeps> = {}): AppDeps {
   return {
     pingDb: () => Promise.resolve(),
     pilots: createInMemoryPilotRepository(),
     flightPlans: createInMemoryFlightPlanRepository(),
+    weatherReports: createNoWeatherRepository(),
+    weather: createFakeWeatherClient(),
     simbrief: createFakeSimbrief(),
     ...overrides,
   };
