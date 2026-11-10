@@ -175,7 +175,9 @@ apps/
 packages/
   ofp/          SimBrief OFP schema, parseOfp(), formatters, shared API schemas
   db/           Drizzle schema, migrations, repositories, test database helpers
+  weather/      aviationweather.gov client for live METAR/TAF
 fixtures/ofp/   Real SimBrief OFPs (personal data removed) used by tests
+fixtures/weather/  Real METAR/TAF responses used by tests (`pnpm fixture:weather`)
 docs/           PLAN.md (design and roadmap), TICKETS.md (MVP tickets)
 scripts/        capture-ofp.ts (save your latest OFP as a fixture)
 ```

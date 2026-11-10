@@ -28,6 +28,7 @@ history in Postgres. **For flight simulation (X-Plane 12) only.** The plan is in
 | `pnpm lint` / `pnpm typecheck`         | ESLint (type-aware) / `tsc --noEmit` in every workspace                                                                     |
 | `pnpm format` / `pnpm format:check`    | Prettier                                                                                                                    |
 | `pnpm fixture:capture <name>`          | Save your latest SimBrief OFP (pilot ID redacted) to `fixtures/ofp/`                                                        |
+| `pnpm fixture:weather`                 | Save current METARs/TAFs for 24 airports to `fixtures/weather/`                                                             |
 
 Before saying a change is done, run `pnpm format:check && pnpm lint && pnpm typecheck && pnpm test`
 (the same steps CI runs, plus `pnpm --filter @ofplens/web build`).
@@ -39,7 +40,9 @@ apps/web       React + Vite + TanStack Router (file-based, src/routes) + Query +
 apps/api       Fastify; buildApp() in app.ts (testable), server.ts (listens)
 packages/ofp   OFP Zod schema, parseOfp(), shared domain types and formatters
 packages/db    Drizzle client, schema, migrations
+packages/weather  aviationweather.gov client (METAR/TAF), later the METAR decoder
 fixtures/ofp   Real SimBrief OFP JSON samples (OFP-05)
+fixtures/weather  Real aviationweather.gov METAR/TAF responses (`pnpm fixture:weather`)
 ```
 
 Web app (`apps/web/src`):
