@@ -1,0 +1,1070 @@
+{
+  "id": "10ea3d73-f075-45e4-acc0-459bc5de6b7d",
+  "prevId": "9e8a36ca-a09e-4d5c-a5a4-b49c3f53b513",
+  "version": "7",
+  "dialect": "postgresql",
+  "tables": {
+    "public.briefings": {
+      "name": "briefings",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "uuid",
+          "primaryKey": true,
+          "notNull": true,
+          "default": "gen_random_uuid()"
+        },
+        "flight_plan_id": {
+          "name": "flight_plan_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "status": {
+          "name": "status",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "model": {
+          "name": "model",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "prompt_version": {
+          "name": "prompt_version",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "output": {
+          "name": "output",
+          "type": "jsonb",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "tool_calls": {
+          "name": "tool_calls",
+          "type": "jsonb",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "input_tokens": {
+          "name": "input_tokens",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "output_tokens": {
+          "name": "output_tokens",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "cost_usd": {
+          "name": "cost_usd",
+          "type": "double precision",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "latency_ms": {
+          "name": "latency_ms",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "error": {
+          "name": "error",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        },
+        "finished_at": {
+          "name": "finished_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": false
+        }
+      },
+      "indexes": {
+        "briefings_plan_idx": {
+          "name": "briefings_plan_idx",
+          "columns": [
+            {
+              "expression": "flight_plan_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            },
+            {
+              "expression": "created_at",
+              "isExpression": false,
+              "asc": false,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        },
+        "briefings_created_idx": {
+          "name": "briefings_created_idx",
+          "columns": [
+            {
+              "expression": "created_at",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        },
+        "briefings_one_pending_per_plan": {
+          "name": "briefings_one_pending_per_plan",
+          "columns": [
+            {
+              "expression": "flight_plan_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": true,
+          "where": "\"briefings\".\"status\" = 'pending'",
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        }
+      },
+      "foreignKeys": {
+        "briefings_flight_plan_id_flight_plans_id_fk": {
+          "name": "briefings_flight_plan_id_flight_plans_id_fk",
+          "tableFrom": "briefings",
+          "tableTo": "flight_plans",
+          "columnsFrom": [
+            "flight_plan_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {
+        "briefings_status_check": {
+          "name": "briefings_status_check",
+          "value": "\"briefings\".\"status\" in ('pending', 'done', 'failed')"
+        }
+      },
+      "isRLSEnabled": false
+    },
+    "public.flight_plan_fuel": {
+      "name": "flight_plan_fuel",
+      "schema": "",
+      "columns": {
+        "flight_plan_id": {
+          "name": "flight_plan_id",
+          "type": "uuid",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "ramp": {
+          "name": "ramp",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "taxi": {
+          "name": "taxi",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "trip": {
+          "name": "trip",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "contingency": {
+          "name": "contingency",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "alternate": {
+          "name": "alternate",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "final_reserve": {
+          "name": "final_reserve",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "extra": {
+          "name": "extra",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "landing": {
+          "name": "landing",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "flight_plan_fuel_flight_plan_id_flight_plans_id_fk": {
+          "name": "flight_plan_fuel_flight_plan_id_flight_plans_id_fk",
+          "tableFrom": "flight_plan_fuel",
+          "tableTo": "flight_plans",
+          "columnsFrom": [
+            "flight_plan_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.flight_plan_weights": {
+      "name": "flight_plan_weights",
+      "schema": "",
+      "columns": {
+        "flight_plan_id": {
+          "name": "flight_plan_id",
+          "type": "uuid",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "pax_count": {
+          "name": "pax_count",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "cargo": {
+          "name": "cargo",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "payload": {
+          "name": "payload",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "zfw": {
+          "name": "zfw",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "tow": {
+          "name": "tow",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "ldw": {
+          "name": "ldw",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "flight_plan_weights_flight_plan_id_flight_plans_id_fk": {
+          "name": "flight_plan_weights_flight_plan_id_flight_plans_id_fk",
+          "tableFrom": "flight_plan_weights",
+          "tableTo": "flight_plans",
+          "columnsFrom": [
+            "flight_plan_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.flight_plans": {
+      "name": "flight_plans",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "uuid",
+          "primaryKey": true,
+          "notNull": true,
+          "default": "gen_random_uuid()"
+        },
+        "pilot_id": {
+          "name": "pilot_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "simbrief_request_id": {
+          "name": "simbrief_request_id",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "generated_at": {
+          "name": "generated_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "airac": {
+          "name": "airac",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "units": {
+          "name": "units",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "airline_icao": {
+          "name": "airline_icao",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "flight_number": {
+          "name": "flight_number",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "callsign": {
+          "name": "callsign",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "aircraft_icao": {
+          "name": "aircraft_icao",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "aircraft_reg": {
+          "name": "aircraft_reg",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "aircraft_name": {
+          "name": "aircraft_name",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "origin_icao": {
+          "name": "origin_icao",
+          "type": "char(4)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "origin_iata": {
+          "name": "origin_iata",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "origin_name": {
+          "name": "origin_name",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "origin_runway": {
+          "name": "origin_runway",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "origin_utc_offset_min": {
+          "name": "origin_utc_offset_min",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "destination_icao": {
+          "name": "destination_icao",
+          "type": "char(4)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "destination_iata": {
+          "name": "destination_iata",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "destination_name": {
+          "name": "destination_name",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "destination_runway": {
+          "name": "destination_runway",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "destination_utc_offset_min": {
+          "name": "destination_utc_offset_min",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "alternate_icao": {
+          "name": "alternate_icao",
+          "type": "char(4)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "alternate_iata": {
+          "name": "alternate_iata",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "alternate_name": {
+          "name": "alternate_name",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "alternate_runway": {
+          "name": "alternate_runway",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "alternate_utc_offset_min": {
+          "name": "alternate_utc_offset_min",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "route": {
+          "name": "route",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "cruise_altitude_ft": {
+          "name": "cruise_altitude_ft",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "cost_index": {
+          "name": "cost_index",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "route_distance_nm": {
+          "name": "route_distance_nm",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "est_out": {
+          "name": "est_out",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "est_off": {
+          "name": "est_off",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "est_on": {
+          "name": "est_on",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "est_in": {
+          "name": "est_in",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "block_time_s": {
+          "name": "block_time_s",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "air_time_s": {
+          "name": "air_time_s",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "raw_ofp": {
+          "name": "raw_ofp",
+          "type": "jsonb",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "imported_at": {
+          "name": "imported_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        },
+        "live_weather_checked_at": {
+          "name": "live_weather_checked_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": false
+        }
+      },
+      "indexes": {
+        "flight_plans_pilot_generated_idx": {
+          "name": "flight_plans_pilot_generated_idx",
+          "columns": [
+            {
+              "expression": "pilot_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            },
+            {
+              "expression": "generated_at",
+              "isExpression": false,
+              "asc": false,
+              "nulls": "last"
+            },
+            {
+              "expression": "id",
+              "isExpression": false,
+              "asc": false,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        },
+        "flight_plans_route_idx": {
+          "name": "flight_plans_route_idx",
+          "columns": [
+            {
+              "expression": "origin_icao",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            },
+            {
+              "expression": "destination_icao",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        }
+      },
+      "foreignKeys": {
+        "flight_plans_pilot_id_pilots_id_fk": {
+          "name": "flight_plans_pilot_id_pilots_id_fk",
+          "tableFrom": "flight_plans",
+          "tableTo": "pilots",
+          "columnsFrom": [
+            "pilot_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {
+        "flight_plans_simbrief_request_id_unique": {
+          "name": "flight_plans_simbrief_request_id_unique",
+          "nullsNotDistinct": false,
+          "columns": [
+            "simbrief_request_id"
+          ]
+        }
+      },
+      "policies": {},
+      "checkConstraints": {
+        "flight_plans_units_check": {
+          "name": "flight_plans_units_check",
+          "value": "\"flight_plans\".\"units\" in ('kgs', 'lbs')"
+        },
+        "flight_plans_alternate_complete_check": {
+          "name": "flight_plans_alternate_complete_check",
+          "value": "(\"flight_plans\".\"alternate_icao\" is null) = (\"flight_plans\".\"alternate_name\" is null) and (\"flight_plans\".\"alternate_icao\" is null) = (\"flight_plans\".\"alternate_utc_offset_min\" is null)"
+        }
+      },
+      "isRLSEnabled": false
+    },
+    "public.pilots": {
+      "name": "pilots",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "uuid",
+          "primaryKey": true,
+          "notNull": true,
+          "default": "gen_random_uuid()"
+        },
+        "simbrief_username": {
+          "name": "simbrief_username",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "simbrief_pilot_id": {
+          "name": "simbrief_pilot_id",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "weight_unit": {
+          "name": "weight_unit",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "'kgs'"
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        },
+        "updated_at": {
+          "name": "updated_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {},
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {
+        "pilots_simbrief_username_unique": {
+          "name": "pilots_simbrief_username_unique",
+          "nullsNotDistinct": false,
+          "columns": [
+            "simbrief_username"
+          ]
+        }
+      },
+      "policies": {},
+      "checkConstraints": {
+        "pilots_weight_unit_check": {
+          "name": "pilots_weight_unit_check",
+          "value": "\"pilots\".\"weight_unit\" in ('kgs', 'lbs')"
+        }
+      },
+      "isRLSEnabled": false
+    },
+    "public.waypoints": {
+      "name": "waypoints",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "bigint",
+          "primaryKey": true,
+          "notNull": true,
+          "identity": {
+            "type": "always",
+            "name": "waypoints_id_seq",
+            "schema": "public",
+            "increment": "1",
+            "startWith": "1",
+            "minValue": "1",
+            "maxValue": "9223372036854775807",
+            "cache": "1",
+            "cycle": false
+          }
+        },
+        "flight_plan_id": {
+          "name": "flight_plan_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "seq": {
+          "name": "seq",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "ident": {
+          "name": "ident",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "name": {
+          "name": "name",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "type": {
+          "name": "type",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "stage": {
+          "name": "stage",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "via": {
+          "name": "via",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "lat": {
+          "name": "lat",
+          "type": "double precision",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "lon": {
+          "name": "lon",
+          "type": "double precision",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "altitude_ft": {
+          "name": "altitude_ft",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "wind_dir_deg": {
+          "name": "wind_dir_deg",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "wind_speed_kt": {
+          "name": "wind_speed_kt",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "oat_c": {
+          "name": "oat_c",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "elapsed_s": {
+          "name": "elapsed_s",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "fuel_on_board": {
+          "name": "fuel_on_board",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "waypoints_flight_plan_id_flight_plans_id_fk": {
+          "name": "waypoints_flight_plan_id_flight_plans_id_fk",
+          "tableFrom": "waypoints",
+          "tableTo": "flight_plans",
+          "columnsFrom": [
+            "flight_plan_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {
+        "waypoints_plan_seq_unique": {
+          "name": "waypoints_plan_seq_unique",
+          "nullsNotDistinct": false,
+          "columns": [
+            "flight_plan_id",
+            "seq"
+          ]
+        }
+      },
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.weather_reports": {
+      "name": "weather_reports",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "bigint",
+          "primaryKey": true,
+          "notNull": true,
+          "identity": {
+            "type": "always",
+            "name": "weather_reports_id_seq",
+            "schema": "public",
+            "increment": "1",
+            "startWith": "1",
+            "minValue": "1",
+            "maxValue": "9223372036854775807",
+            "cache": "1",
+            "cycle": false
+          }
+        },
+        "flight_plan_id": {
+          "name": "flight_plan_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "station_icao": {
+          "name": "station_icao",
+          "type": "char(4)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "role": {
+          "name": "role",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "kind": {
+          "name": "kind",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "source": {
+          "name": "source",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "raw_text": {
+          "name": "raw_text",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "flight_category": {
+          "name": "flight_category",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "parsed": {
+          "name": "parsed",
+          "type": "jsonb",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "observed_at": {
+          "name": "observed_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "fetched_at": {
+          "name": "fetched_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        }
+      },
+      "indexes": {
+        "weather_reports_plan_idx": {
+          "name": "weather_reports_plan_idx",
+          "columns": [
+            {
+              "expression": "flight_plan_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            },
+            {
+              "expression": "station_icao",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            },
+            {
+              "expression": "fetched_at",
+              "isExpression": false,
+              "asc": false,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        },
+        "weather_reports_live_unique": {
+          "name": "weather_reports_live_unique",
+          "columns": [
+            {
+              "expression": "flight_plan_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            },
+            {
+              "expression": "station_icao",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            },
+            {
+              "expression": "role",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            },
+            {
+              "expression": "kind",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            },
+            {
+              "expression": "observed_at",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": true,
+          "where": "\"weather_reports\".\"source\" = 'live'",
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        }
+      },
+      "foreignKeys": {
+        "weather_reports_flight_plan_id_flight_plans_id_fk": {
+          "name": "weather_reports_flight_plan_id_flight_plans_id_fk",
+          "tableFrom": "weather_reports",
+          "tableTo": "flight_plans",
+          "columnsFrom": [
+            "flight_plan_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {
+        "weather_reports_role_check": {
+          "name": "weather_reports_role_check",
+          "value": "\"weather_reports\".\"role\" in ('origin', 'destination', 'alternate', 'enroute')"
+        },
+        "weather_reports_kind_check": {
+          "name": "weather_reports_kind_check",
+          "value": "\"weather_reports\".\"kind\" in ('metar', 'taf')"
+        },
+        "weather_reports_source_check": {
+          "name": "weather_reports_source_check",
+          "value": "\"weather_reports\".\"source\" in ('ofp', 'live')"
+        }
+      },
+      "isRLSEnabled": false
+    }
+  },
+  "enums": {},
+  "schemas": {},
+  "sequences": {},
+  "roles": {},
+  "policies": {},
+  "views": {},
+  "_meta": {
+    "columns": {},
+    "schemas": {},
+    "tables": {}
+  }
+}

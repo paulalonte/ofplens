@@ -9,6 +9,12 @@ const EnvSchema = z.object({
   SIMBRIEF_URL: z.url({ protocol: /^https?$/ }).optional(),
   /** Only for end-to-end tests: a fake aviationweather.gov Data API base URL. */
   AVIATION_WEATHER_URL: z.url({ protocol: /^https?$/ }).optional(),
+  /** Claude API key for AI briefings. Unset: briefings are switched off (503). Never logged. */
+  ANTHROPIC_API_KEY: z.string().min(1).optional(),
+  /** Claude model for briefings (PLAN.md, Phase 5 decisions). */
+  BRIEFING_MODEL: z.string().min(1).default('claude-haiku-5-5'),
+  /** Briefings allowed per rolling 24 hours, to protect the budget. */
+  BRIEFING_DAILY_LIMIT: z.coerce.number().int().min(0).default(20),
 });
 
 export type Env = z.infer<typeof EnvSchema>;

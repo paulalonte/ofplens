@@ -59,7 +59,7 @@ export async function createTestDatabase(): Promise<TestDatabase> {
 export async function truncateAll(db: Database): Promise<void> {
   await db.execute(sql`
     truncate table pilots, flight_plans, flight_plan_fuel, flight_plan_weights,
-                   waypoints, weather_reports
+                   waypoints, weather_reports, briefings
     restart identity cascade
   `);
 }
@@ -71,6 +71,7 @@ const APP_TABLES = [
   'flight_plan_weights',
   'waypoints',
   'weather_reports',
+  'briefings',
 ] as const;
 export type AppTable = (typeof APP_TABLES)[number];
 

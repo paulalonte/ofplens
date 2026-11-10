@@ -1,4 +1,5 @@
 import {
+  createBriefingRepository,
   createDb,
   createFlightPlanRepository,
   createPilotRepository,
@@ -40,6 +41,7 @@ async function startApp(fixture: string) {
     pilots: createPilotRepository(conn.db),
     flightPlans: createFlightPlanRepository(conn.db),
     weatherReports: createWeatherRepository(conn.db),
+    briefings: createBriefingRepository(conn.db),
     simbrief: createFakeSimbrief(() => loadFixture(fixture)),
   });
   return app;

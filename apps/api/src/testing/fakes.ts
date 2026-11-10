@@ -1,4 +1,5 @@
 import type {
+  BriefingRepository,
   FlightPlanRepository,
   ImportFlightPlanInput,
   PilotRepository,
@@ -111,6 +112,16 @@ export function createFakeSimbrief(
   };
 }
 
+/** Briefings are tested on Postgres; route unit tests only need a stub that has none. */
+export function createNoBriefingsRepository(): BriefingRepository {
+  return {
+    start: () => Promise.reject(new Error('briefings.start was not expected in this test')),
+    finish: () => Promise.reject(new Error('briefings.finish was not expected in this test')),
+    latest: () => Promise.resolve(null),
+    countSince: () => Promise.resolve(0),
+  };
+}
+
 /** Weather reads go to Postgres in the integration tests; route unit tests only need a stub. */
 export function createNoWeatherRepository(): WeatherRepository {
   return {
@@ -151,6 +162,7 @@ export function testDeps(overrides: Partial<AppDeps> = {}): AppDeps {
     pilots: createInMemoryPilotRepository(),
     flightPlans: createInMemoryFlightPlanRepository(),
     weatherReports: createNoWeatherRepository(),
+    briefings: createNoBriefingsRepository(),
     weather: createFakeWeatherClient(),
     simbrief: createFakeSimbrief(),
     ...overrides,

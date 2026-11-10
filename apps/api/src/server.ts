@@ -1,4 +1,6 @@
+import Anthropic from '@anthropic-ai/sdk';
 import {
+  createBriefingRepository,
   createDb,
   createFlightPlanRepository,
   createPilotRepository,
@@ -16,6 +18,11 @@ const app = await buildApp({
   pilots: createPilotRepository(db),
   flightPlans: createFlightPlanRepository(db),
   weatherReports: createWeatherRepository(db),
+  briefings: createBriefingRepository(db),
+  // The SDK also reads ANTHROPIC_BASE_URL, which end-to-end tests point at a fake Claude.
+  anthropic: env.ANTHROPIC_API_KEY ? new Anthropic({ apiKey: env.ANTHROPIC_API_KEY }) : null,
+  briefingConfig: { model: env.BRIEFING_MODEL },
+  briefingDailyLimit: env.BRIEFING_DAILY_LIMIT,
   simbriefUrl: env.SIMBRIEF_URL,
   aviationWeatherUrl: env.AVIATION_WEATHER_URL,
   logger: { level: env.LOG_LEVEL },

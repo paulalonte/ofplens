@@ -1,5 +1,6 @@
 import { countRows, createTestDatabase, truncateAll, type TestDatabase } from '@ofplens/db/testing';
 import {
+  createBriefingRepository,
   createDb,
   createFlightPlanRepository,
   createPilotRepository,
@@ -77,6 +78,7 @@ async function start(fake: ReturnType<typeof fakeAviationWeather>, now = () => D
     pilots: createPilotRepository(conn.db),
     flightPlans: createFlightPlanRepository(conn.db),
     weatherReports: createWeatherRepository(conn.db),
+    briefings: createBriefingRepository(conn.db),
     weather: createCachedWeatherClient(
       createWeatherClient({ fetch: fake.fetch, retryDelayMs: 0 }),
       { now },
