@@ -1,9 +1,11 @@
 import { createFileRoute, Link, notFound } from '@tanstack/react-router';
+import { latestBriefingQuery } from '../../api/briefings';
 import { ApiError } from '../../api/client';
 import { flightPlanQuery, useFlightPlan } from '../../api/flightPlans';
 import { pilotQuery, usePilot } from '../../api/pilot';
 import { planWeatherQuery } from '../../api/weather';
 import { BriefingPage } from '../../components/briefing/BriefingPage';
+import { AiBriefingCard } from './-components/AiBriefingCard';
 import { DeletePlan } from './-components/DeletePlan';
 import { LiveWeatherCard } from './-components/LiveWeatherCard';
 
@@ -31,6 +33,7 @@ export const Route = createFileRoute('/history/$planId')({
       queryClient.ensureQueryData(pilotQuery),
       // Stored weather only; the card refreshes live weather itself when it is stale.
       orNotFound(queryClient.ensureQueryData(planWeatherQuery(params.planId))),
+      orNotFound(queryClient.ensureQueryData(latestBriefingQuery(params.planId))),
     ]);
   },
   component: PlanPage,
@@ -67,6 +70,7 @@ function PlanPage() {
         plan={plan}
         {...(pilot && { preferredUnit: pilot.weightUnit })}
         weather={<LiveWeatherCard planId={planId} />}
+        aiBriefing={<AiBriefingCard planId={planId} />}
       />
     </div>
   );

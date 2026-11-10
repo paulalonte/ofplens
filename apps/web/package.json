@@ -10,6 +10,7 @@
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
+    "@ofplens/agent": "workspace:*",
     "@ofplens/ofp": "workspace:*",
     "@ofplens/weather": "workspace:*",
     "@tanstack/react-query": "5.107.1",

@@ -9,10 +9,25 @@ const STYLE: Record<FlightCategory, string> = {
 };
 
 export function CategoryBadge({ metar }: { metar: MetarView | null }) {
-  const category = metar?.category ?? null;
+  return (
+    <FlightCategoryBadge
+      category={metar?.category ?? null}
+      {...(metar && { title: describe(metar) })}
+    />
+  );
+}
+
+/** A flight category on its own, e.g. from an AI briefing; "N/A" when unknown. */
+export function FlightCategoryBadge({
+  category,
+  title,
+}: {
+  category: FlightCategory | null;
+  title?: string;
+}) {
   return (
     <span
-      title={metar ? describe(metar) : undefined}
+      title={title}
       className={`inline-block rounded px-1.5 py-0.5 font-mono text-xs font-bold tracking-wide ${
         category
           ? STYLE[category]
