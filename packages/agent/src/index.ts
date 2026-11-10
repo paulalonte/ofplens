@@ -17,3 +17,13 @@ export {
   type AgentTool,
   type ToolDeps,
 } from './tools';
+export {
+  BriefingPlanNotFoundError,
+  runBriefing,
+  type BriefingRun,
+  type BriefingRunInfo,
+  type RunBriefingOptions,
+} from './agent';
+export { costUsd, DEFAULT_BRIEFING_CONFIG, PRICES_PER_MTOK, type BriefingConfig } from './config';
+export { checkBriefing, collectEvidence, type Evidence, type ToolCallRecord } from './guardrails';
+export { PROMPT_VERSION, SYSTEM_PROMPT } from './prompt';

@@ -446,6 +446,19 @@ export const Briefing = z.object({
 - Log tokens, latency and cost per briefing; set a max tool-call count (for example 8) per run.
 - Show a "simulation use only" label on every briefing.
 
+### Phase 5 decisions (10 Nov 2026)
+
+| Question | Decision |
+| --- | --- |
+| Model | **Claude Haiku 5.5** (`claude-haiku-5-5`) to start; one setting (`BRIEFING_MODEL`) to switch to Sonnet 5.5 / Opus 5.5 later, compared in Phase 7 |
+| Effort | `medium` (Haiku 5.5's default), adaptive thinking |
+| When briefings run | Only when the pilot clicks "Generate briefing" |
+| Limits | At most 8 tool calls and 6 turns per briefing; 20 briefings per day (`BRIEFING_DAILY_LIMIT`) |
+| Spend | Monthly spend limit in the Claude Console (about $5), automatic reload off |
+| Style | English; wind in knots, pressure in hPa, cloud in feet; UTC clock times, never durations |
+| Data sent to Anthropic | Route, airports, planned times and weather reports only; no fuel, weights, username or pilot id |
+| SDK | `@anthropic-ai/sdk` 1.x Tool Runner with `thread: false`; tools bound to the one plan (no arguments) |
+
 ## Open questions and notes for review
 
 **Decisions**
