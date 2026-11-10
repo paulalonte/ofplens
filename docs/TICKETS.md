@@ -4,7 +4,7 @@ Derived from [PLAN.md](PLAN.md). Work them in order, one ticket per branch/PR.
 Each ticket ends with tests green and its "Done when" shown working.
 
 > **Status (10 Nov 2026):** OFP-01 to OFP-23 are done: the MVP and Phase 4 (live weather) are
-> complete. Next: deployment (3b), then the AI phases.
+> complete. In progress: **Phase 5 — AI briefing** (OFP-24 to OFP-28). Deployment (3b) follows.
 
 **MVP = Phases 0–3**: load my latest SimBrief OFP, see a clean briefing, and keep a
 history in Postgres, running locally. Deploy (3b), live weather (4) and everything AI
@@ -205,11 +205,90 @@ repeated refreshes hit the cache.
 
 ---
 
+## Phase 5 — AI briefing
+
+Goal (PLAN.md): a stored plan gets a short weather briefing written by Claude, validated
+against a schema, stored with its cost and trace; failures are stored as `failed`; no fuel,
+time or weight figures come from the model.
+
+**Ground rules for every Phase 5 ticket**
+
+- **Numbers come from code, judgement from the agent.** The model reads decoded data through
+  tools and writes words; fuel, times and weights on screen still come from the database.
+- **Every claim is traceable.** Each report the tools return has an id; the briefing must cite
+  those ids, and a post-check rejects anything it cannot match.
+- **No real Claude in tests or CI.** A fake Claude answers with scripted responses; real calls
+  happen only when the pilot presses the button, or in a manual script.
+- **Tools are plain functions** in `packages/agent` (inputs, a database connection, output), with
+  no dependency on Fastify or the agent loop, so the Phase 8 MCP server can reuse them as-is.
+- Model, effort and limits come from config (`BRIEFING_MODEL`, default `claude-haiku-5-5`);
+  the system prompt is versioned (`prompt_version`) so Phase 7 can compare versions.
+
+### OFP-24 · `packages/agent`: tools and the `Briefing` schema
+- Tools as typed functions with Zod input/output schemas:
+  - `get_flight_plan(flightPlanId)`: airports (role, ICAO, name), planned times, route, cruise
+    level, and the waypoint list (seq, ident, ETA), trimmed so the model sees what it needs.
+  - `get_planned_weather(flightPlanId)`: the OFP's METAR/TAF per airport, decoded (category,
+    ceiling, visibility, observation time).
+  - `get_weather(flightPlanId)`: the latest live METAR/TAF per airport, refreshed through the
+    existing cached client, decoded the same way, with `changedSinceDispatch`.
+- Every report a tool returns carries a stable `reportId` (e.g. `metar:EDDB:2026-11-10T08:50Z`).
+- The `Briefing` output schema from PLAN.md, with `sourceReportId` instead of free text, and
+  `enrouteHazards` allowed but empty until Phase 6.
+- **Done when:** unit tests run every tool against the captured fixtures (no LLM), and the
+  schema accepts a hand-written valid briefing and rejects the usual mistakes.
+
+### OFP-25 · The briefing agent loop, with guardrails
+- `runBriefing(flightPlanId)` with the Anthropic TypeScript SDK (`@anthropic-ai/sdk`, 1.x): tool
+  use for the three tools, at most 8 tool calls, the final answer as structured output
+  validated by `Briefing`.
+- Guardrails after the model answers, any failure making the run `failed`:
+  - every conditions block cites a `reportId` that a tool actually returned, for that airport;
+  - flight categories in the briefing match the decoded ones (no "VFR" for an IFR report);
+  - waypoint names exist in the plan; hazards cite an advisory (none until Phase 6);
+  - no fuel, weight or duration figures in the text (kg, lb, block time, "1:08").
+- Handles refusals, `max_tokens`, API errors and timeouts as `failed` with the reason.
+- Records model, prompt version, input/output tokens, latency, cost (from a price table in
+  config) and the tool calls with their results.
+- **Done when:** tests with a scripted fake Claude cover a valid run, each guardrail rejecting a
+  bad answer, the tool-call limit, a refusal and an API error.
+
+### OFP-26 · Store briefings + API with streamed progress
+- Migration: the `briefings` table from PLAN.md (status, model, prompt_version, output,
+  tool_calls, tokens, latency, cost, error).
+- `POST /api/flight-plans/:id/briefings` runs the agent and streams progress as Server-Sent
+  Events (`started`, `tool` with the tool's name, `done` with the briefing, or `failed`).
+- `GET /api/flight-plans/:id/briefings/latest`.
+- Budget protection: one running briefing per plan, and a daily limit (`BRIEFING_DAILY_LIMIT`)
+  answered with 429 and a clear message.
+- **Done when:** integration tests on Postgres with the fake Claude cover a stored success, a
+  stored failure, the event stream, the per-plan lock and the daily limit.
+
+### OFP-27 · Web: the briefing card
+- On the saved-plan page: a **Generate briefing** button (briefings are never generated
+  automatically, so nothing costs money without a click), live progress ("Reading EDDB
+  weather…"), then the card: headline, overall risk, per-airport conditions with category
+  badge and the cited report, pilot notes.
+- Always labelled "AI-generated · for flight simulation only", with model and time; failures
+  shown with the reason and a retry; the latest stored briefing loads with the page.
+- **Done when:** page tests (mock API with a scripted event stream) cover progress, success,
+  failure, the daily limit message and reloading a stored briefing.
+
+### OFP-28 · First real briefings + end-to-end
+- `pnpm briefing:try <planId>`: runs one real briefing with your key from `.env`, prints the
+  result, tokens, cost and any guardrail failure. Used to tune the system prompt.
+- A fake Claude in the e2e stack (the API pointed at it like SimBrief and aviationweather.gov);
+  the journey generates a briefing and sees the card.
+- **Done when:** real briefings for the three captured plans pass every guardrail and cost under
+  the agreed limit each, and e2e is green in CI. 🎉 Phase 5 done.
+
+---
+
 ## Later phases (not ticketed yet)
 
 | Next | Summary |
 | --- | --- |
 | 3b Deploy | Budget alarm first; then CDK (RDS, Fargate, S3 + CloudFront) or the cheaper Lightsail + Compose fallback |
-| 5–7 AI | Briefing agent, route hazards, evals and tracing |
-| 8 MCP | Same tools exposed to Claude Desktop / Claude Code |
+| 6–7 AI | Route hazards (SIGMETs on the route), evals and tracing |
+| 8 MCP | The `packages/agent` tools exposed to Claude Desktop / Claude Code |
 | Sharing | Auth and multi-pilot support before anyone else uses it |
