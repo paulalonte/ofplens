@@ -1,5 +1,6 @@
 /** Ports for the end-to-end stack, chosen so it can run next to `pnpm dev` (5173 / 3000). */
-export const FAKE_SIMBRIEF_PORT = 4010;
+/** Fake SimBrief and fake aviationweather.gov share one small server. */
+export const FAKE_UPSTREAMS_PORT = 4010;
 export const API_PORT = 3100;
 export const WEB_PORT = 5174;
 

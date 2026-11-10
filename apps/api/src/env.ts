@@ -7,6 +7,8 @@ const EnvSchema = z.object({
   LOG_LEVEL: z.enum(['fatal', 'error', 'warn', 'info', 'debug', 'trace', 'silent']).default('info'),
   /** Only for end-to-end tests: a fake SimBrief fetcher URL. Unset = the real SimBrief. */
   SIMBRIEF_URL: z.url({ protocol: /^https?$/ }).optional(),
+  /** Only for end-to-end tests: a fake aviationweather.gov Data API base URL. */
+  AVIATION_WEATHER_URL: z.url({ protocol: /^https?$/ }).optional(),
 });
 
 export type Env = z.infer<typeof EnvSchema>;

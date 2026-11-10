@@ -29,6 +29,8 @@ export interface AppDeps {
   simbrief?: SimbriefClient;
   /** Base URL for the default SimBrief client (end-to-end tests point it at a fake). */
   simbriefUrl?: string | undefined;
+  /** Base URL for the default weather client (end-to-end tests point it at a fake). */
+  aviationWeatherUrl?: string | undefined;
   dbTimeoutMs?: number;
   logger?: FastifyServerOptions['logger'];
 }
@@ -60,7 +62,14 @@ export async function buildApp(deps: AppDeps) {
   });
   await app.register(weatherRoutes, {
     weatherReports: deps.weatherReports,
-    weather: deps.weather ?? createCachedWeatherClient(createWeatherClient({ log: app.log })),
+    weather:
+      deps.weather ??
+      createCachedWeatherClient(
+        createWeatherClient({
+          log: app.log,
+          ...(deps.aviationWeatherUrl !== undefined && { baseUrl: deps.aviationWeatherUrl }),
+        }),
+      ),
   });
 
   return app;

@@ -17,6 +17,7 @@ const app = await buildApp({
   flightPlans: createFlightPlanRepository(db),
   weatherReports: createWeatherRepository(db),
   simbriefUrl: env.SIMBRIEF_URL,
+  aviationWeatherUrl: env.AVIATION_WEATHER_URL,
   logger: { level: env.LOG_LEVEL },
 });
 app.addHook('onClose', closeDb);

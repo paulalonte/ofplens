@@ -1,10 +1,11 @@
 import { defineConfig, devices } from '@playwright/test';
-import { API_PORT, e2eDatabaseUrl, FAKE_SIMBRIEF_PORT, WEB_PORT } from './ports';
+import { API_PORT, e2eDatabaseUrl, FAKE_UPSTREAMS_PORT, WEB_PORT } from './ports';
 
 const CI = !!process.env.CI;
 
 /**
- * The real web app and API against a fresh Postgres database, with SimBrief faked.
+ * The real web app and API against a fresh Postgres database, with SimBrief and
+ * aviationweather.gov faked.
  * Locally: Docker Postgres must be running (`pnpm db:up`). Run with `pnpm e2e`.
  */
 export default defineConfig({
@@ -23,19 +24,20 @@ export default defineConfig({
   projects: [{ name: 'chromium', use: { ...devices['Desktop Chrome'] } }],
   webServer: [
     {
-      command: 'pnpm exec tsx fake-simbrief.ts',
-      url: `http://127.0.0.1:${FAKE_SIMBRIEF_PORT}/health`,
+      command: 'pnpm exec tsx fake-upstreams.ts',
+      url: `http://127.0.0.1:${FAKE_UPSTREAMS_PORT}/health`,
       reuseExistingServer: false,
     },
     {
-      // A fresh database on every run, then the real API pointed at the fake SimBrief.
+      // A fresh database on every run, then the real API pointed at the fakes.
       command: 'pnpm exec tsx prepare-db.ts && pnpm --filter @ofplens/api start',
       url: `http://127.0.0.1:${API_PORT}/api/health`,
       reuseExistingServer: false,
       env: {
         DATABASE_URL: e2eDatabaseUrl(),
         PORT: String(API_PORT),
-        SIMBRIEF_URL: `http://127.0.0.1:${FAKE_SIMBRIEF_PORT}/api/xml.fetcher.php`,
+        SIMBRIEF_URL: `http://127.0.0.1:${FAKE_UPSTREAMS_PORT}/api/xml.fetcher.php`,
+        AVIATION_WEATHER_URL: `http://127.0.0.1:${FAKE_UPSTREAMS_PORT}/api/data`,
         LOG_LEVEL: 'warn',
       },
       timeout: 60_000,
