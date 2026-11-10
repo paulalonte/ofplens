@@ -1,5 +1,6 @@
 import { z } from 'zod';
 import { Briefing } from './briefing';
+export { reportId } from './reports';
 
 /**
  * What the briefing endpoints send, for the API and the web app. No Anthropic SDK in here, so the

@@ -6,7 +6,8 @@ type Handler = (request: { body: unknown; url: URL }) => Response | Promise<Resp
 /**
  * Replaces fetch with a tiny fake API. Keys are "METHOD /path", e.g. "GET /api/pilot".
  * /api/health answers "ok" unless overridden, and a plan's weather answers "nothing to show,
- * checked just now" (so nothing auto-refreshes) unless a test gives its own handler.
+ * checked just now" (so nothing auto-refreshes) and a plan's latest AI briefing answers "none",
+ * unless a test gives its own handler.
  * Unknown routes fail the test loudly.
  */
 export function mockApi(handlers: Record<string, Handler>) {
@@ -25,7 +26,9 @@ export function mockApi(handlers: Record<string, Handler>) {
       const body: unknown = typeof init?.body === 'string' ? JSON.parse(init.body) : undefined;
       const key = `${method} ${url.pathname}`;
       if (key !== 'GET /api/health') calls.push({ method, path: url.pathname + url.search, body });
-      const handler = all[key] ?? (QUIET_WEATHER.test(key) ? quietWeather : undefined);
+      const handler =
+        all[key] ??
+        (QUIET_WEATHER.test(key) ? quietWeather : NO_BRIEFING.test(key) ? noBriefing : undefined);
       if (!handler) throw new Error(`mockApi: no handler for ${key}`);
       return handler({ body, url });
     }),
@@ -37,6 +40,9 @@ export function mockApi(handlers: Record<string, Handler>) {
 const QUIET_WEATHER = /^GET \/api\/flight-plans\/[^/]+\/weather$/;
 const quietWeather: Handler = () =>
   jsonResponse({ stations: [], liveCheckedAt: new Date().toISOString() });
+
+const NO_BRIEFING = /^GET \/api\/flight-plans\/[^/]+\/briefings\/latest$/;
+const noBriefing: Handler = () => jsonResponse({ briefing: null });
 
 export const apiError = (status: number, code: string, message: string) =>
   jsonResponse({ error: { code, message } }, status);

@@ -233,6 +233,9 @@ importers:
 
   apps/web:
     dependencies:
+      '@ofplens/agent':
+        specifier: workspace:*
+        version: link:../../packages/agent
       '@ofplens/ofp':
         specifier: workspace:*
         version: link:../../packages/ofp
