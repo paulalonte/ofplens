@@ -1,5 +1,5 @@
 import type { FlightPlanSummary, WeightUnit } from '@ofplens/ofp';
-import { useState } from 'react';
+import { useState, type ReactNode } from 'react';
 import { BriefingHeader } from './BriefingHeader';
 import { FuelCard } from './FuelCard';
 import { NavlogCard } from './NavlogCard';
@@ -16,9 +16,11 @@ interface Props {
   plan: FlightPlanSummary;
   /** The pilot's preferred unit from Settings; defaults to the plan's own unit. */
   preferredUnit?: WeightUnit;
+  /** Replaces the OFP-only weather card, e.g. with dispatch vs live weather for saved plans. */
+  weather?: ReactNode;
 }
 
-export function BriefingPage({ plan, preferredUnit }: Props) {
+export function BriefingPage({ plan, preferredUnit, weather }: Props) {
   const [displayUnit, setDisplayUnit] = useState<WeightUnit>(preferredUnit ?? plan.units);
 
   return (
@@ -34,7 +36,7 @@ export function BriefingPage({ plan, preferredUnit }: Props) {
         <PayloadCard plan={plan} displayUnit={displayUnit} />
       </div>
 
-      <WeatherCard plan={plan} />
+      {weather ?? <WeatherCard plan={plan} />}
       <NavlogCard plan={plan} displayUnit={displayUnit} />
 
       <p className="text-xs text-slate-500 dark:text-slate-400">

@@ -2,10 +2,19 @@ import { createFileRoute, Link, notFound } from '@tanstack/react-router';
 import { ApiError } from '../../api/client';
 import { flightPlanQuery, useFlightPlan } from '../../api/flightPlans';
 import { pilotQuery, usePilot } from '../../api/pilot';
+import { planWeatherQuery } from '../../api/weather';
 import { BriefingPage } from '../../components/briefing/BriefingPage';
 import { DeletePlan } from './-components/DeletePlan';
+import { LiveWeatherCard } from './-components/LiveWeatherCard';
 
 type ImportOutcome = 'new' | 'existing';
+
+/** A deleted or unknown plan is "not found", not a broken page, whichever request notices. */
+const orNotFound = <T,>(request: Promise<T>) =>
+  request.catch((err: unknown) => {
+    if (err instanceof ApiError && err.status === 404) throw notFound();
+    throw err;
+  });
 
 /**
  * A saved plan's briefing, read from the database, with delete.
@@ -18,12 +27,10 @@ export const Route = createFileRoute('/history/$planId')({
       : {},
   loader: async ({ context: { queryClient }, params }) => {
     await Promise.all([
-      queryClient.ensureQueryData(flightPlanQuery(params.planId)).catch((err: unknown) => {
-        // A deleted or unknown plan is "not found", not a broken page.
-        if (err instanceof ApiError && err.status === 404) throw notFound();
-        throw err;
-      }),
+      orNotFound(queryClient.ensureQueryData(flightPlanQuery(params.planId))),
       queryClient.ensureQueryData(pilotQuery),
+      // Stored weather only; the card refreshes live weather itself when it is stale.
+      orNotFound(queryClient.ensureQueryData(planWeatherQuery(params.planId))),
     ]);
   },
   component: PlanPage,
@@ -56,7 +63,11 @@ function PlanPage() {
         </p>
       )}
 
-      <BriefingPage plan={plan} {...(pilot && { preferredUnit: pilot.weightUnit })} />
+      <BriefingPage
+        plan={plan}
+        {...(pilot && { preferredUnit: pilot.weightUnit })}
+        weather={<LiveWeatherCard planId={planId} />}
+      />
     </div>
   );
 }
