@@ -10,7 +10,6 @@ describe('parsePerformance on the captured OFPs', () => {
     expect(performanceOf('ksfo-kjfk-b739-lbs')?.takeoff).toEqual({
       airportIcao: 'KSFO',
       runway: '01R',
-      plannedWeight: 170109,
       windDirDeg: 306,
       windSpeedKt: 12,
       temperatureC: 14,
@@ -20,22 +19,14 @@ describe('parsePerformance on the captured OFPs', () => {
       headwindKt: 4,
       crosswindKt: 11,
       crosswindFrom: 'left',
-      ilsFrequency: null,
-      flaps: '5',
       toraFt: 8650,
-      thrust: 'TO',
-      flexTemperatureC: null,
-      v1Kt: 146,
-      vrKt: 154,
-      v2Kt: 162,
     });
   });
 
-  it('reads the KJFK 31R landing with VREF and the dry landing distance', () => {
+  it('reads the KJFK 31R landing with the runway LDA', () => {
     expect(performanceOf('ksfo-kjfk-b739-lbs')?.landing).toEqual({
       airportIcao: 'KJFK',
       runway: '31R',
-      plannedWeight: 142250,
       windDirDeg: 303,
       windSpeedKt: 12,
       temperatureC: 14,
@@ -45,20 +36,14 @@ describe('parsePerformance on the captured OFPs', () => {
       headwindKt: 12,
       crosswindKt: 2,
       crosswindFrom: 'left',
-      ilsFrequency: '111.50',
-      flaps: '30',
       ldaFt: 8486,
-      vrefKt: 142,
-      landingDistanceFt: 4357,
     });
   });
 
-  it('reads a FLEX takeoff with a tailwind, and uses the wet distance on a wet landing', () => {
+  it('reads a takeoff with a tailwind and a wet landing without crosswind', () => {
     const performance = performanceOf('eddf-lepa-a339-noalt');
     expect(performance?.takeoff).toMatchObject({
       runway: '18',
-      thrust: 'FLEX',
-      flexTemperatureC: 53,
       headwindKt: -5,
       crosswindKt: 4,
     });
@@ -67,7 +52,7 @@ describe('parsePerformance on the captured OFPs', () => {
       surface: 'wet',
       crosswindKt: 0,
       crosswindFrom: null,
-      landingDistanceFt: 5729,
+      ldaFt: 9843,
     });
   });
 });
@@ -76,7 +61,6 @@ describe('parsePerformance on missing or odd data', () => {
   const conditions = {
     airport_icao: 'EDDB',
     planned_runway: '06L',
-    planned_weight: '13237',
     wind_direction: '95',
     wind_speed: '5',
     temperature: '3',
@@ -105,16 +89,16 @@ describe('parsePerformance on missing or odd data', () => {
         runway: {
           identifier: '06L',
           length_tora: '11811',
-          ils_frequency: '',
-          flex_temperature: [],
+          magnetic_course: '',
+          crosswind_component: [],
           headwind_component: '-0',
         },
       },
     })?.takeoff;
     expect(takeoff).toMatchObject({
       toraFt: 11811,
-      ilsFrequency: null,
-      flexTemperatureC: null,
+      magneticCourseDeg: null,
+      crosswindKt: null,
       headwindKt: 0,
     });
   });

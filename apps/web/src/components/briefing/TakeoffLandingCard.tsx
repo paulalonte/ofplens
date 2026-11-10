@@ -1,31 +1,23 @@
 import {
   formatAltimeter,
-  formatWeight,
   type FlightPlanSummary,
   type LandingPlan,
   type TakeoffPlan,
-  type WeightUnit,
 } from '@ofplens/ofp';
 import type { ReactNode } from 'react';
 import { Card, Row } from '../Card';
-
-interface Props {
-  plan: FlightPlanSummary;
-  displayUnit: WeightUnit;
-}
 
 const number = new Intl.NumberFormat('en-US');
 const deg = (value: number) => `${String(value).padStart(3, '0')}°`;
 
 /**
- * The planned runways as SimBrief computed them at dispatch: conditions, wind components and
- * setup. Planning data, not live weather; every number comes from the OFP.
+ * The planned runways as SimBrief computed them at dispatch: conditions and wind components.
+ * Planning data, not live weather; every number comes from the OFP. Setup (flaps, speeds,
+ * weights) is left to the aircraft, which computes its own.
  */
-export function TakeoffLandingCard({ plan, displayUnit }: Props) {
+export function TakeoffLandingCard({ plan }: { plan: FlightPlanSummary }) {
   const { performance } = plan;
   if (!performance) return null;
-  const weight = (value: number | null) =>
-    value === null ? null : formatWeight(value, plan.units, displayUnit);
 
   return (
     <Card
@@ -37,54 +29,14 @@ export function TakeoffLandingCard({ plan, displayUnit }: Props) {
       }
     >
       <div className="grid gap-6 md:grid-cols-2">
-        {performance.takeoff && (
-          <Phase label="Takeoff" phase={performance.takeoff}>
-            <Line label="Flaps · thrust">
-              {join([
-                performance.takeoff.flaps && `Flaps ${performance.takeoff.flaps}`,
-                thrust(performance.takeoff),
-              ])}
-            </Line>
-            <Line label="V1 / VR / V2">
-              {performance.takeoff.v1Kt !== null &&
-              performance.takeoff.vrKt !== null &&
-              performance.takeoff.v2Kt !== null
-                ? `${performance.takeoff.v1Kt} / ${performance.takeoff.vrKt} / ${performance.takeoff.v2Kt} kt`
-                : null}
-            </Line>
-            <Line label="Takeoff weight">{weight(performance.takeoff.plannedWeight)}</Line>
-          </Phase>
-        )}
-        {performance.landing && (
-          <Phase label="Landing" phase={performance.landing}>
-            <Line label="Flaps">{performance.landing.flaps}</Line>
-            <Line label="VREF">
-              {performance.landing.vrefKt === null ? null : `${performance.landing.vrefKt} kt`}
-            </Line>
-            <Line label="Landing distance">
-              {performance.landing.landingDistanceFt === null
-                ? null
-                : `${number.format(performance.landing.landingDistanceFt)} ft${
-                    performance.landing.surface ? ` (factored, ${performance.landing.surface})` : ''
-                  }`}
-            </Line>
-            <Line label="Landing weight">{weight(performance.landing.plannedWeight)}</Line>
-          </Phase>
-        )}
+        {performance.takeoff && <Phase label="Takeoff" phase={performance.takeoff} />}
+        {performance.landing && <Phase label="Landing" phase={performance.landing} />}
       </div>
     </Card>
   );
 }
 
-function Phase({
-  label,
-  phase,
-  children,
-}: {
-  label: string;
-  phase: TakeoffPlan | LandingPlan;
-  children: ReactNode;
-}) {
+function Phase({ label, phase }: { label: string; phase: TakeoffPlan | LandingPlan }) {
   const length =
     'toraFt' in phase
       ? phase.toraFt !== null && `TORA ${number.format(phase.toraFt)} ft`
@@ -124,8 +76,6 @@ function Phase({
             phase.magneticCourseDeg !== null && `course ${deg(phase.magneticCourseDeg)}`,
           ])}
         </Line>
-        <Line label="ILS">{phase.ilsFrequency}</Line>
-        {children}
       </dl>
     </section>
   );
@@ -155,13 +105,6 @@ function crosswind(phase: TakeoffPlan | LandingPlan): string | null {
   if (phase.crosswindKt === null) return null;
   if (phase.crosswindKt === 0) return 'None';
   return `${phase.crosswindKt} kt${phase.crosswindFrom ? ` from the ${phase.crosswindFrom}` : ''}`;
-}
-
-function thrust(takeoff: TakeoffPlan): string | null {
-  if (!takeoff.thrust) return null;
-  return takeoff.thrust === 'FLEX' && takeoff.flexTemperatureC !== null
-    ? `FLEX ${takeoff.flexTemperatureC}°C`
-    : takeoff.thrust;
 }
 
 const join = (parts: (string | false | null | undefined)[]) =>

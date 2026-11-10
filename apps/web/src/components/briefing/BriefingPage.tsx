@@ -40,7 +40,7 @@ export function BriefingPage({ plan, preferredUnit, weather, aiBriefing }: Props
         <PayloadCard plan={plan} displayUnit={displayUnit} />
       </div>
       <FlightDataCard plan={plan} />
-      <TakeoffLandingCard plan={plan} displayUnit={displayUnit} />
+      <TakeoffLandingCard plan={plan} />
 
       {aiBriefing}
       {weather ?? <WeatherCard plan={plan} />}
