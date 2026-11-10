@@ -5,6 +5,7 @@ import { FlightDataCard } from './FlightDataCard';
 import { FuelCard } from './FuelCard';
 import { NavlogCard } from './NavlogCard';
 import { PayloadCard } from './PayloadCard';
+import { TakeoffLandingCard } from './TakeoffLandingCard';
 import { TimesCard } from './TimesCard';
 import { UnitToggle } from './UnitToggle';
 import { WeatherCard } from './WeatherCard';
@@ -39,6 +40,7 @@ export function BriefingPage({ plan, preferredUnit, weather, aiBriefing }: Props
         <PayloadCard plan={plan} displayUnit={displayUnit} />
       </div>
       <FlightDataCard plan={plan} />
+      <TakeoffLandingCard plan={plan} />
 
       {aiBriefing}
       {weather ?? <WeatherCard plan={plan} />}

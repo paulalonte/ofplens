@@ -1,4 +1,5 @@
 import { z } from 'zod';
+import { parsePerformance } from './performance';
 import { OfpSchema, type Ofp } from './schema';
 import type { Airport, FlightPlanSummary, StepClimb } from './summary';
 
@@ -114,6 +115,7 @@ function toSummary(ofp: Ofp): FlightPlanSummary {
       elapsedS: fix.time_total,
       fuelOnBoard: fix.fuel_plan_onboard,
     })),
+    performance: parsePerformance(ofp.tlr),
   };
 }
 

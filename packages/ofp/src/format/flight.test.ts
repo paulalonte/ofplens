@@ -1,5 +1,10 @@
 import { describe, expect, it } from 'vitest';
-import { formatFlightLevel, formatIsaDeviation, formatWindComponent } from './flight';
+import {
+  formatAltimeter,
+  formatFlightLevel,
+  formatIsaDeviation,
+  formatWindComponent,
+} from './flight';
 
 describe('formatFlightLevel', () => {
   it.each([
@@ -24,4 +29,12 @@ describe('formatIsaDeviation', () => {
     [-2, 'ISA −2'],
     [0, 'ISA +0'],
   ])('%i -> %s', (c, expected) => expect(formatIsaDeviation(c)).toBe(expected));
+});
+
+describe('formatAltimeter', () => {
+  it.each([
+    [30.13, '1020 hPa · 30.13 inHg'],
+    [29.92, '1013 hPa · 29.92 inHg'],
+    [29.81, '1009 hPa · 29.81 inHg'],
+  ])('%f inHg -> %s', (inHg, expected) => expect(formatAltimeter(inHg)).toBe(expected));
 });
