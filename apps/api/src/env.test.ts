@@ -10,7 +10,19 @@ describe('loadEnv', () => {
       HOST: '127.0.0.1',
       PORT: 3000,
       LOG_LEVEL: 'info',
+      BRIEFING_MODEL: 'claude-haiku-5-5',
+      BRIEFING_DAILY_LIMIT: 20,
     });
+  });
+
+  it('switches briefings off without an API key, and reads the briefing settings', () => {
+    expect(loadEnv({ DATABASE_URL }).ANTHROPIC_API_KEY).toBeUndefined();
+    expect(
+      loadEnv({ DATABASE_URL, BRIEFING_MODEL: 'claude-sonnet-5-5', BRIEFING_DAILY_LIMIT: '5' }),
+    ).toMatchObject({ BRIEFING_MODEL: 'claude-sonnet-5-5', BRIEFING_DAILY_LIMIT: 5 });
+    expect(() => loadEnv({ DATABASE_URL, BRIEFING_DAILY_LIMIT: '-1' })).toThrow(
+      /BRIEFING_DAILY_LIMIT/,
+    );
   });
 
   it('accepts an optional SimBrief URL (end-to-end tests) but only http(s)', () => {

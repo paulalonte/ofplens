@@ -202,6 +202,12 @@ importers:
 
   apps/api:
     dependencies:
+      '@anthropic-ai/sdk':
+        specifier: 1.6.0
+        version: 1.6.0(zod@4.6.7)
+      '@ofplens/agent':
+        specifier: workspace:*
+        version: link:../../packages/agent
       '@ofplens/db':
         specifier: workspace:*
         version: link:../../packages/db

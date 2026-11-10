@@ -210,3 +210,44 @@ export const weatherReports = pgTable(
 
 export type FlightPlanRow = typeof flightPlans.$inferSelect;
 export type NewFlightPlanRow = typeof flightPlans.$inferInsert;
+
+/**
+ * AI briefings (phase 5). One row per run: `pending` while the agent works, then `done` with the
+ * validated output or `failed` with the reason. Model, prompt version, tokens, cost and the tool
+ * calls are kept so runs can be compared and replayed (phase 7).
+ */
+export const briefings = pgTable(
+  'briefings',
+  {
+    id: uuid('id').primaryKey().defaultRandom(),
+    flightPlanId: uuid('flight_plan_id')
+      .notNull()
+      .references(() => flightPlans.id, { onDelete: 'cascade' }),
+    status: text('status', { enum: ['pending', 'done', 'failed'] }).notNull(),
+    model: text('model').notNull(),
+    promptVersion: text('prompt_version').notNull(),
+    /** The validated Briefing (done only). */
+    output: jsonb('output'),
+    /** Every tool call with its output or error. */
+    toolCalls: jsonb('tool_calls'),
+    inputTokens: integer('input_tokens'),
+    outputTokens: integer('output_tokens'),
+    costUsd: doublePrecision('cost_usd'),
+    latencyMs: integer('latency_ms'),
+    error: text('error'),
+    createdAt: timestamptz('created_at').notNull().defaultNow(),
+    finishedAt: timestamptz('finished_at'),
+  },
+  (t) => [
+    check('briefings_status_check', sql`${t.status} in ('pending', 'done', 'failed')`),
+    index('briefings_plan_idx').on(t.flightPlanId, t.createdAt.desc()),
+    // The daily limit counts briefings across all plans by creation time.
+    index('briefings_created_idx').on(t.createdAt),
+    // One running briefing per plan at a time.
+    uniqueIndex('briefings_one_pending_per_plan')
+      .on(t.flightPlanId)
+      .where(sql`${t.status} = 'pending'`),
+  ],
+);
+
+export type BriefingRow = typeof briefings.$inferSelect;

@@ -75,6 +75,7 @@ describe('migrations', () => {
       where table_schema = 'public' order by table_name
     `);
     expect(rows.map((r) => r.table_name)).toEqual([
+      'briefings',
       'flight_plan_fuel',
       'flight_plan_weights',
       'flight_plans',

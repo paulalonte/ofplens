@@ -20,3 +20,11 @@ export {
   type StoredReport,
   type WeatherRepository,
 } from './weather';
+export {
+  createBriefingRepository,
+  INTERRUPTED_ERROR,
+  type BriefingRepository,
+  type FinishBriefingInput,
+  type StartBriefingInput,
+} from './briefings';
+export type { BriefingRow } from './schema';
