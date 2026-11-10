@@ -1,5 +1,16 @@
 import { z } from 'zod';
-import { durationS, icao, int, isoUtc, num, optInt, optText, text, utcOffsetMin } from './values';
+import {
+  durationS,
+  icao,
+  int,
+  isoUtc,
+  maybeInt,
+  num,
+  optInt,
+  optText,
+  text,
+  utcOffsetMin,
+} from './values';
 
 /**
  * Zod schema for the parts of a SimBrief JSON v2 OFP that OFP Lens uses.
@@ -15,6 +26,8 @@ const OfpAirport = z.object({
   iata_code: optText,
   name: text,
   plan_rwy: optText,
+  /** Feet above mean sea level. */
+  elevation: maybeInt,
   timezone: utcOffsetMin,
   metar: optText,
   taf: optText,
@@ -50,6 +63,13 @@ export const OfpSchema = z.object({
     initial_altitude: int,
     costindex: optInt,
     route_distance: int,
+    gc_distance: maybeInt,
+    /** "KSFO/0350/DBQ/0370": fix / flight level pairs, the first being the initial cruise. */
+    stepclimb_string: optText.optional().transform((v) => v ?? null),
+    /** Route averages: ISA deviation (°C), tropopause (ft), wind component (kt, + = tailwind). */
+    avg_temp_dev: maybeInt,
+    avg_tropopause: maybeInt,
+    avg_wind_comp: maybeInt,
   }),
   atc: z.object({ callsign: optText }),
   aircraft: z.object({

@@ -73,12 +73,14 @@ export const flightPlans = pgTable(
     originIata: text('origin_iata'),
     originName: text('origin_name').notNull(),
     originRunway: text('origin_runway'),
+    originElevationFt: integer('origin_elevation_ft'),
     originUtcOffsetMin: integer('origin_utc_offset_min').notNull(),
 
     destinationIcao: char('destination_icao', { length: 4 }).notNull(),
     destinationIata: text('destination_iata'),
     destinationName: text('destination_name').notNull(),
     destinationRunway: text('destination_runway'),
+    destinationElevationFt: integer('destination_elevation_ft'),
     destinationUtcOffsetMin: integer('destination_utc_offset_min').notNull(),
 
     /** All alternate_* columns are null together when the plan has no alternate. */
@@ -86,12 +88,23 @@ export const flightPlans = pgTable(
     alternateIata: text('alternate_iata'),
     alternateName: text('alternate_name'),
     alternateRunway: text('alternate_runway'),
+    alternateElevationFt: integer('alternate_elevation_ft'),
     alternateUtcOffsetMin: integer('alternate_utc_offset_min'),
 
     route: text('route').notNull(),
     cruiseAltitudeFt: integer('cruise_altitude_ft').notNull(),
     costIndex: integer('cost_index'),
     routeDistanceNm: integer('route_distance_nm').notNull(),
+    gcDistanceNm: integer('gc_distance_nm'),
+    /** Step climbs after the initial cruise altitude: [{ at, altitudeFt }]. */
+    stepClimbs: jsonb('step_climbs')
+      .$type<{ at: string; altitudeFt: number }[]>()
+      .notNull()
+      .default([]),
+    avgIsaDevC: integer('avg_isa_dev_c'),
+    avgTropopauseFt: integer('avg_tropopause_ft'),
+    /** Positive = tailwind. */
+    avgWindComponentKt: integer('avg_wind_component_kt'),
 
     /** SimBrief's computed (est_*) gate and runway times, not the entered schedule. */
     estOut: timestamptz('est_out').notNull(),

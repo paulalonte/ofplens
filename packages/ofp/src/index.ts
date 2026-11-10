@@ -1,6 +1,6 @@
-export { OfpParseError, parseOfp } from './parseOfp';
+export { OfpParseError, parseOfp, parseStepClimbs } from './parseOfp';
 export { OfpSchema, WEIGHT_UNITS, type Ofp, type WeightUnit } from './schema';
-export { Airport, FlightPlanSummary, Waypoint } from './summary';
+export { Airport, FlightPlanSummary, StepClimb, Waypoint } from './summary';
 export * from './format';
 export { PilotResponse, PilotSettings, SimbriefUsername } from './settings';
 export {

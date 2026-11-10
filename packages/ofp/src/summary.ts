@@ -19,6 +19,8 @@ export const Airport = z.object({
   iata: z.string().nullable(),
   name: z.string(),
   runway: z.string().nullable(),
+  /** Feet above mean sea level. */
+  elevationFt: int.nullable(),
   /** The airport's UTC offset in minutes at the time of the flight, from the OFP. */
   utcOffsetMin: int,
   /** METAR and TAF as printed in the OFP at dispatch. */
@@ -50,6 +52,10 @@ export const Waypoint = z.object({
 });
 export type Waypoint = z.infer<typeof Waypoint>;
 
+/** A step climb: reach `altitudeFt` at the fix `at`. */
+export const StepClimb = z.object({ at: z.string(), altitudeFt: int });
+export type StepClimb = z.infer<typeof StepClimb>;
+
 export const FlightPlanSummary = z.object({
   simbriefRequestId: z.string(),
   generatedAt: iso,
@@ -73,6 +79,15 @@ export const FlightPlanSummary = z.object({
     cruiseAltitudeFt: int,
     costIndex: int.nullable(),
     distanceNm: int,
+    /** Great-circle distance between origin and destination. */
+    gcDistanceNm: int.nullable(),
+    /** Planned step climbs after the initial cruise altitude, in order. */
+    stepClimbs: z.array(StepClimb),
+    /** Route averages from SimBrief. */
+    avgIsaDevC: int.nullable(),
+    avgTropopauseFt: int.nullable(),
+    /** Positive = tailwind, negative = headwind. */
+    avgWindComponentKt: int.nullable(),
   }),
   /** Planned (SimBrief-computed) gate and runway times. */
   times: z.object({

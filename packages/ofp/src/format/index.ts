@@ -1,3 +1,4 @@
+export { formatFlightLevel, formatIsaDeviation, formatWindComponent } from './flight';
 export { convertWeight, formatWeight, formatWeightNumber, weightUnitLabel } from './weight';
 export {
   addSeconds,

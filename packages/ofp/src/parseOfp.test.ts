@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { OfpParseError, parseOfp } from './parseOfp';
+import { OfpParseError, parseOfp, parseStepClimbs } from './parseOfp';
 import { FlightPlanSummary } from './summary';
 import { FIXTURE_NAMES, loadFixture } from './testing/fixtures';
 
@@ -65,10 +65,16 @@ describe('eddb-eddm-c750-kgs (bizjet, kg, one alternate)', () => {
         icao: 'EDDB',
         name: 'BERLIN BRANDENBURG',
         runway: '06L',
+        elevationFt: 156,
         utcOffsetMin: 60,
         metar: expect.stringMatching(/^EDDB 091320Z /),
       }),
-      destination: expect.objectContaining({ icao: 'EDDM', runway: '08R', utcOffsetMin: 60 }),
+      destination: expect.objectContaining({
+        icao: 'EDDM',
+        runway: '08R',
+        elevationFt: 1487,
+        utcOffsetMin: 60,
+      }),
       alternate: expect.objectContaining({
         icao: 'EDDF',
         name: 'FRANKFURT/MAIN',
@@ -80,6 +86,12 @@ describe('eddb-eddm-c750-kgs (bizjet, kg, one alternate)', () => {
         cruiseAltitudeFt: 28000,
         costIndex: 10,
         distanceNm: 333,
+        gcDistanceNm: 249,
+        stepClimbs: [],
+        // SimBrief writes "-0".
+        avgIsaDevC: 0,
+        avgTropopauseFt: 39325,
+        avgWindComponentKt: -6,
       },
       times: {
         out: '2026-11-09T14:00:00Z',
@@ -140,6 +152,20 @@ describe('ksfo-kjfk-b739-lbs (airline, lbs, crosses midnight UTC and timezones)'
     expect(plan.times.out).toBe('2026-11-10T01:00:00Z');
     expect(plan.times.in).toBe('2026-11-10T06:17:58Z');
     expect(plan.times.blockTimeS).toBe(5 * 3600 + 17 * 60 + 58);
+  });
+
+  it('maps the step climb, a tailwind and both elevations', () => {
+    expect(plan.route).toMatchObject({
+      cruiseAltitudeFt: 35000,
+      stepClimbs: [{ at: 'DBQ', altitudeFt: 37000 }],
+      gcDistanceNm: 2242,
+      distanceNm: 2298,
+      avgIsaDevC: 1,
+      avgTropopauseFt: 41365,
+      avgWindComponentKt: 61,
+    });
+    expect(plan.origin.elevationFt).toBe(13);
+    expect(plan.destination.elevationFt).toBe(13);
   });
 
   it('keeps TOC and TOD as ltlg fixes', () => {
@@ -229,4 +255,20 @@ describe('parseOfp on bad input', () => {
       expect.stringMatching(/^navlog: /),
     ]);
   });
+});
+
+describe('parseStepClimbs', () => {
+  it.each([
+    [null, []],
+    ['EDDB/0280', []],
+    ['EDDF/0290/HERBI/0390', [{ at: 'HERBI', altitudeFt: 39000 }]],
+    [
+      'KSFO/0350/DBQ/0370/N45W080/0390',
+      [
+        { at: 'DBQ', altitudeFt: 37000 },
+        { at: 'N45W080', altitudeFt: 39000 },
+      ],
+    ],
+    ['KSFO/0350/DBQ/abc', []],
+  ])('%s', (input, expected) => expect(parseStepClimbs(input)).toEqual(expected));
 });

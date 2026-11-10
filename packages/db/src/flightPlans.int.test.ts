@@ -1,8 +1,11 @@
+import { readFileSync } from 'node:fs';
+import { resolve } from 'node:path';
 import { parseOfp } from '@ofplens/ofp';
 import { loadFixture } from '@ofplens/ofp/testing';
 import { eq, sql } from 'drizzle-orm';
 import { afterAll, beforeAll, beforeEach, describe, expect, it } from 'vitest';
 import { createFlightPlanRepository, InvalidCursorError, PilotNotFoundError } from './flightPlans';
+import { MIGRATIONS_FOLDER } from './migrate';
 import { createPilotRepository } from './pilots';
 import { flightPlans, pilots, weatherReports } from './schema';
 import { createTestDatabase, truncateAll, type TestDatabase } from './testing';
@@ -159,6 +162,38 @@ describe('reading a stored plan back (Postgres)', () => {
         importedAt: expect.stringMatching(/^\d{4}-\d\d-\d\dT\d\d:\d\d:\d\d(\.\d{3})?Z$/),
         plan: parseOfp(loadFixture(fixture)),
       });
+    },
+  );
+
+  it.each(['eddb-eddm-c750-kgs', 'ksfo-kjfk-b739-lbs', 'eddf-lepa-a339-noalt'])(
+    '%s: migration 0004 fills the flight data of a plan saved before it, like parseOfp',
+    async (fixture) => {
+      const repo = createFlightPlanRepository(testDb.db);
+      const { id } = await repo.import(input(fixture));
+      // As a plan saved before migration 0004 looked: the new columns empty.
+      await testDb.db
+        .update(flightPlans)
+        .set({
+          originElevationFt: null,
+          destinationElevationFt: null,
+          alternateElevationFt: null,
+          gcDistanceNm: null,
+          stepClimbs: [],
+          avgIsaDevC: null,
+          avgTropopauseFt: null,
+          avgWindComponentKt: null,
+        })
+        .where(eq(flightPlans.id, id));
+
+      const migration = readFileSync(resolve(MIGRATIONS_FOLDER, '0004_flight_data.sql'), 'utf8');
+      const backfill = migration.slice(migration.indexOf('-- Backfill'));
+      await testDb.db.transaction(async (tx) => {
+        for (const statement of backfill.split('--> statement-breakpoint')) {
+          await tx.execute(sql.raw(statement));
+        }
+      });
+
+      expect((await repo.get(id))?.plan).toEqual(parseOfp(loadFixture(fixture)));
     },
   );
 
