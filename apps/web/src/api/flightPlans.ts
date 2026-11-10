@@ -6,10 +6,10 @@ import {
 import {
   infiniteQueryOptions,
   queryOptions,
-  useInfiniteQuery,
   useMutation,
-  useQuery,
   useQueryClient,
+  useSuspenseInfiniteQuery,
+  useSuspenseQuery,
 } from '@tanstack/react-query';
 import { z } from 'zod';
 import { apiFetch } from './client';
@@ -35,8 +35,9 @@ export const flightPlansQuery = infiniteQueryOptions({
   getNextPageParam: (last) => last.nextCursor,
 });
 
+/** Load `flightPlansQuery` in the route's loader (ensureInfiniteQueryData) first. */
 export function useFlightPlans() {
-  return useInfiniteQuery(flightPlansQuery);
+  return useSuspenseInfiniteQuery(flightPlansQuery);
 }
 
 export const flightPlanQuery = (id: string) =>
@@ -48,8 +49,9 @@ export const flightPlanQuery = (id: string) =>
     staleTime: Infinity,
   });
 
+/** Load `flightPlanQuery(id)` in the route's loader first; the data is then always there. */
 export function useFlightPlan(id: string) {
-  return useQuery(flightPlanQuery(id));
+  return useSuspenseQuery(flightPlanQuery(id)).data;
 }
 
 /** Fetches the latest SimBrief plan and saves it (or finds it already saved). */
@@ -68,9 +70,8 @@ export function useDeleteFlightPlan() {
     // 204 No Content: there is no body to validate.
     mutationFn: (id: string) =>
       apiFetch(`/api/flight-plans/${encodeURIComponent(id)}`, z.undefined(), { method: 'DELETE' }),
-    onSuccess: (_, id) => {
-      queryClient.removeQueries({ queryKey: flightPlanKeys.detail(id) });
-      return queryClient.invalidateQueries({ queryKey: flightPlanKeys.list() });
-    },
+    // The detail entry is dropped by the page after it has navigated away: removing it while
+    // the page is still mounted would make its suspense query refetch the deleted plan.
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: flightPlanKeys.list() }),
   });
 }

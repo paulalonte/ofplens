@@ -1,8 +1,11 @@
 import { createFileRoute } from '@tanstack/react-router';
-import { usePilot } from '../../api/pilot';
+import { pilotQuery, usePilot } from '../../api/pilot';
 import { SettingsForm } from './-components/SettingsForm';
 
-export const Route = createFileRoute('/settings/')({ component: SettingsPage });
+export const Route = createFileRoute('/settings/')({
+  loader: ({ context: { queryClient } }) => queryClient.ensureQueryData(pilotQuery),
+  component: SettingsPage,
+});
 
 function SettingsPage() {
   const pilot = usePilot();
@@ -16,17 +19,9 @@ function SettingsPage() {
         </p>
       </div>
 
-      {pilot.isPending ? (
-        <p className="text-slate-500">Loading settings…</p>
-      ) : pilot.isError ? (
-        <p role="alert" className="text-red-600 dark:text-red-400">
-          Could not load your settings: {pilot.error.message}
-        </p>
-      ) : (
-        // Rendered only once settings have loaded, so the form starts from the saved values.
-        // Not keyed on them: saving updates the cache and must not remount the form.
-        <SettingsForm initial={pilot.data} />
-      )}
+      {/* Starts from the saved values. Not keyed on them: saving updates the cache and must
+          not remount the form. */}
+      <SettingsForm initial={pilot} />
     </section>
   );
 }

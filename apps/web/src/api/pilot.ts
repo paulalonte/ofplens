@@ -1,5 +1,5 @@
 import { PilotResponse, type PilotSettings } from '@ofplens/ofp';
-import { queryOptions, useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { queryOptions, useMutation, useQueryClient, useSuspenseQuery } from '@tanstack/react-query';
 import { apiFetch } from './client';
 
 export const pilotQuery = queryOptions({
@@ -7,9 +7,12 @@ export const pilotQuery = queryOptions({
   queryFn: () => apiFetch('/api/pilot', PilotResponse).then((r) => r.pilot),
 });
 
-/** The saved pilot settings, or null when none are saved yet. */
+/**
+ * The saved pilot settings, or null when none are saved yet.
+ * Load `pilotQuery` in the route's loader; this then reads it from the cache.
+ */
 export function usePilot() {
-  return useQuery(pilotQuery);
+  return useSuspenseQuery(pilotQuery).data;
 }
 
 export function useSavePilot() {

@@ -1,11 +1,17 @@
 import { createFileRoute, Link, type ErrorComponentProps } from '@tanstack/react-router';
-import { usePilot } from '../../api/pilot';
+import { pilotQuery, usePilot } from '../../api/pilot';
 import { BriefingPage } from '../../components/briefing/BriefingPage';
 import { loadSamplePlan } from '../../lib/samples';
 
 /** Development only: a briefing built from a captured OFP in fixtures/ofp. */
 export const Route = createFileRoute('/sample/$name')({
-  loader: ({ params }) => loadSamplePlan(params.name),
+  loader: async ({ context: { queryClient }, params }) => {
+    const [plan] = await Promise.all([
+      loadSamplePlan(params.name),
+      queryClient.ensureQueryData(pilotQuery),
+    ]);
+    return plan;
+  },
   component: SamplePage,
   pendingComponent: SamplePending,
   errorComponent: SampleError,
@@ -14,7 +20,7 @@ export const Route = createFileRoute('/sample/$name')({
 function SamplePage() {
   const plan = Route.useLoaderData();
   const pilot = usePilot();
-  return <BriefingPage plan={plan} {...(pilot.data && { preferredUnit: pilot.data.weightUnit })} />;
+  return <BriefingPage plan={plan} {...(pilot && { preferredUnit: pilot.weightUnit })} />;
 }
 
 function SampleError({ error }: ErrorComponentProps) {

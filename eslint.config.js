@@ -24,6 +24,24 @@ export default tseslint.config(
     },
   },
   {
+    // TanStack Router signals "not found" and redirects by throwing these objects on purpose.
+    files: ['apps/web/src/routes/**/*.{ts,tsx}'],
+    rules: {
+      '@typescript-eslint/only-throw-error': [
+        'error',
+        {
+          allow: [
+            {
+              from: 'package',
+              package: '@tanstack/router-core',
+              name: ['NotFoundError', 'Redirect'],
+            },
+          ],
+        },
+      ],
+    },
+  },
+  {
     // Vitest's asymmetric matchers (expect.objectContaining, expect.any, ...) are typed `any`.
     files: ['**/*.test.{ts,tsx}'],
     rules: { '@typescript-eslint/no-unsafe-assignment': 'off' },
