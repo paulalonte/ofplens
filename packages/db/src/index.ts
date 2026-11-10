@@ -13,3 +13,10 @@ export {
 export { MIGRATIONS_FOLDER, runMigrations } from './migrate';
 export { createPilotRepository, type PilotRepository, type PilotSettingsRecord } from './pilots';
 export * as schema from './schema';
+export {
+  createWeatherRepository,
+  type NewLiveReport,
+  type PlanWeather,
+  type StoredReport,
+  type WeatherRepository,
+} from './weather';

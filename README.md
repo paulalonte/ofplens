@@ -156,15 +156,17 @@ checks, with its own Postgres, on every pull request.
 
 All errors come back as `{ "error": { "code", "message" } }`.
 
-| Method    | Path                               | Does                                                            |
-| --------- | ---------------------------------- | --------------------------------------------------------------- |
-| GET       | `/api/health`                      | API and database status                                         |
-| GET / PUT | `/api/pilot`                       | Read / save the SimBrief username and kg/lb preference          |
-| GET       | `/api/simbrief/latest`             | Fetch and parse your latest SimBrief plan (nothing saved)       |
-| POST      | `/api/flight-plans/import`         | Fetch your latest plan and save it (201 new, 200 already saved) |
-| GET       | `/api/flight-plans?cursor=&limit=` | Your saved plans, newest first, a page at a time                |
-| GET       | `/api/flight-plans/:id`            | One saved plan, in the briefing's shape                         |
-| DELETE    | `/api/flight-plans/:id`            | Delete a saved plan                                             |
+| Method    | Path                                    | Does                                                                     |
+| --------- | --------------------------------------- | ------------------------------------------------------------------------ |
+| GET       | `/api/health`                           | API and database status                                                  |
+| GET / PUT | `/api/pilot`                            | Read / save the SimBrief username and kg/lb preference                   |
+| GET       | `/api/simbrief/latest`                  | Fetch and parse your latest SimBrief plan (nothing saved)                |
+| POST      | `/api/flight-plans/import`              | Fetch your latest plan and save it (201 new, 200 already saved)          |
+| GET       | `/api/flight-plans?cursor=&limit=`      | Your saved plans, newest first, a page at a time                         |
+| GET       | `/api/flight-plans/:id`                 | One saved plan, in the briefing's shape                                  |
+| DELETE    | `/api/flight-plans/:id`                 | Delete a saved plan                                                      |
+| GET       | `/api/flight-plans/:id/weather`         | Weather at dispatch (OFP) vs now (latest live), per airport              |
+| POST      | `/api/flight-plans/:id/weather/refresh` | Fetch live METAR/TAF from aviationweather.gov (cached 5 min per airport) |
 
 ## Project layout
 

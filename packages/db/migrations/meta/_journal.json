@@ -15,6 +15,13 @@
       "when": 1794256132722,
       "tag": "0001_flight_plans",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1794303094596,
+      "tag": "0002_live_weather",
+      "breakpoints": true
     }
   ]
 }

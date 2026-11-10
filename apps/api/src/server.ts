@@ -1,4 +1,10 @@
-import { createDb, createFlightPlanRepository, createPilotRepository, pingDb } from '@ofplens/db';
+import {
+  createDb,
+  createFlightPlanRepository,
+  createPilotRepository,
+  createWeatherRepository,
+  pingDb,
+} from '@ofplens/db';
 import { buildApp } from './app';
 import { loadEnv } from './env';
 
@@ -9,6 +15,7 @@ const app = await buildApp({
   pingDb: () => pingDb(db),
   pilots: createPilotRepository(db),
   flightPlans: createFlightPlanRepository(db),
+  weatherReports: createWeatherRepository(db),
   simbriefUrl: env.SIMBRIEF_URL,
   logger: { level: env.LOG_LEVEL },
 });
