@@ -39,8 +39,8 @@ describe('History page', () => {
 
     const rows = await screen.findAllByRole('link', { name: /→/ });
     expect(rows.map((r) => r.getAttribute('href'))).toEqual([
-      `/plans/${PLAN_IDS.lbs}`,
-      `/plans/${PLAN_IDS.noalt}`,
+      `/history/${PLAN_IDS.lbs}`,
+      `/history/${PLAN_IDS.noalt}`,
     ]);
     expect(rows[0]).toHaveTextContent(/10 NOV 2026 01:00Z\s*UAL1234\s*KSFO → KJFKALT KEWR\s*B739/);
     expect(screen.getByLabelText('Block time 05:18')).toBeInTheDocument();

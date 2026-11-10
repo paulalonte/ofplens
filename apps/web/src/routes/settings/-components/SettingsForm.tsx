@@ -1,40 +1,14 @@
 import { PilotSettings, WEIGHT_UNITS, weightUnitLabel, type WeightUnit } from '@ofplens/ofp';
 import { Link } from '@tanstack/react-router';
 import { useId, useState, type FormEvent } from 'react';
-import { usePilot, useSavePilot } from '../../api/pilot';
-
-export function SettingsPage() {
-  const pilot = usePilot();
-
-  return (
-    <section className="max-w-md space-y-6">
-      <div className="space-y-1">
-        <h1 className="text-2xl font-semibold">Settings</h1>
-        <p className="text-slate-600 dark:text-slate-400">
-          OFP Lens loads your latest plan from SimBrief with this username.
-        </p>
-      </div>
-
-      {pilot.isPending ? (
-        <p className="text-slate-500">Loading settings…</p>
-      ) : pilot.isError ? (
-        <p role="alert" className="text-red-600 dark:text-red-400">
-          Could not load your settings: {pilot.error.message}
-        </p>
-      ) : (
-        // Rendered only once settings have loaded, so the form starts from the saved values.
-        // Not keyed on them: saving updates the cache and must not remount the form.
-        <SettingsForm initial={pilot.data} />
-      )}
-    </section>
-  );
-}
+import { useSavePilot } from '../../../api/pilot';
 
 interface FormProps {
   initial: PilotSettings | null;
 }
 
-function SettingsForm({ initial }: FormProps) {
+/** SimBrief username and weight unit, validated with the shared schema before saving. */
+export function SettingsForm({ initial }: FormProps) {
   const save = useSavePilot();
   const [username, setUsername] = useState(initial?.simbriefUsername ?? '');
   const [weightUnit, setWeightUnit] = useState<WeightUnit>(initial?.weightUnit ?? 'kgs');

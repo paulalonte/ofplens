@@ -1,8 +1,10 @@
-import { Link } from '@tanstack/react-router';
+import { createFileRoute, Link } from '@tanstack/react-router';
 import { useFlightPlans } from '../../api/flightPlans';
-import { PlanList } from './PlanList';
+import { PlanList } from '../../components/PlanList';
 
-export function HistoryPage() {
+export const Route = createFileRoute('/history/')({ component: HistoryPage });
+
+function HistoryPage() {
   const plans = useFlightPlans();
   const items = plans.data?.pages.flatMap((page) => page.items) ?? [];
 

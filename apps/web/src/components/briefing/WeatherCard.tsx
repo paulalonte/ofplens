@@ -1,5 +1,5 @@
 import type { Airport, FlightPlanSummary } from '@ofplens/ofp';
-import { Card } from '../../components/Card';
+import { Card } from '../Card';
 
 /** METAR and TAF exactly as printed in the OFP at dispatch. Live weather comes in phase 4. */
 export function WeatherCard({ plan }: { plan: FlightPlanSummary }) {

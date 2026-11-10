@@ -163,7 +163,7 @@ All errors come back as `{ "error": { "code", "message" } }`.
 
 ```
 apps/
-  web/          React app (Vite, TanStack Router + Query, Tailwind)
+  web/          React app (Vite, TanStack file-based routes in src/routes, Query, Tailwind)
   api/          HTTP API (Fastify, Zod)
 packages/
   ofp/          SimBrief OFP schema, parseOfp(), formatters, shared API schemas

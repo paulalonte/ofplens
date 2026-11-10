@@ -6,7 +6,7 @@ import {
   localDayOffset,
   type FlightPlanSummary,
 } from '@ofplens/ofp';
-import { Card, Row } from '../../components/Card';
+import { Card, Row } from '../Card';
 
 export function TimesCard({ plan }: { plan: FlightPlanSummary }) {
   const { times, origin, destination } = plan;

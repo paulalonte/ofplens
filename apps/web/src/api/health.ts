@@ -1,6 +1,6 @@
 import { queryOptions, useQuery } from '@tanstack/react-query';
 import { z } from 'zod';
-import { apiFetch } from '../../api/client';
+import { apiFetch } from './client';
 
 export const Health = z.object({
   status: z.enum(['ok', 'error']),

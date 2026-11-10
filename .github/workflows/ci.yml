@@ -54,3 +54,6 @@ jobs:
       - run: pnpm typecheck
       - run: pnpm test
       - run: pnpm --filter @ofplens/web build
+      # The build regenerates the route tree; a diff means a route change was not committed.
+      - name: Route tree is up to date
+        run: git diff --exit-code apps/web/src/routeTree.gen.ts

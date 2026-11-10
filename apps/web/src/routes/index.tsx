@@ -1,14 +1,16 @@
-import { Link, useNavigate } from '@tanstack/react-router';
-import type { ReactNode } from 'react';
-import { ApiError } from '../api/client';
+import { createFileRoute, Link, useNavigate } from '@tanstack/react-router';
 import { useFlightPlans, useImportLatestPlan } from '../api/flightPlans';
 import { usePilot } from '../api/pilot';
-import { SAMPLE_NAMES } from '../features/briefing/samples';
-import { PlanList } from '../features/history/PlanList';
+import { Callout } from '../components/Callout';
+import { PlanList } from '../components/PlanList';
+import { SAMPLE_NAMES } from '../lib/samples';
+import { LoadError } from './-components/LoadError';
+
+export const Route = createFileRoute('/')({ component: HomePage });
 
 const RECENT = 5;
 
-export function HomePage() {
+function HomePage() {
   const pilot = usePilot();
   const recent = useFlightPlans();
   const importLatest = useImportLatestPlan();
@@ -20,7 +22,7 @@ export function HomePage() {
     importLatest.mutate(undefined, {
       onSuccess: ({ id, created }) =>
         void navigate({
-          to: '/plans/$planId',
+          to: '/history/$planId',
           params: { planId: id },
           search: { imported: created ? 'new' : 'existing' },
         }),
@@ -117,42 +119,6 @@ export function HomePage() {
           </ul>
         </nav>
       )}
-    </div>
-  );
-}
-
-function LoadError({ error }: { error: Error }) {
-  const code = error instanceof ApiError ? error.code : undefined;
-  const fixInSettings = code === 'USERNAME_REQUIRED' || code === 'SIMBRIEF_NOT_FOUND';
-  const transient = code === 'SIMBRIEF_UNAVAILABLE' || code === 'NETWORK_ERROR';
-
-  return (
-    <Callout tone="error">
-      <p className="font-medium">Could not load your latest plan</p>
-      <p className="text-sm">{error.message}</p>
-      {fixInSettings && (
-        <p className="text-sm">
-          <Link to="/settings" className="underline">
-            Check your username in Settings
-          </Link>
-        </p>
-      )}
-      {transient && <p className="text-sm">This is usually temporary. Try again in a moment.</p>}
-    </Callout>
-  );
-}
-
-function Callout({ children, tone = 'info' }: { children: ReactNode; tone?: 'info' | 'error' }) {
-  return (
-    <div
-      role={tone === 'error' ? 'alert' : 'note'}
-      className={`space-y-1 rounded-lg border p-4 ${
-        tone === 'error'
-          ? 'border-red-200 bg-red-50 text-red-900 dark:border-red-900 dark:bg-red-950/50 dark:text-red-200'
-          : 'border-sky-200 bg-sky-50 text-sky-900 dark:border-sky-900 dark:bg-sky-950/50 dark:text-sky-200'
-      }`}
-    >
-      {children}
     </div>
   );
 }

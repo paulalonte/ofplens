@@ -41,7 +41,7 @@ describe('Home', () => {
 
     const recent = await screen.findByRole('region', { name: 'Recent plans' });
     const link = await within(recent).findByRole('link', { name: /UAL1234/ });
-    expect(link).toHaveAttribute('href', `/plans/${PLAN_IDS.lbs}`);
+    expect(link).toHaveAttribute('href', `/history/${PLAN_IDS.lbs}`);
     expect(link).toHaveTextContent('10 NOV 2026 01:00Z');
     expect(link).toHaveTextContent('KSFO → KJFK');
     expect(within(recent).getByRole('link', { name: 'All plans' })).toHaveAttribute(
@@ -66,7 +66,7 @@ describe('Home', () => {
     await user.click(await screen.findByRole('button', { name: 'Load latest plan' }));
 
     expect(await screen.findByRole('heading', { level: 1, name: 'UAL1234' })).toBeInTheDocument();
-    expect(router.state.location.pathname).toBe(`/plans/${PLAN_IDS.lbs}`);
+    expect(router.state.location.pathname).toBe(`/history/${PLAN_IDS.lbs}`);
     expect(screen.getByText('Saved to your history.')).toBeInTheDocument();
     expect(api.calls.filter((c) => c.method === 'POST').map((c) => c.path)).toEqual([
       '/api/flight-plans/import',

@@ -1,4 +1,5 @@
 import tailwindcss from '@tailwindcss/vite';
+import { tanstackRouter } from '@tanstack/router-plugin/vite';
 import react from '@vitejs/plugin-react';
 import { defineConfig, loadEnv } from 'vite';
 
@@ -10,7 +11,17 @@ export default defineConfig(({ mode }) => {
   const apiPort = env.PORT ?? '3000';
 
   return {
-    plugins: [react(), tailwindcss()],
+    plugins: [
+      // File-based routing: generates src/routeTree.gen.ts from src/routes. Must run before react().
+      // Files and folders starting with "-" (e.g. -components/) and *.test.* files are not routes.
+      tanstackRouter({
+        target: 'react',
+        autoCodeSplitting: true,
+        routeFileIgnorePattern: '\\.test\\.',
+      }),
+      react(),
+      tailwindcss(),
+    ],
     server: {
       port: 5173,
       strictPort: true,
