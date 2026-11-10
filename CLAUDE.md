@@ -24,11 +24,12 @@ history in Postgres. **For flight simulation (X-Plane 12) only.** The plan is in
 | `pnpm db:studio`                       | Browse the dev database in Drizzle Studio                                                                                   |
 | `pnpm test`                            | All Vitest tests: `web` (jsdom), `node` (api, packages), `integration` (`*.int.test.ts`, real Postgres: needs `pnpm db:up`) |
 | `pnpm test --project web`              | Only the web tests (no `--` with pnpm; it is passed on literally)                                                           |
-| `pnpm e2e`                             | Playwright end to end (`e2e/`): real web + API, fresh `ofplens_e2e` DB, fake SimBrief + aviationweather.gov                 |
+| `pnpm e2e`                             | Playwright end to end (`e2e/`): real web + API, fresh `ofplens_e2e` DB, fake SimBrief, aviationweather.gov and Claude       |
 | `pnpm lint` / `pnpm typecheck`         | ESLint (type-aware) / `tsc --noEmit` in every workspace                                                                     |
 | `pnpm format` / `pnpm format:check`    | Prettier                                                                                                                    |
 | `pnpm fixture:capture <name>`          | Save your latest SimBrief OFP (pilot ID redacted) to `fixtures/ofp/`                                                        |
 | `pnpm fixture:weather`                 | Save current METARs/TAFs for 24 airports to `fixtures/weather/`                                                             |
+| `pnpm briefing:try <planId\|fixture>`  | One real, paid AI briefing (key from `.env`), or `--fixtures` for all; prints briefing, tokens, cost, guardrail failures    |
 
 Before saying a change is done, run `pnpm format:check && pnpm lint && pnpm typecheck && pnpm test`
 (the same steps CI runs, plus `pnpm --filter @ofplens/web build`).

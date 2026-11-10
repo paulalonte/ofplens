@@ -4,8 +4,8 @@ import { API_PORT, e2eDatabaseUrl, FAKE_UPSTREAMS_PORT, WEB_PORT } from './ports
 const CI = !!process.env.CI;
 
 /**
- * The real web app and API against a fresh Postgres database, with SimBrief and
- * aviationweather.gov faked.
+ * The real web app and API against a fresh Postgres database, with SimBrief,
+ * aviationweather.gov and Claude faked.
  * Locally: Docker Postgres must be running (`pnpm db:up`). Run with `pnpm e2e`.
  */
 export default defineConfig({
@@ -38,6 +38,10 @@ export default defineConfig({
         PORT: String(API_PORT),
         SIMBRIEF_URL: `http://127.0.0.1:${FAKE_UPSTREAMS_PORT}/api/xml.fetcher.php`,
         AVIATION_WEATHER_URL: `http://127.0.0.1:${FAKE_UPSTREAMS_PORT}/api/data`,
+        // Never a real key or the real API here, even when .env has one: env set here wins.
+        ANTHROPIC_API_KEY: 'e2e-fake-key',
+        ANTHROPIC_BASE_URL: `http://127.0.0.1:${FAKE_UPSTREAMS_PORT}`,
+        BRIEFING_MODEL: 'claude-haiku-5-5',
         LOG_LEVEL: 'warn',
       },
       timeout: 60_000,
