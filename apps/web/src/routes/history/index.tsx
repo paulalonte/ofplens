@@ -1,12 +1,16 @@
 import { createFileRoute, Link } from '@tanstack/react-router';
-import { useFlightPlans } from '../../api/flightPlans';
+import { flightPlansQuery, useFlightPlans } from '../../api/flightPlans';
 import { PlanList } from '../../components/PlanList';
 
-export const Route = createFileRoute('/history/')({ component: HistoryPage });
+export const Route = createFileRoute('/history/')({
+  // First page only; "Load more" fetches the next ones from the component.
+  loader: ({ context: { queryClient } }) => queryClient.ensureInfiniteQueryData(flightPlansQuery),
+  component: HistoryPage,
+});
 
 function HistoryPage() {
   const plans = useFlightPlans();
-  const items = plans.data?.pages.flatMap((page) => page.items) ?? [];
+  const items = plans.data.pages.flatMap((page) => page.items);
 
   return (
     <section className="space-y-6">
@@ -17,13 +21,7 @@ function HistoryPage() {
         </p>
       </div>
 
-      {plans.isPending ? (
-        <p className="text-slate-500">Loading your plans…</p>
-      ) : plans.isError ? (
-        <p role="alert" className="text-red-600 dark:text-red-400">
-          Could not load your history: {plans.error.message}
-        </p>
-      ) : items.length === 0 ? (
+      {items.length === 0 ? (
         <p className="text-slate-600 dark:text-slate-400">
           No saved plans yet.{' '}
           <Link to="/" className="underline">

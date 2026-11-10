@@ -1,8 +1,12 @@
-import { createRootRoute, Link, Outlet } from '@tanstack/react-router';
+import { createRootRouteWithContext, Link, Outlet } from '@tanstack/react-router';
 import { HealthStatus } from '../components/HealthStatus';
+import type { RouterContext } from '../router';
 import { NotFound } from './-components/NotFound';
 
-export const Route = createRootRoute({ component: RootLayout, notFoundComponent: NotFound });
+export const Route = createRootRouteWithContext<RouterContext>()({
+  component: RootLayout,
+  notFoundComponent: NotFound,
+});
 
 /** Header with navigation and API status, the page, and the simulation-only footer. */
 function RootLayout() {

@@ -66,6 +66,10 @@ describe('Saved plan page', () => {
     expect(await screen.findByRole('heading', { name: 'History' })).toBeInTheDocument();
     expect(router.state.location.pathname).toBe('/history');
     expect(api.calls.filter((c) => c.method === 'DELETE')).toHaveLength(1);
+    // The deleted plan is not requested again on the way out.
+    expect(
+      api.calls.filter((c) => c.method === 'GET' && c.path === `/api/flight-plans/${PLAN_IDS.kgs}`),
+    ).toHaveLength(1);
   });
 
   it('does nothing when the delete is cancelled', async () => {

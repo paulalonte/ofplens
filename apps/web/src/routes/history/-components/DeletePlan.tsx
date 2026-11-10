@@ -1,12 +1,19 @@
+import { useQueryClient } from '@tanstack/react-query';
 import { useNavigate } from '@tanstack/react-router';
 import { useState } from 'react';
-import { useDeleteFlightPlan } from '../../../api/flightPlans';
+import { flightPlanKeys, useDeleteFlightPlan } from '../../../api/flightPlans';
 
 /** "Delete plan" with an inline confirmation; goes back to History once deleted. */
 export function DeletePlan({ planId }: { planId: string }) {
   const [confirming, setConfirming] = useState(false);
   const remove = useDeleteFlightPlan();
   const navigate = useNavigate();
+  const queryClient = useQueryClient();
+
+  async function onDeleted() {
+    await navigate({ to: '/history' });
+    queryClient.removeQueries({ queryKey: flightPlanKeys.detail(planId) });
+  }
 
   if (!confirming) {
     return (
@@ -30,9 +37,7 @@ export function DeletePlan({ planId }: { planId: string }) {
       <button
         type="button"
         disabled={remove.isPending}
-        onClick={() =>
-          remove.mutate(planId, { onSuccess: () => void navigate({ to: '/history' }) })
-        }
+        onClick={() => remove.mutate(planId, { onSuccess: () => void onDeleted() })}
         className="rounded-md bg-red-600 px-3 py-1.5 font-medium text-white hover:bg-red-700 disabled:opacity-60"
       >
         {remove.isPending ? 'Deleting…' : 'Delete'}

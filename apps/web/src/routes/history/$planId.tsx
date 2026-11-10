@@ -1,7 +1,7 @@
-import { createFileRoute, Link } from '@tanstack/react-router';
+import { createFileRoute, Link, notFound } from '@tanstack/react-router';
 import { ApiError } from '../../api/client';
-import { useFlightPlan } from '../../api/flightPlans';
-import { usePilot } from '../../api/pilot';
+import { flightPlanQuery, useFlightPlan } from '../../api/flightPlans';
+import { pilotQuery, usePilot } from '../../api/pilot';
 import { BriefingPage } from '../../components/briefing/BriefingPage';
 import { DeletePlan } from './-components/DeletePlan';
 
@@ -16,31 +16,25 @@ export const Route = createFileRoute('/history/$planId')({
     search.imported === 'new' || search.imported === 'existing'
       ? { imported: search.imported }
       : {},
+  loader: async ({ context: { queryClient }, params }) => {
+    await Promise.all([
+      queryClient.ensureQueryData(flightPlanQuery(params.planId)).catch((err: unknown) => {
+        // A deleted or unknown plan is "not found", not a broken page.
+        if (err instanceof ApiError && err.status === 404) throw notFound();
+        throw err;
+      }),
+      queryClient.ensureQueryData(pilotQuery),
+    ]);
+  },
   component: PlanPage,
+  notFoundComponent: PlanNotFound,
 });
 
 function PlanPage() {
   const { planId } = Route.useParams();
   const { imported } = Route.useSearch();
-  const stored = useFlightPlan(planId);
+  const { plan } = useFlightPlan(planId);
   const pilot = usePilot();
-
-  if (stored.isPending) return <p className="text-slate-500">Loading plan…</p>;
-
-  if (stored.isError) {
-    const notFound = stored.error instanceof ApiError && stored.error.status === 404;
-    return (
-      <div role="alert" className="space-y-3">
-        <h1 className="text-xl font-semibold">
-          {notFound ? 'Plan not found' : 'Could not load this plan'}
-        </h1>
-        <p className="text-slate-600 dark:text-slate-400">{stored.error.message}</p>
-        <Link to="/history" className="text-sm underline">
-          Back to history
-        </Link>
-      </div>
-    );
-  }
 
   return (
     <div className="space-y-6">
@@ -62,10 +56,21 @@ function PlanPage() {
         </p>
       )}
 
-      <BriefingPage
-        plan={stored.data.plan}
-        {...(pilot.data && { preferredUnit: pilot.data.weightUnit })}
-      />
+      <BriefingPage plan={plan} {...(pilot && { preferredUnit: pilot.weightUnit })} />
+    </div>
+  );
+}
+
+function PlanNotFound() {
+  return (
+    <div role="alert" className="space-y-3">
+      <h1 className="text-xl font-semibold">Plan not found</h1>
+      <p className="text-slate-600 dark:text-slate-400">
+        That flight plan does not exist (it may have been deleted).
+      </p>
+      <Link to="/history" className="text-sm underline">
+        Back to history
+      </Link>
     </div>
   );
 }

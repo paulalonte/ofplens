@@ -60,6 +60,14 @@ A component used by one route lives in that route's `-components/`; move it to `
 once a second route needs it. Route files export only `Route` (keeps code splitting working).
 Tests may sit next to routes: `*.test.*` files are ignored by the router.
 
+**Data loading:** a route's `loader` fetches what the page needs into the Query cache
+(`context.queryClient.ensureQueryData(...)` / `ensureInfiniteQueryData`), and the page and its
+children read it with the suspense hooks in `api/` (`usePilot()`, `useFlightPlan(id)`, …), whose
+data is never undefined. Slow loads show the router's spinner (`PageSpinner`), failures its error
+page (`RouteError`, with "Try again"); throw `notFound()` for a missing resource. Mutations (save,
+import, delete) and polling (the API status) stay in components. Query options live in `api/`
+next to their hook, so loaders and components share one definition.
+
 Workspace packages export their TypeScript source directly (`"exports": "./src/index.ts"`);
 there is no build step between packages.
 

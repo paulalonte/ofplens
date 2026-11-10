@@ -1,12 +1,19 @@
 import { createFileRoute, Link, useNavigate } from '@tanstack/react-router';
-import { useFlightPlans, useImportLatestPlan } from '../api/flightPlans';
-import { usePilot } from '../api/pilot';
+import { flightPlansQuery, useFlightPlans, useImportLatestPlan } from '../api/flightPlans';
+import { pilotQuery, usePilot } from '../api/pilot';
 import { Callout } from '../components/Callout';
 import { PlanList } from '../components/PlanList';
 import { SAMPLE_NAMES } from '../lib/samples';
 import { LoadError } from './-components/LoadError';
 
-export const Route = createFileRoute('/')({ component: HomePage });
+export const Route = createFileRoute('/')({
+  loader: ({ context: { queryClient } }) =>
+    Promise.all([
+      queryClient.ensureQueryData(pilotQuery),
+      queryClient.ensureInfiniteQueryData(flightPlansQuery),
+    ]),
+  component: HomePage,
+});
 
 const RECENT = 5;
 
@@ -15,8 +22,8 @@ function HomePage() {
   const recent = useFlightPlans();
   const importLatest = useImportLatestPlan();
   const navigate = useNavigate();
-  const username = pilot.data?.simbriefUsername;
-  const recentItems = recent.data?.pages[0]?.items.slice(0, RECENT) ?? [];
+  const username = pilot?.simbriefUsername;
+  const recentItems = recent.data.pages[0]?.items.slice(0, RECENT) ?? [];
 
   function load() {
     importLatest.mutate(undefined, {
@@ -33,9 +40,7 @@ function HomePage() {
     <div className="space-y-8">
       <section className="flex flex-wrap items-center justify-between gap-4">
         <div>
-          {pilot.isPending ? (
-            <p className="text-slate-500">Loading settings…</p>
-          ) : username ? (
+          {username ? (
             <p className="text-sm text-slate-600 dark:text-slate-400">
               SimBrief user <span className="font-mono font-semibold">{username}</span> ·{' '}
               <Link to="/settings" className="underline">
@@ -57,7 +62,7 @@ function HomePage() {
         </button>
       </section>
 
-      {pilot.isSuccess && !username && (
+      {!username && (
         <Callout>
           <p className="font-medium">Set your SimBrief username first.</p>
           <p className="text-sm">
@@ -83,9 +88,7 @@ function HomePage() {
               </Link>
             )}
           </div>
-          {recent.isPending ? (
-            <p className="text-slate-500">Loading…</p>
-          ) : recentItems.length > 0 ? (
+          {recentItems.length > 0 ? (
             <PlanList items={recentItems} />
           ) : (
             <p className="text-slate-600 dark:text-slate-400">
