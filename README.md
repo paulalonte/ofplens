@@ -89,18 +89,19 @@ directly on your machine. Settings live in `.env` (git-ignored); see `.env.examp
 
 ## Commands
 
-| Command                             | What it does                                                       |
-| ----------------------------------- | ------------------------------------------------------------------ |
-| `pnpm dev`                          | Start Postgres, apply migrations, run web and API                  |
-| `pnpm dev:apps`                     | Run only web and API (Postgres already up and migrated)            |
-| `pnpm db:up` / `pnpm db:down`       | Start / stop the Postgres container (your data is kept)            |
-| `pnpm db:migrate`                   | Apply new database migrations (`pnpm dev` does this for you)       |
-| `pnpm db:generate`                  | Create a migration after changing `packages/db/src/schema.ts`      |
-| `pnpm db:studio`                    | Browse the database in Drizzle Studio                              |
-| `pnpm test`                         | All tests: unit, component, and integration tests against Postgres |
-| `pnpm test --project web`           | Only one test group: `web`, `node` or `integration`                |
-| `pnpm lint` / `pnpm typecheck`      | ESLint / TypeScript                                                |
-| `pnpm format` / `pnpm format:check` | Prettier                                                           |
+| Command                             | What it does                                                                                      |
+| ----------------------------------- | ------------------------------------------------------------------------------------------------- |
+| `pnpm dev`                          | Start Postgres, apply migrations, run web and API                                                 |
+| `pnpm dev:apps`                     | Run only web and API (Postgres already up and migrated)                                           |
+| `pnpm db:up` / `pnpm db:down`       | Start / stop the Postgres container (your data is kept)                                           |
+| `pnpm db:migrate`                   | Apply new database migrations (`pnpm dev` does this for you)                                      |
+| `pnpm db:generate`                  | Create a migration after changing `packages/db/src/schema.ts`                                     |
+| `pnpm db:studio`                    | Browse the database in Drizzle Studio                                                             |
+| `pnpm test`                         | All tests: unit, component, and integration tests against Postgres                                |
+| `pnpm test --project web`           | Only one test group: `web`, `node` or `integration`                                               |
+| `pnpm e2e`                          | End-to-end tests in a real browser (Playwright); needs `pnpm db:up` and, once, `pnpm e2e:install` |
+| `pnpm lint` / `pnpm typecheck`      | ESLint / TypeScript                                                                               |
+| `pnpm format` / `pnpm format:check` | Prettier                                                                                          |
 
 ## Looking at the database
 
@@ -141,6 +142,12 @@ Three groups run together:
 - **node**: the OFP parser, formatters and API routes, with the database and SimBrief faked.
 - **integration**: `*.int.test.ts` against a real Postgres. Each test file gets its own temporary
   database, so your dev data is never touched. Needs Docker running (`pnpm db:up`).
+
+**End-to-end** (`pnpm e2e`, Playwright): the real web app and API in Chromium against a fresh
+`ofplens_e2e` database, with a fake SimBrief serving a saved OFP. It walks through what a pilot
+does: set the username, load a plan, find it in History, open it, delete it, and the error for an
+unknown SimBrief user. It uses its own ports (web 5174, API 3100), so it can run next to
+`pnpm dev`. Install the browser once with `pnpm e2e:install`.
 
 Tests never call SimBrief; they use the real OFPs saved in `fixtures/ofp/`. CI runs the same
 checks, with its own Postgres, on every pull request.

@@ -5,6 +5,8 @@ const EnvSchema = z.object({
   HOST: z.string().min(1).default('127.0.0.1'),
   PORT: z.coerce.number().int().min(1).max(65535).default(3000),
   LOG_LEVEL: z.enum(['fatal', 'error', 'warn', 'info', 'debug', 'trace', 'silent']).default('info'),
+  /** Only for end-to-end tests: a fake SimBrief fetcher URL. Unset = the real SimBrief. */
+  SIMBRIEF_URL: z.url({ protocol: /^https?$/ }).optional(),
 });
 
 export type Env = z.infer<typeof EnvSchema>;

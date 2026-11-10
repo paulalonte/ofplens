@@ -18,6 +18,8 @@
     "typecheck": "tsc --noEmit -p tsconfig.json && pnpm -r typecheck",
     "test": "vitest run",
     "test:watch": "vitest",
+    "e2e": "pnpm --filter @ofplens/e2e test",
+    "e2e:install": "pnpm --filter @ofplens/e2e install-browser",
     "format": "prettier --write .",
     "format:check": "prettier --check .",
     "fixture:capture": "tsx --env-file-if-exists=.env scripts/capture-ofp.ts"

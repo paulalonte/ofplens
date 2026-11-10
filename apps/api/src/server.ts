@@ -9,6 +9,7 @@ const app = await buildApp({
   pingDb: () => pingDb(db),
   pilots: createPilotRepository(db),
   flightPlans: createFlightPlanRepository(db),
+  simbriefUrl: env.SIMBRIEF_URL,
   logger: { level: env.LOG_LEVEL },
 });
 app.addHook('onClose', closeDb);
