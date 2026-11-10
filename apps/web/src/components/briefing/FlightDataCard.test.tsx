@@ -21,6 +21,18 @@ describe('<FlightDataCard />', () => {
     render(<FlightDataCard plan={fixturePlan('ksfo-kjfk-b739-lbs')} />);
 
     expect(screen.getByRole('region', { name: 'Flight data' })).toBeInTheDocument();
+    // Column by column: cruise, then distances, then airports and wind.
+    expect(Object.keys(items())).toEqual([
+      'Cruise altitude',
+      'Cruise temperature',
+      'Tropopause',
+      'Cost index',
+      'G/C distance',
+      'Route distance',
+      'Origin elevation',
+      'Destination elevation',
+      'Wind component',
+    ]);
     expect(items()).toEqual({
       'Cost index': '16',
       'Cruise altitude': 'FL350 | Step to FL370 at DBQ',

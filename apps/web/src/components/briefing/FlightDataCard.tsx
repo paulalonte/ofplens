@@ -28,8 +28,8 @@ export function FlightDataCard({ plan }: { plan: FlightPlanSummary }) {
 
   return (
     <Card title="Flight data">
-      <dl className="grid grid-cols-2 gap-x-4 gap-y-4 sm:grid-cols-3">
-        <Item label="Cost index">{route.costIndex ?? NONE}</Item>
+      {/* Column by column from sm up: cruise, then distances, then airports and wind. */}
+      <dl className="grid grid-cols-2 gap-x-4 gap-y-4 sm:grid-flow-col sm:grid-cols-3 sm:grid-rows-3">
         <Item label="Cruise altitude" note={steps ? `Step to ${steps}` : 'No step climbs'}>
           {formatFlightLevel(route.cruiseAltitudeFt)}
         </Item>
@@ -47,8 +47,12 @@ export function FlightDataCard({ plan }: { plan: FlightPlanSummary }) {
         <Item label="Tropopause" note="Route average">
           {route.avgTropopauseFt === null ? NONE : formatFlightLevel(route.avgTropopauseFt)}
         </Item>
-        <Item label="Wind component" note="Route average">
-          {route.avgWindComponentKt === null ? NONE : formatWindComponent(route.avgWindComponentKt)}
+        <Item label="Cost index">{route.costIndex ?? NONE}</Item>
+        <Item label="G/C distance" note="Great circle">
+          {nm(route.gcDistanceNm)}
+        </Item>
+        <Item label="Route distance" note="Planned route">
+          {nm(route.distanceNm)}
         </Item>
         <Item label="Origin elevation" note={origin.icao}>
           {ft(origin.elevationFt)}
@@ -56,11 +60,8 @@ export function FlightDataCard({ plan }: { plan: FlightPlanSummary }) {
         <Item label="Destination elevation" note={destination.icao}>
           {ft(destination.elevationFt)}
         </Item>
-        <Item label="G/C distance" note="Great circle">
-          {nm(route.gcDistanceNm)}
-        </Item>
-        <Item label="Route distance" note="Planned route">
-          {nm(route.distanceNm)}
+        <Item label="Wind component" note="Route average">
+          {route.avgWindComponentKt === null ? NONE : formatWindComponent(route.avgWindComponentKt)}
         </Item>
       </dl>
     </Card>
