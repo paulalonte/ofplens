@@ -22,7 +22,8 @@
     "e2e:install": "pnpm --filter @ofplens/e2e install-browser",
     "format": "prettier --write .",
     "format:check": "prettier --check .",
-    "fixture:capture": "tsx --env-file-if-exists=.env scripts/capture-ofp.ts"
+    "fixture:capture": "tsx --env-file-if-exists=.env scripts/capture-ofp.ts",
+    "fixture:weather": "tsx scripts/capture-weather.ts"
   },
   "devDependencies": {
     "@eslint/js": "10.0.1",
