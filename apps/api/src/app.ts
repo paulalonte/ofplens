@@ -18,6 +18,8 @@ export interface AppDeps {
   flightPlans: FlightPlanRepository;
   /** Defaults to the real SimBrief client, logging through the app's logger. */
   simbrief?: SimbriefClient;
+  /** Base URL for the default SimBrief client (end-to-end tests point it at a fake). */
+  simbriefUrl?: string | undefined;
   dbTimeoutMs?: number;
   logger?: FastifyServerOptions['logger'];
 }
@@ -35,7 +37,12 @@ export async function buildApp(deps: AppDeps) {
     ...(deps.dbTimeoutMs !== undefined && { dbTimeoutMs: deps.dbTimeoutMs }),
   });
   await app.register(pilotRoutes, { pilots: deps.pilots });
-  const simbrief = deps.simbrief ?? createSimbriefClient({ log: app.log });
+  const simbrief =
+    deps.simbrief ??
+    createSimbriefClient({
+      log: app.log,
+      ...(deps.simbriefUrl !== undefined && { baseUrl: deps.simbriefUrl }),
+    });
   await app.register(simbriefRoutes, { pilots: deps.pilots, simbrief });
   await app.register(flightPlanRoutes, {
     pilots: deps.pilots,

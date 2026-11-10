@@ -13,6 +13,14 @@ describe('loadEnv', () => {
     });
   });
 
+  it('accepts an optional SimBrief URL (end-to-end tests) but only http(s)', () => {
+    expect(
+      loadEnv({ DATABASE_URL, SIMBRIEF_URL: 'http://127.0.0.1:4010/api/xml.fetcher.php' })
+        .SIMBRIEF_URL,
+    ).toBe('http://127.0.0.1:4010/api/xml.fetcher.php');
+    expect(() => loadEnv({ DATABASE_URL, SIMBRIEF_URL: 'ftp://x' })).toThrow(/SIMBRIEF_URL/);
+  });
+
   it('coerces PORT from a string', () => {
     expect(loadEnv({ DATABASE_URL, PORT: '4000' }).PORT).toBe(4000);
   });

@@ -57,3 +57,51 @@ jobs:
       # The build regenerates the route tree; a diff means a route change was not committed.
       - name: Route tree is up to date
         run: git diff --exit-code apps/web/src/routeTree.gen.ts
+
+  e2e:
+    name: End-to-end (Playwright)
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+
+    # Same Postgres as the check job; the e2e run creates its own ofplens_e2e database in it.
+    services:
+      postgres:
+        image: postgres:16-alpine
+        env:
+          POSTGRES_USER: ofplens
+          POSTGRES_PASSWORD: ofplens
+          POSTGRES_DB: ofplens
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U ofplens -d ofplens"
+          --health-interval 2s
+          --health-timeout 3s
+          --health-retries 15
+
+    env:
+      TEST_DATABASE_URL: postgres://ofplens:ofplens@localhost:5432/ofplens
+
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: pnpm/action-setup@v6
+
+      - uses: actions/setup-node@v7
+        with:
+          node-version-file: .nvmrc
+          cache: pnpm
+
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm --filter @ofplens/e2e exec playwright install --with-deps chromium
+      - run: pnpm e2e
+
+      - name: Upload Playwright report
+        if: failure()
+        uses: actions/upload-artifact@v7
+        with:
+          name: playwright-report
+          path: |
+            e2e/playwright-report/
+            e2e/test-results/
+          retention-days: 7
