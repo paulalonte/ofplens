@@ -1,6 +1,7 @@
 import type { FlightPlanSummary, WeightUnit } from '@ofplens/ofp';
 import { useState, type ReactNode } from 'react';
 import { BriefingHeader } from './BriefingHeader';
+import { FlightDataCard } from './FlightDataCard';
 import { FuelCard } from './FuelCard';
 import { NavlogCard } from './NavlogCard';
 import { PayloadCard } from './PayloadCard';
@@ -37,6 +38,7 @@ export function BriefingPage({ plan, preferredUnit, weather, aiBriefing }: Props
         <FuelCard plan={plan} displayUnit={displayUnit} />
         <PayloadCard plan={plan} displayUnit={displayUnit} />
       </div>
+      <FlightDataCard plan={plan} />
 
       {aiBriefing}
       {weather ?? <WeatherCard plan={plan} />}

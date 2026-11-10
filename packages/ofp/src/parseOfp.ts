@@ -1,6 +1,6 @@
 import { z } from 'zod';
 import { OfpSchema, type Ofp } from './schema';
-import type { Airport, FlightPlanSummary } from './summary';
+import type { Airport, FlightPlanSummary, StepClimb } from './summary';
 
 /** Thrown when input is not a usable SimBrief OFP. `issues` lists every failing field. */
 export class OfpParseError extends Error {
@@ -65,6 +65,12 @@ function toSummary(ofp: Ofp): FlightPlanSummary {
       cruiseAltitudeFt: general.initial_altitude,
       costIndex: general.costindex,
       distanceNm: general.route_distance,
+      gcDistanceNm: general.gc_distance,
+      stepClimbs: parseStepClimbs(general.stepclimb_string),
+      // `+ 0` turns SimBrief's "-0" into 0.
+      avgIsaDevC: general.avg_temp_dev === null ? null : general.avg_temp_dev + 0,
+      avgTropopauseFt: general.avg_tropopause,
+      avgWindComponentKt: general.avg_wind_comp === null ? null : general.avg_wind_comp + 0,
     },
     times: {
       out: times.est_out,
@@ -111,12 +117,29 @@ function toSummary(ofp: Ofp): FlightPlanSummary {
   };
 }
 
+/**
+ * "KSFO/0350/DBQ/0370" -> [{ at: 'DBQ', altitudeFt: 37000 }]. The first pair is the initial
+ * cruise altitude at the origin, so it is left out. Malformed pairs are skipped.
+ */
+export function parseStepClimbs(stepClimbString: string | null): StepClimb[] {
+  if (!stepClimbString) return [];
+  const parts = stepClimbString.split('/');
+  const steps: StepClimb[] = [];
+  for (let i = 2; i + 1 < parts.length; i += 2) {
+    const at = parts[i]!.trim();
+    const level = parts[i + 1]!.trim();
+    if (at && /^\d{3,4}$/.test(level)) steps.push({ at, altitudeFt: Number(level) * 100 });
+  }
+  return steps;
+}
+
 function toAirport(a: Ofp['origin']): Airport {
   return {
     icao: a.icao_code,
     iata: a.iata_code,
     name: a.name,
     runway: a.plan_rwy,
+    elevationFt: a.elevation,
     utcOffsetMin: a.timezone,
     metar: a.metar,
     taf: a.taf,

@@ -21,6 +21,9 @@ export const int = num.pipe(z.number().int());
 /** A numeric string that may be empty: "" -> null. */
 export const optInt = z.union([z.literal('').transform(() => null), int]);
 
+/** A numeric string that may be empty or missing: "" or absent -> null. */
+export const maybeInt = optInt.optional().transform((v) => v ?? null);
+
 /** Non-empty text, trimmed. */
 export const text = z.string().trim().min(1);
 
