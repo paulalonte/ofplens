@@ -40,7 +40,8 @@ apps/web       React + Vite + TanStack Router (file-based, src/routes) + Query +
 apps/api       Fastify; buildApp() in app.ts (testable), server.ts (listens)
 packages/ofp   OFP Zod schema, parseOfp(), shared domain types and formatters
 packages/db    Drizzle client, schema, migrations
-packages/weather  aviationweather.gov client (METAR/TAF), METAR decoder, flight category
+packages/weather  aviationweather.gov client (METAR/TAF), METAR decoder, flight category, plan weather (read/refresh)
+packages/agent    Briefing agent: tools as plain functions (reused by the API and, later, MCP), Briefing schema
 fixtures/ofp   Real SimBrief OFP JSON samples (OFP-05)
 fixtures/weather  Real aviationweather.gov METAR/TAF responses (`pnpm fixture:weather`)
 ```
