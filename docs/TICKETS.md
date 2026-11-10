@@ -3,8 +3,8 @@
 Derived from [PLAN.md](PLAN.md). Work them in order, one ticket per branch/PR.
 Each ticket ends with tests green and its "Done when" shown working.
 
-> **Status (10 Nov 2026):** OFP-01 to OFP-18 are done: the MVP is complete.
-> In progress: **Phase 4 — Live weather** (OFP-19 to OFP-23). Deployment (3b) follows.
+> **Status (10 Nov 2026):** OFP-01 to OFP-23 are done: the MVP and Phase 4 (live weather) are
+> complete. Next: deployment (3b), then the AI phases.
 
 **MVP = Phases 0–3**: load my latest SimBrief OFP, see a clean briefing, and keep a
 history in Postgres, running locally. Deploy (3b), live weather (4) and everything AI

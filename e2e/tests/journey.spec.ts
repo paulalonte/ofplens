@@ -1,7 +1,8 @@
 import { expect, test, type Page } from '@playwright/test';
 
 /**
- * The MVP end to end: real web app, real API, real Postgres (fresh per run), fake SimBrief.
+ * The MVP end to end: real web app, real API, real Postgres (fresh per run), with SimBrief and
+ * aviationweather.gov faked (captured real reports).
  * Tests run in order and share the database, like one pilot using the app.
  */
 test.describe.configure({ mode: 'serial' });
@@ -53,6 +54,39 @@ test('load a plan, find it in History, open it, delete it', async ({ page }) => 
   // The kg/lb toggle converts every weight.
   await page.getByRole('button', { name: 'lb', exact: true }).click();
   await expect(fuel).toContainText('5,362 lb');
+
+  await test.step('weather at dispatch vs now', async () => {
+    const card = page.getByRole('region', { name: 'Weather: dispatch vs now' });
+    // Opening a plan without live weather fetches it straight away.
+    await expect(card.getByText(/^Live as of \d\d:\d\dZ$/)).toBeVisible();
+
+    // EDDB: BKN009 in the OFP (IFR) → BKN004 now (LIFR).
+    const departure = card.getByRole('region', { name: 'Departure weather' });
+    await expect(departure).toContainText('Changed since dispatch: IFR → LIFR');
+    await expect(departure).toContainText('EDDB 091320Z AUTO 10005KT 9999 BKN009');
+    await expect(departure).toContainText('METAR EDDB 100850Z');
+    await expect(departure.getByText('LIFR', { exact: true })).toBeVisible();
+
+    // EDDM: IFR at dispatch and now: shown, not flagged.
+    const destination = card.getByRole('region', { name: 'Destination weather' });
+    await expect(destination.getByText('IFR', { exact: true })).toHaveCount(2);
+    await expect(destination).not.toContainText('Changed since dispatch');
+
+    // EDDF: OVC014 (MVFR) → FEW011 (VFR).
+    await expect(card.getByRole('region', { name: 'Alternate weather' })).toContainText(
+      'Changed since dispatch: MVFR → VFR',
+    );
+
+    // The TAFs are folded away, with a note that there is a newer one.
+    await departure.getByText('TAF', { exact: true }).click();
+    await expect(departure).toContainText('TAF EDDB');
+    await expect(departure.getByText('TAF updated since dispatch')).toBeVisible();
+
+    // Refreshing again works (served from the API's 5-minute cache).
+    await card.getByRole('button', { name: 'Refresh' }).click();
+    await expect(card.getByText(/^Live as of /)).toBeVisible();
+    await expect(departure).toContainText('Changed since dispatch: IFR → LIFR');
+  });
 
   // Loading again finds the same plan instead of saving a copy.
   await goHome(page);

@@ -10,12 +10,13 @@ the weather printed at dispatch and the full navigation log, in kg or lb.
 **Status:** MVP in progress. The roadmap is in [docs/PLAN.md](docs/PLAN.md); work is tracked
 ticket by ticket in [docs/TICKETS.md](docs/TICKETS.md).
 
-| Works today                                                                     | Coming next                                 |
-| ------------------------------------------------------------------------------- | ------------------------------------------- |
-| Briefing page: header, times, fuel, payload, OFP weather, navigation log        | Deployment to AWS (3b)                      |
-| Settings: SimBrief username and kg/lb preference, saved in Postgres             | Live weather (phase 4)                      |
-| One-click **Load latest plan**: fetched from SimBrief and saved to your history | AI weather and hazard briefing (phases 5–7) |
-| **History** of every plan you loaded, newest first; open or delete any of them  | MCP server for Claude (phase 8)             |
+| Works today                                                                                                                | Coming next                                 |
+| -------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------- |
+| Briefing page: header, times, fuel, payload, OFP weather, navigation log                                                   | Deployment to AWS (3b)                      |
+| Settings: SimBrief username and kg/lb preference, saved in Postgres                                                        | AI weather and hazard briefing (phases 5–7) |
+| One-click **Load latest plan**: fetched from SimBrief and saved to your history                                            | MCP server for Claude (phase 8)             |
+| **History** of every plan you loaded; open or delete any of them                                                           |                                             |
+| **Weather at dispatch vs now** per airport, with VFR–LIFR badges and a "changed since dispatch" flag (aviationweather.gov) |                                             |
 
 ## What you need
 
@@ -144,9 +145,9 @@ Three groups run together:
   database, so your dev data is never touched. Needs Docker running (`pnpm db:up`).
 
 **End-to-end** (`pnpm e2e`, Playwright): the real web app and API in Chromium against a fresh
-`ofplens_e2e` database, with a fake SimBrief serving a saved OFP. It walks through what a pilot
-does: set the username, load a plan, find it in History, open it, delete it, and the error for an
-unknown SimBrief user. It uses its own ports (web 5174, API 3100), so it can run next to
+`ofplens_e2e` database, with a fake SimBrief and a fake aviationweather.gov serving saved OFPs and weather reports. It walks through what a pilot
+does: set the username, load a plan, compare its weather at dispatch with now, find it in
+History, open it, delete it, and the error for an unknown SimBrief user. It uses its own ports (web 5174, API 3100), so it can run next to
 `pnpm dev`. Install the browser once with `pnpm e2e:install`.
 
 Tests never call SimBrief; they use the real OFPs saved in `fixtures/ofp/`. CI runs the same
