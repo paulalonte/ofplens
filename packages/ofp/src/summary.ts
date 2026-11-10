@@ -1,4 +1,5 @@
 import { z } from 'zod';
+import { Performance } from './performance';
 import { WEIGHT_UNITS } from './schema';
 
 /**
@@ -117,5 +118,7 @@ export const FlightPlanSummary = z.object({
     ldw: int,
   }),
   waypoints: z.array(Waypoint),
+  /** SimBrief's takeoff and landing data for the planned runways; null when the OFP has none. */
+  performance: Performance.nullable(),
 });
 export type FlightPlanSummary = z.infer<typeof FlightPlanSummary>;

@@ -79,6 +79,8 @@ export const OfpSchema = z.object({
   }),
   origin: OfpAirport,
   destination: OfpAirport,
+  /** Takeoff and landing data; read leniently by parsePerformance. */
+  tlr: z.unknown().optional(),
   alternate: z.array(OfpAirport),
   times: z.object({
     est_out: isoUtc,

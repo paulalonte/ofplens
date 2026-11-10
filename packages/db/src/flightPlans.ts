@@ -1,4 +1,9 @@
-import type { Airport, FlightPlanListItem, FlightPlanSummary } from '@ofplens/ofp';
+import {
+  parsePerformance,
+  type Airport,
+  type FlightPlanListItem,
+  type FlightPlanSummary,
+} from '@ofplens/ofp';
 import { and, asc, desc, eq, sql } from 'drizzle-orm';
 import type { Database } from './client';
 import {
@@ -312,6 +317,8 @@ function toSummary(
     fuel: fuelValues,
     weights: weightValues,
     waypoints: fixes.map(({ id: _id, flightPlanId: _plan, ...w }) => w),
+    // Read from the stored raw OFP, so plans saved before this field existed have it too.
+    performance: parsePerformance((p.rawOfp as { tlr?: unknown } | null)?.tlr),
   };
 }
 

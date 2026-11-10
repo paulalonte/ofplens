@@ -112,6 +112,10 @@ describe('eddb-eddm-c750-kgs (bizjet, kg, one alternate)', () => {
         landing: 1372,
       },
       weights: { paxCount: 8, cargo: 200, payload: 835, zfw: 10873, tow: 13237, ldw: 12245 },
+      performance: {
+        takeoff: expect.objectContaining({ airportIcao: 'EDDB', runway: '06L', surface: 'dry' }),
+        landing: expect.objectContaining({ airportIcao: 'EDDM', runway: '08R', flaps: 'FULL' }),
+      },
     });
   });
 
