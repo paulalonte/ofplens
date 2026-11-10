@@ -179,6 +179,7 @@ packages/
   ofp/          SimBrief OFP schema, parseOfp(), formatters, shared API schemas
   db/           Drizzle schema, migrations, repositories, test database helpers
   weather/      aviationweather.gov client for live METAR/TAF
+  agent/        AI briefing: tools the agent calls, and the Briefing schema
 fixtures/ofp/   Real SimBrief OFPs (personal data removed) used by tests
 fixtures/weather/  Real METAR/TAF responses used by tests (`pnpm fixture:weather`)
 docs/           PLAN.md (design and roadmap), TICKETS.md (MVP tickets)
