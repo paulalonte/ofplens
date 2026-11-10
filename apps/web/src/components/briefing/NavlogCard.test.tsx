@@ -26,10 +26,11 @@ describe('<NavlogCard /> with the EDDB → EDDM plan', () => {
     expect(rows.at(-1)).toHaveTextContent(/^EDDM/);
   });
 
-  it('shows via, stage, altitude, wind, OAT, ETA (takeoff + elapsed) and fuel on board', () => {
+  it('shows via, stage, altitude, wind, OAT, ETA, fuel on board, elapsed time and fuel used', () => {
     render(<NavlogCard plan={fixturePlan('eddb-eddm-c750-kgs')} displayUnit="kgs" />);
 
-    // Off 14:10Z + 00:04:05 elapsed = 14:14:05Z.
+    // Off 14:10Z + 00:04:05 elapsed = 14:14:05Z. Used = takeoff 2,364 - FOB 2,236 = 128,
+    // SimBrief's own fuel_totalused for this fix.
     expect(cells('DB069')).toEqual([
       'LURO4B',
       'CLB',
@@ -38,8 +39,19 @@ describe('<NavlogCard /> with the EDDB → EDDM plan', () => {
       '-16°',
       '14:14Z',
       '2,236',
+      '00:04',
+      '128',
     ]);
     expect(screen.getByRole('columnheader', { name: 'FOB (kg)' })).toBeInTheDocument();
+    expect(screen.getByRole('columnheader', { name: 'ET' })).toBeInTheDocument();
+    expect(screen.getByRole('columnheader', { name: 'Used (kg)' })).toBeInTheDocument();
+  });
+
+  it('ends at the destination with the air time and the planned trip fuel', () => {
+    render(<NavlogCard plan={fixturePlan('eddb-eddm-c750-kgs')} displayUnit="kgs" />);
+
+    // Air time 00:49:31, trip fuel 992 kg.
+    expect(cells('EDDM').slice(-2)).toEqual(['00:50', '992']);
   });
 
   it('prints the route string and a summary line', () => {
@@ -49,11 +61,13 @@ describe('<NavlogCard /> with the EDDB → EDDM plan', () => {
     expect(screen.getByText('333 nm · FL280 · CI 10')).toBeInTheDocument();
   });
 
-  it('shows fuel on board in the selected display unit', () => {
+  it('shows fuel on board and fuel used in the selected display unit', () => {
     render(<NavlogCard plan={fixturePlan('eddb-eddm-c750-kgs')} displayUnit="lbs" />);
 
     expect(screen.getByRole('columnheader', { name: 'FOB (lb)' })).toBeInTheDocument();
-    expect(cells('DB069').at(-1)).toBe('4,930');
+    expect(screen.getByRole('columnheader', { name: 'Used (lb)' })).toBeInTheDocument();
+    // 2,236 kg and 128 kg in pounds.
+    expect(cells('DB069').slice(-3)).toEqual(['4,930', '00:04', '282']);
   });
 });
 
@@ -66,5 +80,7 @@ describe('<NavlogCard /> with the KSFO → KJFK plan', () => {
     expect(screen.getByRole('rowheader', { name: 'TOD TOP OF DESCENT' })).toBeInTheDocument();
     // Off 01:20Z + 00:24:18 elapsed = 01:44:18Z.
     expect(cells('TOC')).toEqual(expect.arrayContaining(['CLB', '35,000', '01:44Z']));
+    // 24 minutes after takeoff, 4,643 lb burned (takeoff 35,108 - FOB 30,465).
+    expect(cells('TOC').slice(-2)).toEqual(['00:24', '4,643']);
   });
 });

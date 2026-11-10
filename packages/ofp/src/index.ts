@@ -9,3 +9,4 @@ export {
   FlightPlanListResponse,
   ImportFlightPlanResponse,
 } from './flightPlanApi';
+export { fuelUsedAt } from './navlog';
