@@ -40,7 +40,7 @@ describe('Briefing schema', () => {
     ['a headline over 140 characters', { headline: 'x'.repeat(141) }],
     ['an unknown risk level', { overallRisk: 'extreme' }],
     ['more than five pilot notes', { pilotNotes: ['a', 'b', 'c', 'd', 'e', 'f'] }],
-    ['a note over 160 characters', { pilotNotes: ['x'.repeat(161)] }],
+    ['a note over 240 characters', { pilotNotes: ['x'.repeat(241)] }],
     ['a missing alternate field', { alternate: undefined }],
   ])('rejects %s', (_, change) => {
     expect(Briefing.safeParse({ ...valid(), ...change }).success).toBe(false);

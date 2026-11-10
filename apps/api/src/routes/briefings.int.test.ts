@@ -1,6 +1,7 @@
 import Anthropic from '@anthropic-ai/sdk';
 import type { Briefing } from '@ofplens/agent/contract';
 import { answer, callTools, fakeClaude } from '@ofplens/agent/testing';
+import { PROMPT_VERSION } from '@ofplens/agent';
 import {
   createBriefingRepository,
   createDb,
@@ -153,7 +154,7 @@ describe('POST /api/flight-plans/:id/briefings', () => {
       flightPlanId: planId,
       status: 'done',
       model: 'claude-haiku-5-5',
-      promptVersion: 'briefing-v1',
+      promptVersion: PROMPT_VERSION,
       briefing: goodBriefing(),
       error: null,
       inputTokens: 10_000,
@@ -240,7 +241,7 @@ describe('POST /api/flight-plans/:id/briefings', () => {
     await createBriefingRepository(conn.db).start({
       flightPlanId: planId,
       model: 'claude-haiku-5-5',
-      promptVersion: 'briefing-v1',
+      promptVersion: PROMPT_VERSION,
     });
 
     const res = await post(a);

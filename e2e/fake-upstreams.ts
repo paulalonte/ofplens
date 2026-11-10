@@ -4,6 +4,9 @@
  * - SimBrief's fetcher: the latest OFP as JSON v2, or HTTP 400 for an unknown user.
  * - aviationweather.gov's Data API: METARs and TAFs from fixtures/weather (real reports
  *   captured earlier), filtered by `ids`; HTTP 204 when none of the stations has one.
+ * - Claude's Messages API (the API's ANTHROPIC_BASE_URL): first asks for all three briefing
+ *   tools, then writes a briefing from their results, citing real report ids so it passes the
+ *   guardrails. No key and no cost.
  */
 import { readFile } from 'node:fs/promises';
 import { createServer } from 'node:http';
@@ -41,6 +44,12 @@ const server = createServer((req, res) => {
       return;
     }
 
+    // Claude
+    if (req.method === 'POST' && url.pathname === '/v1/messages') {
+      json(200, fakeClaudeReply(JSON.parse(await readBody(req)) as MessagesRequest));
+      return;
+    }
+
     // aviationweather.gov
     const weather = /^\/api\/data\/(metar|taf)$/.exec(url.pathname);
     if (weather && url.searchParams.get('format') === 'json') {
@@ -62,6 +71,93 @@ const server = createServer((req, res) => {
   });
 });
 
+const readBody = async (req: AsyncIterable<Buffer>) => {
+  const chunks: Buffer[] = [];
+  for await (const chunk of req) chunks.push(chunk);
+  return Buffer.concat(chunks).toString('utf8');
+};
+
+interface Block {
+  type: string;
+  id?: string;
+  name?: string;
+  tool_use_id?: string;
+  content?: string | { type: string; text?: string }[];
+}
+interface MessagesRequest {
+  model: string;
+  messages: { role: string; content: string | Block[] }[];
+}
+interface ToolStation {
+  role: 'origin' | 'destination' | 'alternate';
+  icao: string;
+  metar: { reportId: string; flightCategory: string | null } | null;
+  changedSinceDispatch?: boolean;
+}
+
+const BRIEFING_TOOLS = ['get_flight_plan', 'get_planned_weather', 'get_weather'];
+
+/** One Messages API reply: call the tools, or answer from what they returned. */
+function fakeClaudeReply(request: MessagesRequest) {
+  const blocks = request.messages.flatMap((m) => (Array.isArray(m.content) ? m.content : []));
+  const toolNames = new Map(
+    blocks.filter((b) => b.type === 'tool_use').map((b) => [b.id ?? '', b.name ?? '']),
+  );
+  const results = new Map<string, unknown>();
+  for (const b of blocks.filter((x) => x.type === 'tool_result')) {
+    const text =
+      typeof b.content === 'string'
+        ? b.content
+        : (b.content ?? []).map((c) => c.text ?? '').join('');
+    results.set(toolNames.get(b.tool_use_id ?? '') ?? '', JSON.parse(text));
+  }
+
+  const message = (content: unknown[], stopReason: string) => ({
+    id: `msg_fake_${Date.now()}`,
+    type: 'message',
+    role: 'assistant',
+    model: request.model,
+    content,
+    stop_reason: stopReason,
+    stop_sequence: null,
+    usage: { input_tokens: 5000, output_tokens: 500 },
+  });
+
+  if (results.size === 0) {
+    return message(
+      BRIEFING_TOOLS.map((name, i) => ({ type: 'tool_use', id: `toolu_${i}`, name, input: {} })),
+      'tool_use',
+    );
+  }
+
+  const planned = (results.get('get_planned_weather') as { stations: ToolStation[] }).stations;
+  const live = (results.get('get_weather') as { stations: ToolStation[] }).stations;
+  const conditions = (role: ToolStation['role']) => {
+    const now = live.find((s) => s.role === role);
+    const station = now?.metar ? now : planned.find((s) => s.role === role);
+    if (!station?.metar) return null;
+    return {
+      icao: station.icao,
+      flightCategory: station.metar.flightCategory,
+      summary: `Scripted summary for ${station.icao}.`,
+      changedSinceDispatch: station === now && (now.changedSinceDispatch ?? false),
+      sourceReportId: station.metar.reportId,
+    };
+  };
+  const briefing = {
+    headline: 'Scripted briefing from the fake Claude',
+    overallRisk: 'moderate',
+    departure: conditions('origin'),
+    destination: conditions('destination'),
+    alternate: conditions('alternate'),
+    enrouteHazards: [],
+    pilotNotes: ['This note comes from the end-to-end fake.'],
+  };
+  return message([{ type: 'text', text: JSON.stringify(briefing) }], 'end_turn');
+}
+
 server.listen(FAKE_UPSTREAMS_PORT, '127.0.0.1', () => {
-  console.log(`Fake SimBrief and aviationweather.gov on http://127.0.0.1:${FAKE_UPSTREAMS_PORT}`);
+  console.log(
+    `Fake SimBrief, aviationweather.gov and Claude on http://127.0.0.1:${FAKE_UPSTREAMS_PORT}`,
+  );
 });

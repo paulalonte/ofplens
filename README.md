@@ -10,13 +10,14 @@ the weather printed at dispatch and the full navigation log, in kg or lb.
 **Status:** MVP in progress. The roadmap is in [docs/PLAN.md](docs/PLAN.md); work is tracked
 ticket by ticket in [docs/TICKETS.md](docs/TICKETS.md).
 
-| Works today                                                                                                                | Coming next                                 |
-| -------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------- |
-| Briefing page: header, times, fuel, payload, OFP weather, navigation log                                                   | Deployment to AWS (3b)                      |
-| Settings: SimBrief username and kg/lb preference, saved in Postgres                                                        | AI weather and hazard briefing (phases 5–7) |
-| One-click **Load latest plan**: fetched from SimBrief and saved to your history                                            | MCP server for Claude (phase 8)             |
-| **History** of every plan you loaded; open or delete any of them                                                           |                                             |
-| **Weather at dispatch vs now** per airport, with VFR–LIFR badges and a "changed since dispatch" flag (aviationweather.gov) |                                             |
+| Works today                                                                                                                | Coming next                            |
+| -------------------------------------------------------------------------------------------------------------------------- | -------------------------------------- |
+| Briefing page: header, times, fuel, payload, OFP weather, navigation log                                                   | Deployment to AWS (3b)                 |
+| Settings: SimBrief username and kg/lb preference, saved in Postgres                                                        | Route hazards and briefing evals (6–7) |
+| One-click **Load latest plan**: fetched from SimBrief and saved to your history                                            | MCP server for Claude (phase 8)        |
+| **History** of every plan you loaded; open or delete any of them                                                           |                                        |
+| **Weather at dispatch vs now** per airport, with VFR–LIFR badges and a "changed since dispatch" flag (aviationweather.gov) |                                        |
+| **AI weather briefing** (Claude), on request: headline, risk, conditions per airport with the cited METAR, pilot notes     |                                        |
 
 ## What you need
 
@@ -64,6 +65,21 @@ pnpm dev
 Open **http://localhost:5173**, go to **Settings**, enter your SimBrief username, then press
 **Load latest plan** on the home page. Every plan you load is saved under **History**.
 
+### AI briefings (optional)
+
+The AI weather briefing calls Claude with your own API key. Create one in the
+[Claude Console](https://console.anthropic.com), set a monthly spend limit there, and add it to
+`.env`:
+
+```bash
+ANTHROPIC_API_KEY=your-key-here
+```
+
+Restart `pnpm dev`. On a saved plan, **Generate briefing** runs one briefing (about $0.003 with
+the default Claude Haiku 5.5); nothing runs without a click, and the API allows
+`BRIEFING_DAILY_LIMIT` (default 20) per day. Without a key the rest of the app works as usual.
+Only the route, airports, times and weather are sent to Anthropic, never your SimBrief username.
+
 ### Every day after that
 
 ```bash
@@ -90,19 +106,20 @@ directly on your machine. Settings live in `.env` (git-ignored); see `.env.examp
 
 ## Commands
 
-| Command                             | What it does                                                                                      |
-| ----------------------------------- | ------------------------------------------------------------------------------------------------- |
-| `pnpm dev`                          | Start Postgres, apply migrations, run web and API                                                 |
-| `pnpm dev:apps`                     | Run only web and API (Postgres already up and migrated)                                           |
-| `pnpm db:up` / `pnpm db:down`       | Start / stop the Postgres container (your data is kept)                                           |
-| `pnpm db:migrate`                   | Apply new database migrations (`pnpm dev` does this for you)                                      |
-| `pnpm db:generate`                  | Create a migration after changing `packages/db/src/schema.ts`                                     |
-| `pnpm db:studio`                    | Browse the database in Drizzle Studio                                                             |
-| `pnpm test`                         | All tests: unit, component, and integration tests against Postgres                                |
-| `pnpm test --project web`           | Only one test group: `web`, `node` or `integration`                                               |
-| `pnpm e2e`                          | End-to-end tests in a real browser (Playwright); needs `pnpm db:up` and, once, `pnpm e2e:install` |
-| `pnpm lint` / `pnpm typecheck`      | ESLint / TypeScript                                                                               |
-| `pnpm format` / `pnpm format:check` | Prettier                                                                                          |
+| Command                             | What it does                                                                                                           |
+| ----------------------------------- | ---------------------------------------------------------------------------------------------------------------------- |
+| `pnpm dev`                          | Start Postgres, apply migrations, run web and API                                                                      |
+| `pnpm dev:apps`                     | Run only web and API (Postgres already up and migrated)                                                                |
+| `pnpm db:up` / `pnpm db:down`       | Start / stop the Postgres container (your data is kept)                                                                |
+| `pnpm db:migrate`                   | Apply new database migrations (`pnpm dev` does this for you)                                                           |
+| `pnpm db:generate`                  | Create a migration after changing `packages/db/src/schema.ts`                                                          |
+| `pnpm db:studio`                    | Browse the database in Drizzle Studio                                                                                  |
+| `pnpm test`                         | All tests: unit, component, and integration tests against Postgres                                                     |
+| `pnpm test --project web`           | Only one test group: `web`, `node` or `integration`                                                                    |
+| `pnpm e2e`                          | End-to-end tests in a real browser (Playwright); needs `pnpm db:up` and, once, `pnpm e2e:install`                      |
+| `pnpm briefing:try <plan>`          | One real AI briefing (your key) for a saved plan id or a fixture name, or `--fixtures` for all; prints tokens and cost |
+| `pnpm lint` / `pnpm typecheck`      | ESLint / TypeScript                                                                                                    |
+| `pnpm format` / `pnpm format:check` | Prettier                                                                                                               |
 
 ## Looking at the database
 
@@ -145,12 +162,13 @@ Three groups run together:
   database, so your dev data is never touched. Needs Docker running (`pnpm db:up`).
 
 **End-to-end** (`pnpm e2e`, Playwright): the real web app and API in Chromium against a fresh
-`ofplens_e2e` database, with a fake SimBrief and a fake aviationweather.gov serving saved OFPs and weather reports. It walks through what a pilot
-does: set the username, load a plan, compare its weather at dispatch with now, find it in
-History, open it, delete it, and the error for an unknown SimBrief user. It uses its own ports (web 5174, API 3100), so it can run next to
+`ofplens_e2e` database, with a fake SimBrief, a fake aviationweather.gov and a fake Claude serving saved OFPs, weather reports and a scripted
+briefing (never your API key). It walks through what a pilot
+does: set the username, load a plan, compare its weather at dispatch with now, generate an AI
+briefing, find it in History, open it, delete it, and the error for an unknown SimBrief user. It uses its own ports (web 5174, API 3100), so it can run next to
 `pnpm dev`. Install the browser once with `pnpm e2e:install`.
 
-Tests never call SimBrief; they use the real OFPs saved in `fixtures/ofp/`. CI runs the same
+Tests never call SimBrief or Claude; they use the real OFPs saved in `fixtures/ofp/`. CI runs the same
 checks, with its own Postgres, on every pull request.
 
 ## API

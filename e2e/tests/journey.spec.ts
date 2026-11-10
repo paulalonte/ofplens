@@ -88,6 +88,25 @@ test('load a plan, find it in History, open it, delete it', async ({ page }) => 
     await expect(departure).toContainText('Changed since dispatch: IFR → LIFR');
   });
 
+  await test.step('AI briefing, generated only on a click (fake Claude)', async () => {
+    const card = page.getByRole('region', { name: 'AI weather briefing' });
+    await expect(card).toContainText('It runs only when you click');
+    await card.getByRole('button', { name: 'Generate briefing' }).click();
+
+    // Streamed through the real API and Vite's proxy, checked by the real guardrails.
+    await expect(card.getByText('Scripted briefing from the fake Claude')).toBeVisible();
+    const departure = card.getByRole('region', { name: 'Departure briefing' });
+    await expect(departure).toContainText('EDDB');
+    await expect(departure.getByText('LIFR', { exact: true })).toBeVisible();
+    await expect(departure).toContainText('Changed since dispatch');
+    await expect(departure).toContainText(/Based on the live METAR of 10 NOV 08:50Z/);
+    await expect(card.getByRole('region', { name: 'Alternate briefing' })).toContainText('EDDF');
+    await expect(card).toContainText(
+      'AI-generated · for flight simulation only · claude-haiku-5-5',
+    );
+    await expect(card.getByRole('button', { name: 'Generate again' })).toBeEnabled();
+  });
+
   // Loading again finds the same plan instead of saving a copy.
   await goHome(page);
   await expect(page.getByRole('region', { name: 'Recent plans' })).toContainText('EDDB → EDDM');
@@ -110,6 +129,12 @@ test('load a plan, find it in History, open it, delete it', async ({ page }) => 
   await expect(page).toHaveURL(PLAN_URL);
   await page.reload();
   await expect(page.getByRole('heading', { level: 1 })).toHaveText('N70P');
+  // The stored briefing comes back with the page.
+  await expect(
+    page
+      .getByRole('region', { name: 'AI weather briefing' })
+      .getByText('Scripted briefing from the fake Claude'),
+  ).toBeVisible();
   await expect(page.getByRole('region', { name: 'Navigation log' })).toContainText('EDDM');
 
   // Delete asks first, then the plan is gone.

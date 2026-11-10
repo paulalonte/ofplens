@@ -52,6 +52,7 @@ export const Briefing = z.object({
   alternate: Conditions.nullable(),
   /** Empty until route hazards exist (Phase 6). */
   enrouteHazards: z.array(EnrouteHazard).max(10),
-  pilotNotes: z.array(z.string().min(1).max(160)).max(5),
+  /** The prompt asks for 150 characters; the model cannot count exactly, so allow some slack. */
+  pilotNotes: z.array(z.string().min(1).max(240)).max(5),
 });
 export type Briefing = z.infer<typeof Briefing>;
