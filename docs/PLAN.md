@@ -467,7 +467,30 @@ export const Briefing = z.object({
 
 - Verify the OFP field mapping against `fixtures/ofp/*.json` before writing the Zod schema; paths in this doc are expected, not confirmed.
 - Check the SimBrief fetch endpoint and `json=v2` format against the [SimBrief developer docs](https://developers.navigraph.com/docs/simbrief/fetching-ofp-data).
-- Check the aviationweather.gov Data API endpoints, formats and rate limits before phase 4.
+- ~~Check the aviationweather.gov Data API endpoints, formats and rate limits before phase 4.~~ Done; see "Weather source" below.
 - Review the schema for missing indexes, nullability that does not match real OFPs, and anything that should be `numeric` instead of `integer`.
 - Challenge scope: anything in a phase that does not serve that phase's acceptance criteria should move later.
 - Work one phase per branch/PR; each phase ends with tests green and the acceptance criteria demonstrated.
+
+## Weather source (checked 10 Nov 2026)
+
+[aviationweather.gov Data API](https://aviationweather.gov/data/api/), free, no key.
+
+| | |
+| --- | --- |
+| METAR | `GET https://aviationweather.gov/api/data/metar?ids=LSZH,EDDB,EDDP&format=json` |
+| TAF | `GET https://aviationweather.gov/api/data/taf?ids=LSZH,EDDB,EDDP&format=json` |
+| Limits | 100 requests per minute; max 400 entries per query; data covers the last 30 days |
+| Etiquette | Set a custom User-Agent; keep requests small; 429 when limits apply; no CORS (our API proxies anyway) |
+| Unknown station | HTTP 204, empty body |
+| Caching | `cache-control: max-age=60`; most METARs update about hourly |
+
+METAR JSON fields we use: `icaoId`, `obsTime` (Unix seconds), `reportTime` (ISO), `rawOb`
+(starts with `METAR `), `fltCat` (`VFR`/`MVFR`/`IFR`/`LIFR`, may be missing), `wdir` (number or
+`"VRB"`), `wspd`, `wgst`, `visib` (statute miles, number or a string like `"10+"`), `clouds`
+(`[{ cover, base }]`, base in feet), `temp`, `dewp`, `altim` (hPa). TAF JSON: `icaoId`,
+`issueTime` (ISO), `validTimeFrom` / `validTimeTo` (Unix seconds), `rawTAF` (starts with
+`TAF `), `fcsts[]`. Results are not in request order: match them by `icaoId`.
+
+The OFP's own METAR/TAF are plain text without these fields, so OFP Lens decodes METARs itself
+(OFP-20) to compare dispatch and live weather on equal terms.

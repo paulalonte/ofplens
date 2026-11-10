@@ -1,10 +1,10 @@
-# OFP Lens — MVP Tickets
+# OFP Lens — Tickets
 
 Derived from [PLAN.md](PLAN.md). Work them in order, one ticket per branch/PR.
 Each ticket ends with tests green and its "Done when" shown working.
 
-> **Status (10 Nov 2026):** OFP-01 to OFP-18 are done. The MVP is complete; next up are
-> the post-MVP phases at the end of this file.
+> **Status (10 Nov 2026):** OFP-01 to OFP-18 are done: the MVP is complete.
+> In progress: **Phase 4 — Live weather** (OFP-19 to OFP-23). Deployment (3b) follows.
 
 **MVP = Phases 0–3**: load my latest SimBrief OFP, see a clean briefing, and keep a
 history in Postgres, running locally. Deploy (3b), live weather (4) and everything AI
@@ -139,12 +139,77 @@ come after the MVP is usable.
 
 ---
 
-## After the MVP (not ticketed yet)
+## Phase 4 — Live weather
+
+Goal (PLAN.md): origin, destination and alternate show the OFP's weather and the current
+weather side by side, with a flight category badge and a "changed since dispatch" flag;
+repeated refreshes hit the cache.
+
+> Checked against the aviationweather.gov Data API on 10 Nov 2026 (see PLAN.md, "Weather
+> source"): `GET /api/data/metar|taf?ids=A,B,C&format=json` takes several stations per call;
+> 100 requests/minute; a custom User-Agent is expected; an unknown station is HTTP 204 with an
+> empty body; responses are `cache-control: max-age=60`; most METARs update about hourly.
+> The OFP's METAR is plain text, so dispatch and live weather are compared by decoding both
+> with our own code, not by trusting one side's labels.
+
+### OFP-19 · `packages/weather`: aviationweather.gov client
+- Fetch METARs and TAFs for several stations in one request each (`ids=EDDB,EDDM,EDDF`).
+- Identify ourselves with a User-Agent (no personal data); 10 s timeout, one retry on network
+  errors and 5xx, like the SimBrief client; HTTP 204 means "no report", not an error.
+- Zod schemas for the fields we use, tolerant of the API's quirks (`wdir` can be `"VRB"`,
+  `visib` can be `"10+"`, `fltCat` can be missing); results keyed by ICAO, since the API does
+  not keep the request order.
+- Capture real responses into `fixtures/weather/` for tests.
+- **Done when:** unit tests with a faked HTTP layer cover success, several stations, 204,
+  timeout, retry and a malformed body.
+
+### OFP-20 · Decode METARs and work out the flight category
+- One decoder for **both** the OFP's METAR text and live METARs: observation time (`091320Z`
+  → a full UTC time, using the plan or fetch date for month and year), wind, visibility
+  (`9999`, `5000`, `3/4SM`, `P6SM`, `CAVOK`), ceiling (lowest BKN/OVC/VV), and the flight
+  category (VFR / MVFR / IFR / LIFR, FAA thresholds).
+- Pure functions in `packages/weather`, no network.
+- **Done when:** tests cover each visibility and ceiling form, and the category we compute
+  matches aviationweather.gov's `fltCat` for every METAR in the captured fixtures.
+
+### OFP-21 · Store live weather + refresh and read endpoints
+- `POST /api/flight-plans/:id/weather/refresh`: fetch live METAR and TAF for origin,
+  destination and alternate, store them as `weather_reports` rows with `source = 'live'`,
+  observation time, flight category and decoded fields; a report already stored (same station,
+  kind and observation time) is not stored again.
+- Cache per station for 5 minutes, so repeated refreshes (or several plans with the same
+  airports) do not call aviationweather.gov again.
+- `GET /api/flight-plans/:id/weather`: per airport, the OFP report and the latest live one,
+  each with its decoded category and time, plus `changedSinceDispatch` (a newer observation
+  with a different category, or a TAF issued after dispatch).
+- If aviationweather.gov is down, the refresh returns 502 and the stored reports still show.
+- **Done when:** integration tests on Postgres cover storing, not duplicating, the cache (one
+  upstream call for two refreshes), a plan without an alternate, and the "changed" rules.
+
+### OFP-22 · Web: OFP vs live weather on the plan page
+- The weather card shows, per airport, **at dispatch** and **now** side by side, each with a
+  flight category badge (VFR green, MVFR blue, IFR red, LIFR magenta, labelled in text too),
+  the observation time, and a "changed since dispatch" flag.
+- Live weather loads with the page (route loader), is refreshed automatically when it is more
+  than 10 minutes old, and has a "Refresh" button; when live weather is unavailable, the OFP
+  side still shows with a short note.
+- **Done when:** page tests cover both sides, the flag, refresh, and the unavailable state;
+  checked in the browser against real aviationweather.gov.
+
+### OFP-23 · End-to-end: live weather
+- A fake aviationweather.gov in the e2e stack (like the fake SimBrief), serving METARs that
+  differ from the OFP's.
+- Journey: load a plan, see OFP and live weather side by side with the right badges and the
+  "changed since dispatch" flag, refresh.
+- **Done when:** green locally and in CI. 🎉 Phase 4 done.
+
+---
+
+## Later phases (not ticketed yet)
 
 | Next | Summary |
 | --- | --- |
 | 3b Deploy | Budget alarm first; then CDK (RDS, Fargate, S3 + CloudFront) or the cheaper Lightsail + Compose fallback |
-| 4 Live weather | aviationweather.gov client, cache, OFP vs live, flight category badge |
 | 5–7 AI | Briefing agent, route hazards, evals and tracing |
 | 8 MCP | Same tools exposed to Claude Desktop / Claude Code |
 | Sharing | Auth and multi-pilot support before anyone else uses it |
