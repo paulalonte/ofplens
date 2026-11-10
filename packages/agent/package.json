@@ -10,6 +10,7 @@
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
+    "@anthropic-ai/sdk": "1.6.0",
     "@ofplens/ofp": "workspace:*",
     "@ofplens/weather": "workspace:*",
     "zod": "4.6.7"
