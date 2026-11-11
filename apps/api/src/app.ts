@@ -3,12 +3,16 @@ import { DEFAULT_BRIEFING_CONFIG, type BriefingConfig } from '@ofplens/agent';
 import type {
   BriefingRepository,
   FlightPlanRepository,
+  HazardRepository,
   PilotRepository,
   WeatherRepository,
 } from '@ofplens/db';
 import {
+  createCachedHazardClient,
   createCachedWeatherClient,
+  createHazardClient,
   createWeatherClient,
+  type HazardClient,
   type WeatherClient,
 } from '@ofplens/weather';
 import Fastify, { type FastifyServerOptions } from 'fastify';
@@ -20,6 +24,7 @@ import {
 import { registerErrorHandling } from './plugins/errors';
 import { briefingRoutes } from './routes/briefings';
 import { flightPlanRoutes } from './routes/flightPlans';
+import { hazardRoutes } from './routes/hazards';
 import { healthRoutes } from './routes/health';
 import { pilotRoutes } from './routes/pilot';
 import { simbriefRoutes } from './routes/simbrief';
@@ -32,6 +37,7 @@ export interface AppDeps {
   flightPlans: FlightPlanRepository;
   weatherReports: WeatherRepository;
   briefings: BriefingRepository;
+  hazards: HazardRepository;
   /** Claude client for briefings; null or absent = briefings answer 503 (no API key). */
   anthropic?: Anthropic | null;
   briefingConfig?: Partial<BriefingConfig>;
@@ -40,6 +46,8 @@ export interface AppDeps {
   now?: () => Date;
   /** Defaults to aviationweather.gov behind a 5-minute per-station cache. */
   weather?: WeatherClient;
+  /** Defaults to aviationweather.gov's SIGMET/G-AIRMET feeds behind a 5-minute cache. */
+  hazardFeeds?: HazardClient;
   /** Defaults to the real SimBrief client, logging through the app's logger. */
   simbrief?: SimbriefClient;
   /** Base URL for the default SimBrief client (end-to-end tests point it at a fake). */
@@ -85,6 +93,21 @@ export async function buildApp(deps: AppDeps) {
       }),
     );
   await app.register(weatherRoutes, { weatherReports: deps.weatherReports, weather });
+  const hazardFeeds =
+    deps.hazardFeeds ??
+    createCachedHazardClient(
+      createHazardClient({
+        log: app.log,
+        // Three feeds, the international one large: more time than for a few METARs.
+        timeoutMs: 20_000,
+        ...(deps.aviationWeatherUrl !== undefined && { baseUrl: deps.aviationWeatherUrl }),
+      }),
+    );
+  await app.register(hazardRoutes, {
+    hazards: deps.hazards,
+    hazardFeeds,
+    ...(deps.now && { now: deps.now }),
+  });
   await app.register(briefingRoutes, {
     briefings: deps.briefings,
     tools: { flightPlans: deps.flightPlans, weatherReports: deps.weatherReports, weather },

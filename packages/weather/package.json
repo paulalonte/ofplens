@@ -11,6 +11,8 @@
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
+    "@turf/boolean-intersects": "7.3.5",
+    "@turf/helpers": "7.3.5",
     "zod": "4.6.7"
   },
   "devDependencies": {

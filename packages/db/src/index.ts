@@ -28,3 +28,4 @@ export {
   type StartBriefingInput,
 } from './briefings';
 export type { BriefingRow } from './schema';
+export { createHazardRepository, type HazardRepository, type PlanHazards } from './hazards';

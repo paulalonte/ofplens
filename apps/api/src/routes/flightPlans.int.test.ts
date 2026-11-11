@@ -3,6 +3,7 @@ import {
   createDb,
   createFlightPlanRepository,
   createPilotRepository,
+  createHazardRepository,
   createWeatherRepository,
   pingDb,
   type DbConnection,
@@ -41,6 +42,7 @@ async function startApp(fixture: string) {
     pilots: createPilotRepository(conn.db),
     flightPlans: createFlightPlanRepository(conn.db),
     weatherReports: createWeatherRepository(conn.db),
+    hazards: createHazardRepository(conn.db),
     briefings: createBriefingRepository(conn.db),
     simbrief: createFakeSimbrief(() => loadFixture(fixture)),
   });

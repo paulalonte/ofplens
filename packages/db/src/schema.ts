@@ -118,6 +118,15 @@ export const flightPlans = pgTable(
     importedAt: timestamptz('imported_at').notNull().defaultNow(),
     /** Last successful live weather refresh (phase 4), even when no report was new. */
     liveWeatherCheckedAt: timestamptz('live_weather_checked_at'),
+    /** Last successful hazard check (phase 6); null = never checked. */
+    hazardsCheckedAt: timestamptz('hazards_checked_at'),
+    /** The takeoff time that check worked out ETAs from. */
+    hazardsTakeoffAt: timestamptz('hazards_takeoff_at'),
+    /** Feeds that could not be read at that check (isigmet, airsigmet, gairmet). */
+    hazardsUnavailable: text('hazards_unavailable')
+      .array()
+      .notNull()
+      .default(sql`'{}'::text[]`),
   },
   (t) => [
     check('flight_plans_units_check', sql`${t.units} in ('kgs', 'lbs')`),
@@ -264,3 +273,46 @@ export const briefings = pgTable(
 );
 
 export type BriefingRow = typeof briefings.$inferSelect;
+
+/**
+ * SIGMETs, AIRMETs and G-AIRMETs that touch the plan's route (phase 6), as found by the last
+ * hazard check; each check replaces them. One row per advisory, with the stretches of the
+ * route (fix to fix) where it applies.
+ */
+export const advisories = pgTable(
+  'advisories',
+  {
+    id: bigint('id', { mode: 'number' }).primaryKey().generatedAlwaysAsIdentity(),
+    flightPlanId: uuid('flight_plan_id')
+      .notNull()
+      .references(() => flightPlans.id, { onDelete: 'cascade' }),
+    /** Our stable id for the advisory, e.g. "isigmet:RPHI:3:1794384000". */
+    advisoryId: text('advisory_id').notNull(),
+    source: text('source', { enum: ['isigmet', 'airsigmet', 'gairmet'] }).notNull(),
+    /** thunderstorm, turbulence, icing, ... */
+    hazard: text('hazard').notNull(),
+    /** The feed's own code: TS, CONVECTIVE, TURB-HI, ... */
+    code: text('code').notNull(),
+    severity: text('severity', { enum: ['moderate', 'severe'] }),
+    detail: text('detail'),
+    validFrom: timestamptz('valid_from').notNull(),
+    validTo: timestamptz('valid_to').notNull(),
+    baseFt: integer('base_ft'),
+    topFt: integer('top_ft'),
+    /** [lon, lat] rings. */
+    polygons: jsonb('polygons').$type<[number, number][][]>().notNull(),
+    /** [{ fromSeq, toSeq, fromIdent, toIdent }], in route order. */
+    segments: jsonb('segments')
+      .$type<{ fromSeq: number; toSeq: number; fromIdent: string; toIdent: string }[]>()
+      .notNull(),
+    /** First affected fix, for ordering. */
+    firstWaypointSeq: integer('first_waypoint_seq').notNull(),
+    fir: text('fir'),
+    firName: text('fir_name'),
+    rawText: text('raw_text'),
+  },
+  (t) => [
+    unique('advisories_plan_advisory_unique').on(t.flightPlanId, t.advisoryId),
+    index('advisories_plan_idx').on(t.flightPlanId, t.firstWaypointSeq),
+  ],
+);

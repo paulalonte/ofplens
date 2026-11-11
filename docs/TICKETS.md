@@ -3,9 +3,9 @@
 Derived from [PLAN.md](PLAN.md). Work them in order, one ticket per branch/PR.
 Each ticket ends with tests green and its "Done when" shown working.
 
-> **Status (11 Nov 2026):** OFP-01 to OFP-29 are done: the MVP and Phase 4 (live weather) are
+> **Status (11 Nov 2026):** OFP-01 to OFP-30 are done: the MVP and Phase 4 (live weather) are
 > complete, and so is **Phase 5 — AI briefing** (OFP-24 to OFP-28). In progress: **Phase 6 —
-> hazards along the route** (OFP-30 to OFP-33 left). Deployment (3b) follows.
+> hazards along the route** (OFP-31 to OFP-33 left). Deployment (3b) follows.
 
 **MVP = Phases 0–3**: load my latest SimBrief OFP, see a clean briefing, and keep a
 history in Postgres, running locally. Deploy (3b), live weather (4) and everything AI
@@ -331,6 +331,13 @@ mapped to the affected waypoints, shown on the plan page, and named by the AI br
 - **Done when:** fixture tests map a known polygon to the right waypoints of the EDDB → EDDM
   and KSFO → KJFK plans, the altitude and time filters each exclude a case, an antimeridian
   route matches, and the routes are tested with `app.inject()`.
+- *As built:* one `advisories` row per advisory with its `segments` (fix to fix) as JSON, since
+  one advisory can cross the route more than once. Legs follow the great circle; a leg counts
+  when any of its planned altitudes is inside base–top (a missing base is the surface; low
+  visibility without levels counts below 10,000 ft). The time margin is 30 min. ETAs count from
+  the planned takeoff, or from the check time when that has passed (plans flown later than
+  planned). The route starts at the first navlog fix: SimBrief's navlog has no origin position.
+  Feeds are cached 5 minutes (1 minute when one was down), shared by all plans.
 
 ### OFP-31 · Web: hazards on the plan page
 - A **Hazards along the route** card: per hazard its type, severity, levels (FL), valid until
