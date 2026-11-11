@@ -99,8 +99,9 @@ export const WEATHER_WORDS: Phenomenon[] = [
   {
     word: /turbulen(?:ce|t)|\bturb\b/g,
     label: 'turbulence',
-    codes: [['GUST']],
-    hazards: ['turbulence', 'mountain_wave'],
+    // Gusty wind, and thunderstorms: "expect turbulence near the storms" is standard advice.
+    codes: [['GUST'], ['TS'], ['CB']],
+    hazards: ['turbulence', 'mountain_wave', 'thunderstorm'],
   },
   { word: /wind ?shear/g, label: 'wind shear', codes: [['WS'], ['GUST']] },
   { word: /\bgust(?:s|ing|y)?\b/g, label: 'gusts', codes: [['GUST']] },
@@ -242,7 +243,7 @@ export function summaryNumbers(summary: string): SummaryNumbers {
     visibilitiesM.push({ metres: Number(m[1]) * 1000, orMore: Boolean(m[2]), text: m[0] });
   }
   for (const m of text.matchAll(
-    /((?:\d+\s+)?\d+(?:\/\d+)?)\+?\s*(?:sm|statute miles?|miles?)\b/g,
+    /((?:\d+\s+)?\d+(?:\.\d+|\/\d+)?)\+?\s*(?:sm|statute miles?|miles?)\b/g,
   )) {
     visibilitiesM.push({ metres: fraction(m[1]!) * SM_M, orMore: m[0].includes('+'), text: m[0] });
   }
@@ -257,7 +258,10 @@ export function summaryNumbers(summary: string): SummaryNumbers {
 }
 
 export interface MetarNumbers {
-  /** Cloud and vertical visibility heights in feet, from the whole report (trend included). */
+  /**
+   * Heights in feet from the whole report (trend included): cloud and vertical visibility,
+   * 5,000 ft for CAVOK, and runway visual ranges given in feet.
+   */
   heightsFt: Set<number>;
   /** Visibilities in metres from the whole report; 9999 counts as 10 km or more. */
   visibilitiesM: { metres: number; orMore: boolean }[];
@@ -276,7 +280,18 @@ export function metarNumbers(raw: string): MetarNumbers {
     const t = body[i]!;
     const cloud = /^(?:FEW|SCT|BKN|OVC|VV)(\d{3})/.exec(t);
     if (cloud) heightsFt.add(Number(cloud[1]) * 100);
-    if (t === 'CAVOK') visibilitiesM.push({ metres: 10_000, orMore: true });
+    if (t === 'CAVOK') {
+      visibilitiesM.push({ metres: 10_000, orMore: true });
+      heightsFt.add(5000); // CAVOK: no cloud below 5,000 ft
+    }
+    // Runway visual range, e.g. R28R/1400VP6000FT (feet) or R19R/P2000N (metres).
+    const rvr = /^R\d{2}[LCR]?\/([PM]?)(\d{4})(?:V([PM]?)(\d{4}))?(FT)?/.exec(t);
+    if (rvr) {
+      for (const value of [rvr[2], rvr[4]].filter((v): v is string => Boolean(v))) {
+        if (rvr[5]) heightsFt.add(Number(value));
+        else visibilitiesM.push({ metres: Number(value), orMore: false });
+      }
+    }
     const metres = /^(\d{4})(?:N|NE|E|SE|S|SW|W|NW|NDV)?$/.exec(t);
     if (metres && i > 1) {
       const m = Number(metres[1]);

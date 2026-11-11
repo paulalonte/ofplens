@@ -449,6 +449,20 @@ check and per prompt version, so prompt or model changes are measured, not guess
 - **Done when:** a fake-Claude run writes complete rows and traces (tested), and a real
   baseline run on Haiku 5.5 is recorded.
 
+- *As built:* results in `packages/evals/runs/<prompt version>__<model>/` (`results.jsonl` with
+  each answer, `errors.jsonl`, `meta.json` committed; traces and `report.html` rebuilt locally).
+  A seventh check, **valid answer**: a run with no usable briefing fails it, and the other checks
+  do not apply. `pnpm eval:regrade` grades stored answers again after a grader change and
+  `pnpm eval:report` rebuilds the report, both free. API errors, timeouts and a different model
+  answering are kept out of the scores and run again on resume.
+- *Baseline, `briefing-v3` on Haiku 5.5 (21 cases × 3, $0.16, 12.7 s per run):* all checks
+  76% (48/63); valid answer 98%, guardrails 98%, risk 95%, no invented weather 87%, numbers
+  97%, hazards noted 100%, missing data said 100%. The mistakes: mist (`BR`) called fog (6
+  runs), freezing rain and drizzle no report has, a TAF value in a METAR summary, a wrong wind
+  direction, "block time" in a note, a headline over 140 characters (no briefing), and risk
+  "moderate" with thunderstorms in the arrival TAF where the prompt's rule says low (3 runs; the
+  rule, not the model, is probably what needs changing).
+
 ### OFP-38 · Baseline and first improvements
 - Baseline on Haiku 5.5 (`briefing-v3`), and once on Sonnet 5.5 for comparison.
 - Fix the prompt for what the checks find (e.g. invented weather), as `briefing-v4`, and keep
