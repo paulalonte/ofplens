@@ -148,7 +148,7 @@ Distribution: 8 MCP server · Stretch: X-Plane live tracking
 
 ### Phase 6 — Hazards along the route
 
-- Fetch SIGMETs (convective, turbulence, icing) and intersect their polygons with route segments (for example with Turf.js).
+- Fetch SIGMETs (international and US) and US G-AIRMETs, and intersect their polygons with route legs (Turf.js), filtered by level and time. See "Hazard source" below.
 - Store matches in `advisories` with the affected waypoint range; add the `get_route_hazards` tool.
 - Optional: route map (MapLibre) with hazard polygons.
 - **Done when:** a test fixture with a known SIGMET maps to the correct waypoints, and the briefing names them.
@@ -507,3 +507,22 @@ METAR JSON fields we use: `icaoId`, `obsTime` (Unix seconds), `reportTime` (ISO)
 
 The OFP's own METAR/TAF are plain text without these fields, so OFP Lens decodes METARs itself
 (OFP-20) to compare dispatch and live weather on equal terms.
+
+## Hazard source (checked 11 Nov 2026)
+
+aviationweather.gov Data API, the same service as METAR/TAF (free, no key, custom User-Agent).
+One request per feed returns everything currently valid, worldwide or for the US.
+
+| Feed | Request | What it has (on 11 Nov 2026) |
+| --- | --- | --- |
+| International SIGMETs | `GET /api/data/isigmet?format=json` | 137 worldwide (Asia, Europe, the Americas…); hazards `TS`, `TURB`, `ICE`, `VA`, `TC`, `MTW` |
+| US SIGMETs | `GET /api/data/airsigmet?format=json` | Domestic and convective SIGMETs (`CONVECTIVE`, …) |
+| US G-AIRMETs | `GET /api/data/gairmet?format=json` | `TURB-HI`, `TURB-LO`, `ICE`, `IFR`, `MT_OBSC`, `SFC_WND`, `LLWS`, `FZLVL`, per forecast hour |
+
+Fields we use: `hazard`, `qualifier`/`severity`, `validTimeFrom`/`validTimeTo` (Unix seconds)
+or `validTime`/`expireTime`, `base`/`top` or `altitudeLow1`/`altitudeHi1` (feet; G-AIRMET levels
+are hundreds of feet as strings), `coords` (`[{ lat, lon }]`, numbers or strings), `firId`,
+`rawSigmet`/`rawAirSigmet`. Almost every international SIGMET has a polygon (134 of 137); the
+few given only as text ("N OF S0232", "WI 90NM OF LINE…") have no `coords` and are listed but
+not matched to the route.
+
