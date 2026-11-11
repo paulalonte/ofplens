@@ -80,6 +80,7 @@ function PlanPage() {
         aiBriefing={<AiBriefingCard planId={planId} />}
         hazards={<HazardsCard planId={planId} />}
         navlogMarks={hazardMarks(hazards)}
+        routeHazards={hazards.hazards}
       />
     </div>
   );

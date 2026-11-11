@@ -22,6 +22,11 @@ export default defineConfig(({ mode }) => {
       react(),
       tailwindcss(),
     ],
+    build: {
+      // The route map's MapLibre chunk (~1.1 MB, 290 kB gzipped) loads only when the map is
+      // shown; anything else this large would still warn.
+      chunkSizeWarningLimit: 1200,
+    },
     server: {
       port: 5173,
       strictPort: true,

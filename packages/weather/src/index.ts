@@ -69,3 +69,4 @@ export {
   type PlanHazards,
   type PlanHazardStore,
 } from './hazards/planHazards';
+export { greatCircle, greatCirclePath, unwrap } from './hazards/geo';

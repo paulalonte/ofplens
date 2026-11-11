@@ -99,6 +99,15 @@ test('load a plan, find it in History, open it, delete it', async ({ page }) => 
     await expect(navlog.getByRole('rowheader', { name: /^PIKIB/ })).toContainText('⚠ TS');
   });
 
+  await test.step('route map with the hazard', async () => {
+    const card = page.getByRole('region', { name: 'Route map' });
+    await card.scrollIntoViewIfNeeded();
+    // MapLibre loaded on scroll and drew into its canvas (style from the fake, no tiles).
+    await expect(card.locator('canvas.maplibregl-canvas')).toBeVisible();
+    await expect(card).not.toContainText('Map unavailable');
+    await expect(card.getByRole('list', { name: 'Map legend' })).toHaveText('Thunderstorms');
+  });
+
   await test.step('AI briefing, generated only on a click (fake Claude)', async () => {
     const card = page.getByRole('region', { name: 'AI weather briefing' });
     await expect(card).toContainText('It runs only when you click');

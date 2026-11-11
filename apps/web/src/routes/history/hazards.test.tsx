@@ -125,6 +125,20 @@ describe('Saved plan: hazards along the route', () => {
     }
   });
 
+  it('shows a route map card with a legend of the hazard types on it', async () => {
+    mockApi({ ...base, [`GET ${HAZARDS}`]: () => jsonResponse(response()) });
+    await renderApp(`/history/${ID}`);
+
+    const map = await screen.findByRole('region', { name: 'Route map' });
+    // jsdom has no IntersectionObserver: the map library is never loaded here.
+    expect(map).toHaveTextContent('The map loads when you scroll to it.');
+    expect(
+      within(within(map).getByRole('list', { name: 'Map legend' }))
+        .getAllByRole('listitem')
+        .map((li) => li.textContent),
+    ).toEqual(['Thunderstorms', 'Turbulence']);
+  });
+
   it('says when none is on the route, with how many were checked', async () => {
     mockApi({ ...base, [`GET ${HAZARDS}`]: () => jsonResponse(response({ hazards: [] })) });
     await renderApp(`/history/${ID}`);
