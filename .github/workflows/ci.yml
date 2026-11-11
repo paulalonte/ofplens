@@ -93,7 +93,25 @@ jobs:
           cache: pnpm
 
       - run: pnpm install --frozen-lockfile
-      - run: pnpm --filter @ofplens/e2e exec playwright install --with-deps chromium
+
+      # Chromium comes from Playwright's own download server, cached between runs (the key
+      # follows the lockfile, so a Playwright upgrade downloads the new browser).
+      - name: Cache Playwright browsers
+        uses: actions/cache@v6
+        with:
+          path: ~/.cache/ms-playwright
+          key: playwright-${{ runner.os }}-${{ hashFiles('pnpm-lock.yaml') }}
+      - run: pnpm --filter @ofplens/e2e exec playwright install chromium
+
+      # Its system packages come from Ubuntu's mirrors, which runners sometimes cannot reach.
+      # The runner image already has the libraries headless Chromium needs (what was missing on
+      # 11 Nov 2026 were extra fonts), so this is best effort: a failure warns, and the tests
+      # still decide the outcome.
+      - name: Install Chromium system packages (best effort)
+        run: pnpm --filter @ofplens/e2e exec playwright install-deps chromium
+        continue-on-error: true
+        timeout-minutes: 4
+
       - run: pnpm e2e
 
       - name: Upload Playwright report
