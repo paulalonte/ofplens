@@ -21,7 +21,15 @@ export interface BriefingRunInfo {
 }
 
 export type BriefingRun = BriefingRunInfo &
-  ({ status: 'done'; briefing: Briefing } | { status: 'failed'; error: string });
+  (
+    | { status: 'done'; briefing: Briefing }
+    | {
+        status: 'failed';
+        error: string;
+        /** The schema-valid briefing the guardrails rejected, kept for evals; never shown. */
+        rejectedBriefing?: Briefing;
+      }
+  );
 
 export class BriefingPlanNotFoundError extends Error {
   constructor(id: string) {
@@ -165,7 +173,14 @@ export async function runBriefing(
   }
 
   const problems = checkBriefing(parsed.data, collectEvidence(toolCalls));
-  if (problems.length > 0) return failed(`Guardrails rejected the briefing: ${problems.join(' ')}`);
+  if (problems.length > 0) {
+    return {
+      ...info(),
+      status: 'failed',
+      error: `Guardrails rejected the briefing: ${problems.join(' ')}`,
+      rejectedBriefing: parsed.data,
+    };
+  }
 
   return { ...info(), status: 'done', briefing: parsed.data };
 }
