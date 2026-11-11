@@ -1,6 +1,13 @@
 import { checkBriefing, collectEvidence, type Briefing } from '@ofplens/agent';
 import { airports, metarsById, referenceToolCalls, type Reference } from './reference';
-import { intensityMismatches, isBacked, metarNumbers, summaryNumbers, weatherMentions } from './wx';
+import {
+  intensityMismatches,
+  isBacked,
+  metarNumbers,
+  summaryNumbers,
+  weatherCodes,
+  weatherMentions,
+} from './wx';
 
 /**
  * The eval's checks. Each looks at one thing, from the briefing and the tool data alone, and
@@ -54,7 +61,8 @@ const rank = (category: string | null | undefined) =>
   category ? CATEGORY_ORDER.indexOf(category) : -1;
 
 /**
- * The overall risk the prompt's rule gives for the tool data. Usually one level; when the
+ * The overall risk the prompt's rule (briefing-v4) gives for the tool data: earlier prompts are
+ * graded by the same rule, so versions compare on one standard. Usually one level; when the
  * hazard feeds were unreadable, "no route hazard" is unknown, so low and moderate both count.
  */
 export function expectedRisk(reference: Reference): Briefing['overallRisk'][] {
@@ -83,7 +91,12 @@ export function expectedRisk(reference: Reference): Briefing['overallRisk'][] {
 
   const allGood = weather.every((a) => ['VFR', 'MVFR'].includes(a.metar?.flightCategory ?? ''));
   const hazardsKnown = hazards.available && hazards.unavailableFeeds.length === 0;
-  if (allGood && !worse && hazards.hazards.length === 0) {
+  // Thunderstorms in the destination's TAF (the live one, else dispatch) rule out "low".
+  const destinationTaf =
+    reference.get_weather.stations.find((s) => s.role === 'destination')?.taf ??
+    reference.get_planned_weather.stations.find((s) => s.role === 'destination')?.taf;
+  const stormsForecast = destinationTaf ? weatherCodes(destinationTaf.raw).has('TS') : false;
+  if (allGood && !worse && !stormsForecast && hazards.hazards.length === 0) {
     return hazardsKnown ? ['low'] : ['low', 'moderate'];
   }
   return ['moderate'];

@@ -77,6 +77,10 @@ describe('each mistake fails its own check', () => {
       failing(changed('egll-kjfk-oceanic-turbulence', (b) => (b.overallRisk = 'low'))),
     ).toEqual(['risk']);
     expect(failing(changed('eddf-lepa-quiet', (b) => (b.overallRisk = 'high')))).toEqual(['risk']);
+    // Thunderstorms in the destination TAF (LEPA TEMPO TSRA): moderate, not low.
+    expect(failing(changed('eddf-lepa-arrival-storms', (b) => (b.overallRisk = 'low')))).toEqual([
+      'risk',
+    ]);
     // Hazards unknown: low and moderate are both fine.
     expect(
       failing(changed('eddf-lepa-hazard-feeds-down', (b) => (b.overallRisk = 'moderate'))),

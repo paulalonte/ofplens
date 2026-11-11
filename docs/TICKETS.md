@@ -469,6 +469,17 @@ check and per prompt version, so prompt or model changes are measured, not guess
   it only if it scores better without making another check worse.
 - **Done when:** the results for v3 and v4 (and Sonnet) are recorded here, and the app uses the
   better prompt.
+- *As built:* `briefing-v4` adds a "weather words" section (BR is mist, never fog; freezing rain
+  only for FZRA; RASN is rain and snow; "-" light, none moderate, "+" heavy), keeps forecasts out
+  of airport summaries, asks for the METAR wind copied exactly, a headline of at most 110
+  characters, and no fuel or time words at all. The risk rule now says thunderstorms in the
+  destination TAF rule out "low" (the v3 model was right to say moderate); the grader follows it
+  and grades every version by it.
+- *Results (Haiku 5.5, 21 cases × 3):* `briefing-v3` 81% of runs pass every check (51/63, after
+  the risk rule fix), `briefing-v4` **92% (58/63)**, $0.17. Better on 8 cases, worse on 1 (by
+  one run); no check got worse (no invented weather 54/62 → 58/63, numbers 60/62 → 63/63,
+  guardrails 61/62 → 63/63, valid answer 62/63 → 63/63). Left: mist still called fog in 3
+  headlines or notes, and "rain showers" for RA twice. The app uses v4.
 
 ---
 
