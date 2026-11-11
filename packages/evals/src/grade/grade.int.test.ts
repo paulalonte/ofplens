@@ -119,6 +119,34 @@ describe('each mistake fails its own check', () => {
     expect(reasons(intensity)).toContain('"heavy rain", but the METAR has -RA');
   });
 
+  it('no invented weather: a note is checked against the airports it names, JFK for KJFK too', () => {
+    // KJFK (dispatch) is gusty; KSFO is not.
+    expect(
+      failing(
+        changed('ksfo-kjfk-severe-turbulence', (b) => {
+          b.headline = 'KSFO now VFR; JFK gusty.';
+        }),
+      ),
+    ).toEqual([]);
+    expect(
+      failing(
+        changed('ksfo-kjfk-severe-turbulence', (b) => {
+          b.headline = 'KSFO gusty.';
+        }),
+      ),
+    ).toEqual(['no_invented_weather']);
+  });
+
+  it('no invented weather: advice is not a claim', () => {
+    expect(
+      failing(
+        changed('ksfo-kjfk-us-feeds-down', (b) => {
+          b.pilotNotes.push('None were returned; check for turbulence and icing yourself.');
+        }),
+      ),
+    ).toEqual([]);
+  });
+
   it('no invented weather: real weather and negations pass', () => {
     expect(
       failing(

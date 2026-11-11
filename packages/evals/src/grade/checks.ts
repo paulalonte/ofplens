@@ -172,7 +172,7 @@ export function checkNoInventedWeather(briefing: Briefing, reference: Reference)
     h.rawText ? [h.rawText] : [],
   );
   for (const { where, text } of free) {
-    const named = weather.filter((a) => text.toUpperCase().includes(a.icao));
+    const named = weather.filter((a) => namesAirport(text, a.icao));
     const sources = [...(named.length > 0 ? named : weather).flatMap((a) => a.raws), ...bulletins];
     for (const mention of weatherMentions(text)) {
       if (!isBacked(mention, sources, hazardTypes)) {
@@ -182,6 +182,16 @@ export function checkNoInventedWeather(briefing: Briefing, reference: Reference)
     }
   }
   return result('no_invented_weather', reasons);
+}
+
+/**
+ * Whether a sentence names an airport: its ICAO code, or for US and Canadian airports the
+ * three-letter code pilots use ("JFK" for KJFK).
+ */
+export function namesAirport(text: string, icao: string): boolean {
+  const upper = text.toUpperCase();
+  if (new RegExp(`\\b${icao}\\b`).test(upper)) return true;
+  return /^[KC][A-Z]{3}$/.test(icao) && new RegExp(`\\b${icao.slice(1)}\\b`).test(upper);
 }
 
 /**

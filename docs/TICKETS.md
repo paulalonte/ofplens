@@ -480,6 +480,12 @@ check and per prompt version, so prompt or model changes are measured, not guess
   one run); no check got worse (no invented weather 54/62 → 58/63, numbers 60/62 → 63/63,
   guardrails 61/62 → 63/63, valid answer 62/63 → 63/63). Left: mist still called fog in 3
   headlines or notes, and "rain showers" for RA twice. The app uses v4.
+- *Sonnet 5.5 (`briefing-v4`, 21 cases × 1, $0.78):* 86% (18/21; interval 65–95%), 7.9 s per run
+  against Haiku's 13.4 s, at $0.037 a run (14× Haiku). Not more accurate: a 10 SM visibility
+  given as 10 km, mist called fog, a "high" risk where the rule says moderate, and six pilot
+  notes (no briefing). Haiku 5.5 stays the default. Reading these failures also fixed two
+  grader mistakes: notes naming US airports by their three-letter code ("JFK"), and advice
+  ("check for icing") read as a weather claim.
 
 ---
 
