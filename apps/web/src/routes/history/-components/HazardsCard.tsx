@@ -1,24 +1,9 @@
-import { formatFlightLevel, formatZulu, formatZuluDate } from '@ofplens/ofp';
-import type {
-  FlightPlanHazardsResponse,
-  HazardKind,
-  HazardSource,
-  RouteHazardView,
-} from '@ofplens/weather';
+import { formatZulu, formatZuluDate } from '@ofplens/ofp';
+import type { FlightPlanHazardsResponse, HazardSource, RouteHazardView } from '@ofplens/weather';
 import { useHazardRefreshState, usePlanHazards, useRefreshHazards } from '../../../api/hazards';
 import { useAutoRefreshWeather } from '../../../api/weather';
+import { HAZARD_LABEL, hazardLevels } from '../../../components/briefing/hazardStyle';
 import { Card } from '../../../components/Card';
-
-const KIND_LABEL: Record<HazardKind, string> = {
-  thunderstorm: 'Thunderstorms',
-  turbulence: 'Turbulence',
-  icing: 'Icing',
-  volcanic_ash: 'Volcanic ash',
-  tropical_cyclone: 'Tropical cyclone',
-  mountain_wave: 'Mountain waves',
-  low_visibility: 'Low ceilings / visibility',
-  other: 'Other hazard',
-};
 
 const SOURCE_LABEL: Record<HazardSource, string> = {
   isigmet: 'SIGMETs',
@@ -111,9 +96,9 @@ function NoneFound({ hazards }: { hazards: FlightPlanHazardsResponse }) {
 function HazardItem({ hazard, checkedAt }: { hazard: RouteHazardView; checkedAt: string | null }) {
   const detail = hazard.detail && (QUALIFIERS[hazard.detail] ?? hazard.detail.toLowerCase());
   return (
-    <li aria-label={KIND_LABEL[hazard.hazard]} className="space-y-1.5 py-3 first:pt-0 last:pb-0">
+    <li aria-label={HAZARD_LABEL[hazard.hazard]} className="space-y-1.5 py-3 first:pt-0 last:pb-0">
       <div className="flex flex-wrap items-center gap-2">
-        <h3 className="text-sm font-semibold">{KIND_LABEL[hazard.hazard]}</h3>
+        <h3 className="text-sm font-semibold">{HAZARD_LABEL[hazard.hazard]}</h3>
         {hazard.severity && <SeverityBadge severity={hazard.severity} />}
         {detail && <span className="text-xs text-slate-600 dark:text-slate-400">{detail}</span>}
         <span className="ml-auto text-xs text-slate-500 dark:text-slate-400">
@@ -126,7 +111,7 @@ function HazardItem({ hazard, checkedAt }: { hazard: RouteHazardView; checkedAt:
           {hazard.segments.map((s) => `${s.fromIdent} → ${s.toIdent}`).join(', ')}
         </dd>
         <dt className="text-slate-600 dark:text-slate-400">Levels</dt>
-        <dd className="font-mono">{levels(hazard)}</dd>
+        <dd className="font-mono">{hazardLevels(hazard)}</dd>
         <dt className="text-slate-600 dark:text-slate-400">Valid</dt>
         <dd className="font-mono">{validity(hazard, checkedAt)}</dd>
       </dl>
@@ -164,15 +149,6 @@ function sourceOf(hazard: RouteHazardView): string {
     case 'gairmet':
       return 'G-AIRMET';
   }
-}
-
-/** "SFC–FL380", "FL300–FL420", "Up to FL380", "FL240 and above", "Not given". */
-function levels({ baseFt, topFt }: RouteHazardView): string {
-  const level = (ft: number) => (ft === 0 ? 'SFC' : formatFlightLevel(ft));
-  if (baseFt === null && topFt === null) return 'Not given';
-  if (baseFt === null) return `Up to ${level(topFt!)}`;
-  if (topFt === null) return `${level(baseFt)} and above`;
-  return `${level(baseFt)}–${level(topFt)}`;
 }
 
 /** "until 16:00Z", or "14:00Z to 16:00Z" when it starts later; the date when it is not today. */

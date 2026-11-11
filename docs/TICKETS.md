@@ -3,9 +3,9 @@
 Derived from [PLAN.md](PLAN.md). Work them in order, one ticket per branch/PR.
 Each ticket ends with tests green and its "Done when" shown working.
 
-> **Status (11 Nov 2026):** OFP-01 to OFP-32 are done: the MVP, Phase 4 (live weather),
+> **Status (11 Nov 2026):** OFP-01 to OFP-33 are done: the MVP, Phase 4 (live weather),
 > **Phase 5 — AI briefing** (OFP-24 to OFP-28) and **Phase 6 — hazards along the route**
-> (OFP-29 to OFP-32) are complete; the optional route map (OFP-33) is left. Deployment (3b) follows.
+> (OFP-29 to OFP-33, route map included) are complete. Deployment (3b) follows.
 
 **MVP = Phases 0–3**: load my latest SimBrief OFP, see a clean briefing, and keep a
 history in Postgres, running locally. Deploy (3b), live weather (4) and everything AI
@@ -372,6 +372,12 @@ mapped to the affected waypoints, shown on the plan page, and named by the AI br
 ### OFP-33 · Optional: route map
 - A MapLibre map of the route with the hazard polygons drawn on it, on the plan page.
 - **Done when:** it renders the captured plans with and without hazards, on phone width too.
+- *As built:* MapLibre 6 with OpenFreeMap tiles (no key; positron or dark, following the system
+  theme), in its own chunk loaded when the card scrolls into view; the main bundle is
+  unchanged. Route along great circles from the first navlog fix, hazard areas in a colour per
+  type, affected stretches highlighted, a popup per area and a legend; "Map unavailable" when
+  the map or its style cannot load. Also on sample pages (without hazards). e2e serves a plain
+  style from the fake (`VITE_MAP_STYLE_BASE`), so no tiles come from the internet.
 
 ---
 

@@ -51,7 +51,11 @@ export default defineConfig({
       command: `pnpm --filter @ofplens/web exec vite --host 127.0.0.1 --port ${WEB_PORT} --strictPort`,
       url: `http://127.0.0.1:${WEB_PORT}`,
       reuseExistingServer: false,
-      env: { PORT: String(API_PORT) },
+      // The route map's style from the fake too: no map tiles from the internet.
+      env: {
+        PORT: String(API_PORT),
+        VITE_MAP_STYLE_BASE: `http://127.0.0.1:${FAKE_UPSTREAMS_PORT}/map-styles`,
+      },
       timeout: 60_000,
     },
   ],

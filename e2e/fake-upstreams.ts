@@ -5,6 +5,7 @@
  * - aviationweather.gov's Data API: METARs and TAFs from fixtures/weather (real reports
  *   captured earlier), filtered by `ids`; HTTP 204 when none of the stations has one. The
  *   hazard feeds from fixtures/hazards, plus one made-up SIGMET on the e2e route.
+ * - Map styles for the route map: a plain background (OpenFreeMap in real use).
  * - Claude's Messages API (the API's ANTHROPIC_BASE_URL): first asks for all four briefing
  *   tools, then writes a briefing from their results, citing real report and advisory ids so it
  *   passes the guardrails. No key and no cost.
@@ -31,6 +32,26 @@ const server = createServer((req, res) => {
 
     if (url.pathname === '/health') {
       res.writeHead(200).end('ok');
+      return;
+    }
+
+    // Map styles (OpenFreeMap's in real use): a plain background, no tiles or fonts. Fetched by
+    // the browser from another origin, hence CORS.
+    if (/^\/map-styles\/(positron|dark)$/.test(url.pathname)) {
+      res
+        .writeHead(200, {
+          'content-type': 'application/json',
+          'access-control-allow-origin': '*',
+        })
+        .end(
+          JSON.stringify({
+            version: 8,
+            sources: {},
+            layers: [
+              { id: 'background', type: 'background', paint: { 'background-color': '#e2e8f0' } },
+            ],
+          }),
+        );
       return;
     }
 

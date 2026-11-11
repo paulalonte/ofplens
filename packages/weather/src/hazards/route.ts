@@ -1,6 +1,7 @@
 import booleanIntersects from '@turf/boolean-intersects';
 import { lineString, polygon as turfPolygon } from '@turf/helpers';
 import type { Advisory, Position, Ring } from './advisory';
+import { greatCircle, unwrap } from './geo';
 
 /** One navlog fix, as much of it as matching needs. */
 export interface RoutePoint {
@@ -41,9 +42,6 @@ export const DEFAULT_MARGIN_MS = 30 * 60_000;
  * and visibility near the ground, so they count only below this altitude.
  */
 export const LOW_VISIBILITY_TOP_FT = 10_000;
-
-/** Long legs are followed along the great circle in steps of at most this many degrees. */
-const MAX_STEP_DEG = 1;
 
 /**
  * Which advisories touch the route, and between which fixes. A leg (one fix to the next)
@@ -134,41 +132,6 @@ function buildLegs(route: readonly RoutePoint[], takeoffMs: number): Leg[] {
     previousLon = path.at(-1)![0];
   }
   return legs;
-}
-
-/** The longitude equal to `lon` (mod 360) that is closest to `near`. */
-function unwrap(lon: number, near: number): number {
-  let value = lon;
-  while (value - near > 180) value -= 360;
-  while (value - near < -180) value += 360;
-  return value;
-}
-
-const RAD = Math.PI / 180;
-
-/** Points along the great circle from a to b, both ends included. */
-function greatCircle(a: Position, b: Position): Position[] {
-  const [lon1, lat1] = [a[0] * RAD, a[1] * RAD];
-  const [lon2, lat2] = [b[0] * RAD, b[1] * RAD];
-  const p1 = [Math.cos(lat1) * Math.cos(lon1), Math.cos(lat1) * Math.sin(lon1), Math.sin(lat1)];
-  const p2 = [Math.cos(lat2) * Math.cos(lon2), Math.cos(lat2) * Math.sin(lon2), Math.sin(lat2)];
-  const dot = Math.min(1, Math.max(-1, p1[0]! * p2[0]! + p1[1]! * p2[1]! + p1[2]! * p2[2]!));
-  const angle = Math.acos(dot);
-  const steps = Math.max(1, Math.ceil(angle / RAD / MAX_STEP_DEG));
-  if (angle < 1e-9) return [a, b];
-
-  const points: Position[] = [a];
-  for (let i = 1; i < steps; i++) {
-    const t = i / steps;
-    const k1 = Math.sin((1 - t) * angle) / Math.sin(angle);
-    const k2 = Math.sin(t * angle) / Math.sin(angle);
-    const x = k1 * p1[0]! + k2 * p2[0]!;
-    const y = k1 * p1[1]! + k2 * p2[1]!;
-    const z = k1 * p1[2]! + k2 * p2[2]!;
-    points.push([Math.atan2(y, x) / RAD, Math.atan2(z, Math.hypot(x, y)) / RAD]);
-  }
-  points.push(b);
-  return points;
 }
 
 interface Area {

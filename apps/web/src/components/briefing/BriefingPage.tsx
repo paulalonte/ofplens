@@ -1,10 +1,12 @@
 import type { FlightPlanSummary, WeightUnit } from '@ofplens/ofp';
+import type { RouteHazardView } from '@ofplens/weather';
 import { useState, type ReactNode } from 'react';
 import { BriefingHeader } from './BriefingHeader';
 import { FlightDataCard } from './FlightDataCard';
 import { FuelCard } from './FuelCard';
 import { NavlogCard } from './NavlogCard';
 import { PayloadCard } from './PayloadCard';
+import { RouteMapCard } from './routeMap/RouteMapCard';
 import { TakeoffLandingCard } from './TakeoffLandingCard';
 import { TimesCard } from './TimesCard';
 import { UnitToggle } from './UnitToggle';
@@ -28,6 +30,8 @@ interface Props {
   hazards?: ReactNode;
   /** Navlog fixes inside a hazard, by seq, with the hazards' codes. */
   navlogMarks?: ReadonlyMap<number, readonly string[]>;
+  /** Hazards along the route, drawn on the route map (saved plans). */
+  routeHazards?: readonly RouteHazardView[];
 }
 
 export function BriefingPage({
@@ -38,6 +42,7 @@ export function BriefingPage({
   aiBriefing,
   hazards,
   navlogMarks,
+  routeHazards,
 }: Props) {
   const [displayUnit, setDisplayUnit] = useState<WeightUnit>(preferredUnit ?? plan.units);
 
@@ -59,6 +64,7 @@ export function BriefingPage({
       {aiBriefing}
       {weather ?? <WeatherCard plan={plan} />}
       {hazards}
+      <RouteMapCard plan={plan} {...(routeHazards && { hazards: routeHazards })} />
       <NavlogCard plan={plan} displayUnit={displayUnit} hazardMarks={navlogMarks} />
 
       <p className="text-xs text-slate-500 dark:text-slate-400">
