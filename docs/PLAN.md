@@ -434,14 +434,16 @@ export const Briefing = z.object({
   departure: Conditions,
   destination: Conditions,
   alternate: Conditions.nullable(),
+  // One entry per segment of each hazard get_route_hazards returned (none left out).
   enrouteHazards: z.array(z.object({
-    type: z.enum(['thunderstorm', 'turbulence', 'icing', 'volcanic_ash', 'other']),
-    fromWaypoint: z.string(),
+    type: z.enum(['thunderstorm', 'turbulence', 'icing', 'volcanic_ash', 'tropical_cyclone',
+                  'mountain_wave', 'low_visibility', 'other']),
+    fromWaypoint: z.string(),             // one of the advisory's segments
     toWaypoint: z.string(),
     validUntil: z.string().datetime().nullable(),
-    severity: z.enum(['light', 'moderate', 'severe']).nullable(),
+    severity: z.enum(['moderate', 'severe']).nullable(),
     advisoryId: z.string(),               // must reference a tool result
-  })),
+  })).max(20),
   pilotNotes: z.array(z.string().max(160)).max(5),
 });
 ```

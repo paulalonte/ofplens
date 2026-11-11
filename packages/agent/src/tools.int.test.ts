@@ -1,6 +1,7 @@
 import {
   createDb,
   createFlightPlanRepository,
+  createHazardRepository,
   createPilotRepository,
   createWeatherRepository,
   type DbConnection,
@@ -8,17 +9,23 @@ import {
 import { createTestDatabase, truncateAll, type TestDatabase } from '@ofplens/db/testing';
 import { parseOfp } from '@ofplens/ofp';
 import { loadFixture } from '@ofplens/ofp/testing';
-import { createCachedWeatherClient, createWeatherClient } from '@ofplens/weather';
+import {
+  createCachedWeatherClient,
+  createWeatherClient,
+  WeatherUnavailableError,
+} from '@ofplens/weather';
 import { loadWeatherFixture } from '@ofplens/weather/testing';
 import { afterAll, beforeAll, beforeEach, describe, expect, it, vi } from 'vitest';
 import {
   briefingTools,
   getFlightPlan,
   getPlannedWeather,
+  getRouteHazards,
   getWeather,
   ToolError,
   type ToolDeps,
 } from './tools';
+import { fixtureHazardClient } from './testing/routeHazards';
 
 /**
  * The agent's tools on a real Postgres database, with aviationweather.gov answered from the
@@ -43,7 +50,7 @@ afterAll(async () => {
 const urlOf = (input: string | URL | Request) =>
   input instanceof Request ? input.url : input.toString();
 
-function deps({ down = false } = {}): ToolDeps {
+function deps({ down = false, hazardsDown = false } = {}): ToolDeps {
   const fetch = vi.fn((input: string | URL | Request) => {
     if (down) return Promise.resolve(new Response('', { status: 503 }));
     const url = new URL(urlOf(input));
@@ -57,6 +64,13 @@ function deps({ down = false } = {}): ToolDeps {
   return {
     flightPlans: createFlightPlanRepository(conn.db),
     weatherReports: createWeatherRepository(conn.db),
+    hazards: createHazardRepository(conn.db),
+    hazardFeeds: hazardsDown
+      ? {
+          fetchAdvisories: () =>
+            Promise.reject(new WeatherUnavailableError('aviationweather.gov returned HTTP 503')),
+        }
+      : fixtureHazardClient(),
     weather: createCachedWeatherClient(createWeatherClient({ fetch, retryDelayMs: 0 })),
   };
 }
@@ -217,6 +231,58 @@ describe('get_weather', () => {
     expect(out.liveAvailable).toBe(false);
     expect(out.note).toMatch(/unavailable/);
     expect(out.stations.every((s) => s.metar === null && !s.changedSinceDispatch)).toBe(true);
+  });
+});
+
+describe('get_route_hazards', () => {
+  it('checks the route now and returns each hazard with its segments, citable by id', async () => {
+    const id = await importPlan('ksfo-kjfk-b739-lbs');
+
+    const out = getRouteHazards.output.parse(
+      await getRouteHazards.run({ flightPlanId: id }, deps()),
+    );
+
+    expect(out).toMatchObject({
+      available: true,
+      note: null,
+      unavailableFeeds: [],
+      moreNotShown: 0,
+    });
+    expect(out.advisoriesChecked).toBe(125 + 2);
+    // Only the made-up severe turbulence around OCS: the captured feeds are from 11 Nov.
+    expect(out.hazards).toEqual([
+      expect.objectContaining({
+        advisoryId: expect.stringMatching(/^isigmet:KZLC:T2:\d+$/) as unknown,
+        type: 'turbulence',
+        code: 'TURB',
+        severity: 'severe',
+        baseFt: 30000,
+        topFt: 40000,
+        segments: [{ fromWaypoint: 'LCU', toWaypoint: 'KATES' }],
+        issuedBy: 'SIGMET, KZLC SALT LAKE CITY',
+      }),
+    ]);
+    expect(out.hazards[0]?.rawText).toContain('SEV TURB');
+    expect(JSON.stringify(out)).not.toContain('polygons');
+  });
+
+  it('returns an empty list when nothing is on the route', async () => {
+    const id = await importPlan('eddf-lepa-a339-noalt');
+    const out = await getRouteHazards.run({ flightPlanId: id }, deps());
+    expect(out).toMatchObject({ available: true, hazards: [] });
+  });
+
+  it('says when the feeds are unavailable and returns the last check instead', async () => {
+    const id = await importPlan('eddb-eddm-c750-kgs');
+    await getRouteHazards.run({ flightPlanId: id }, deps());
+
+    const out = await getRouteHazards.run({ flightPlanId: id }, deps({ hazardsDown: true }));
+
+    expect(out.note).toMatch(/unavailable right now/);
+    expect(out.available).toBe(true); // a stored check exists
+    expect(out.hazards.map((h) => h.segments)).toEqual([
+      [{ fromWaypoint: 'BEBKU', toWaypoint: 'MAREM' }],
+    ]);
   });
 });
 

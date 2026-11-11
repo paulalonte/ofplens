@@ -1,5 +1,10 @@
 import type { FlightPlanRepository } from '@ofplens/db';
-import type { PlanWeatherStore, WeatherClient } from '@ofplens/weather';
+import type {
+  HazardClient,
+  PlanHazardStore,
+  PlanWeatherStore,
+  WeatherClient,
+} from '@ofplens/weather';
 import type { z } from 'zod';
 
 /**
@@ -11,6 +16,9 @@ export interface ToolDeps {
   weatherReports: PlanWeatherStore;
   /** Use the cached client: the agent may ask for weather more than once. */
   weather: WeatherClient;
+  hazards: PlanHazardStore;
+  /** Use the cached client: the feeds cover the whole world and are shared by all plans. */
+  hazardFeeds: HazardClient;
 }
 
 /**

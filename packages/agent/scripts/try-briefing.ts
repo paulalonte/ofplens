@@ -8,7 +8,8 @@
  *   pnpm briefing:try --model claude-sonnet-5-5 <plan>
  *
  * Reads ANTHROPIC_API_KEY (and DATABASE_URL for saved plans) from the root .env. Live weather
- * comes from aviationweather.gov. Nothing is stored and the daily limit does not apply: every
+ * comes from aviationweather.gov; so do route hazards for saved plans, while captured plans get
+ * the captured hazard feeds plus made-up SIGMETs on their routes (src/testing/routeHazards.ts). Nothing is stored and the daily limit does not apply: every
  * run here is a paid call, so the script refuses more than 5 at once.
  *
  * Captured plans run in a temporary database that is dropped afterwards.
@@ -17,6 +18,7 @@ import Anthropic from '@anthropic-ai/sdk';
 import {
   createDb,
   createFlightPlanRepository,
+  createHazardRepository,
   createPilotRepository,
   createWeatherRepository,
   type Database,
@@ -24,10 +26,17 @@ import {
 import { createTestDatabase } from '@ofplens/db/testing';
 import { parseOfp } from '@ofplens/ofp';
 import { loadFixture } from '@ofplens/ofp/testing';
-import { createCachedWeatherClient, createWeatherClient } from '@ofplens/weather';
+import {
+  createCachedHazardClient,
+  createCachedWeatherClient,
+  createHazardClient,
+  createWeatherClient,
+  type HazardClient,
+} from '@ofplens/weather';
 import { readdirSync } from 'node:fs';
 import { resolve } from 'node:path';
 import { DEFAULT_BRIEFING_CONFIG, runBriefing, type BriefingRun, type ToolDeps } from '../src';
+import { fixtureHazardClient } from '../src/testing/routeHazards';
 
 const MAX_RUNS = 5;
 const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
@@ -75,10 +84,17 @@ const weather = createCachedWeatherClient(
     process.env.AVIATION_WEATHER_URL ? { baseUrl: process.env.AVIATION_WEATHER_URL } : {},
   ),
 );
-const depsFor = (db: Database): ToolDeps => ({
+const awcUrl = process.env.AVIATION_WEATHER_URL
+  ? { baseUrl: process.env.AVIATION_WEATHER_URL }
+  : {};
+/** Saved plans: the live hazard feeds. Captured plans: the captured feeds plus made-up SIGMETs on their routes. */
+const liveHazards = createCachedHazardClient(createHazardClient({ timeoutMs: 20_000, ...awcUrl }));
+const depsFor = (db: Database, hazardFeeds: HazardClient): ToolDeps => ({
   flightPlans: createFlightPlanRepository(db),
   weatherReports: createWeatherRepository(db),
   weather,
+  hazards: createHazardRepository(db),
+  hazardFeeds,
 });
 
 // Saved plans: the dev database. Captured plans: one temporary database for all of them.
@@ -92,7 +108,7 @@ async function planFor(target: string): Promise<{ id: string; deps: ToolDeps }> 
     const url = process.env.DATABASE_URL;
     if (!url) usage('Set DATABASE_URL in the root .env to brief a saved plan.');
     open.devDb ??= createDb(url, { max: 2 });
-    return { id: target, deps: depsFor(open.devDb.db) };
+    return { id: target, deps: depsFor(open.devDb.db, liveHazards) };
   }
   if (!open.scratch) {
     open.scratch = await createTestDatabase();
@@ -107,7 +123,7 @@ async function planFor(target: string): Promise<{ id: string; deps: ToolDeps }> 
     plan: parseOfp(raw),
     rawOfp: raw,
   });
-  return { id, deps: depsFor(open.scratch.db) };
+  return { id, deps: depsFor(open.scratch.db, fixtureHazardClient()) };
 }
 
 const usd = (n: number | null) =>

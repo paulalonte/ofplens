@@ -1,4 +1,4 @@
-import { FLIGHT_CATEGORIES } from '@ofplens/weather';
+import { FLIGHT_CATEGORIES, HAZARD_KINDS } from '@ofplens/weather';
 import { z } from 'zod';
 
 /**
@@ -20,23 +20,18 @@ export const Conditions = z.object({
 });
 export type Conditions = z.infer<typeof Conditions>;
 
-export const HAZARD_TYPES = [
-  'thunderstorm',
-  'turbulence',
-  'icing',
-  'volcanic_ash',
-  'other',
-] as const;
-export const HAZARD_SEVERITIES = ['light', 'moderate', 'severe'] as const;
+/** The same types get_route_hazards returns. */
+export const HAZARD_TYPES = HAZARD_KINDS;
+export const HAZARD_SEVERITIES = ['moderate', 'severe'] as const;
 
 export const EnrouteHazard = z.object({
   type: z.enum(HAZARD_TYPES),
-  /** Waypoint idents from get_flight_plan. */
+  /** One of the advisory's segments from get_route_hazards, copied exactly. */
   fromWaypoint: z.string().min(1),
   toWaypoint: z.string().min(1),
   validUntil: z.iso.datetime().nullable(),
   severity: z.enum(HAZARD_SEVERITIES).nullable(),
-  /** Must reference an advisory returned by a tool (route hazards arrive in Phase 6). */
+  /** An advisoryId returned by get_route_hazards. */
   advisoryId: z.string().min(1),
 });
 export type EnrouteHazard = z.infer<typeof EnrouteHazard>;
@@ -50,8 +45,8 @@ export const Briefing = z.object({
   destination: Conditions,
   /** Null when the plan has no alternate. */
   alternate: Conditions.nullable(),
-  /** Empty until route hazards exist (Phase 6). */
-  enrouteHazards: z.array(EnrouteHazard).max(10),
+  /** One entry per segment of each advisory get_route_hazards returned. */
+  enrouteHazards: z.array(EnrouteHazard).max(20),
   /** The prompt asks for 150 characters; the model cannot count exactly, so allow some slack. */
   pilotNotes: z.array(z.string().min(1).max(240)).max(5),
 });
