@@ -417,17 +417,25 @@ check and per prompt version, so prompt or model changes are measured, not guess
 ### OFP-36 · Graders
 - Per briefing, each check passes or fails with a reason:
   - **guardrails:** the existing guardrails pass (citations, flight categories, hazard
-    coverage).
+    coverage, no fuel, weights or durations).
   - **risk:** `overallRisk` matches the rule in the prompt, worked out in code from the case.
   - **no invented weather:** each weather word in the text (freezing rain, thunderstorm, fog,
     snow, hail, ...) is backed by a code in that airport's METAR or TAF (FZRA, TS, FG, ...).
   - **numbers:** wind direction and speed and cloud heights in each summary match the cited
     METAR.
-  - **no fuel or durations:** no fuel, weights, block or flight time in the text.
   - **hazards in notes:** every hazard on the route is named in a pilot note.
 - Side measures per run: tokens, cost, latency, tool calls, turns.
 - **Done when:** every check is tested with a passing and a failing hand-written briefing, a
   perfect briefing scores 100% and an empty or wrong one fails, with no Claude call.
+- *As built:* six checks. Fuel and durations are already part of the guardrails, so they are
+  not scored twice; **says what is missing** was added (when live weather or a hazard feed
+  could not be read, the briefing must say so). An airport summary may only describe the METAR
+  it cites, at its intensity ("light rain" needs `-RA`); notes may use any report of the
+  airports they name, or a route hazard. Visibility and pressure are checked with wind and
+  cloud. A code-written model answer for each case passes every check, and each kind of
+  mistake fails only its own check. `pnpm eval:stored` grades the briefings in the dev
+  database for free: 2 of the 4 recent `briefing-v3` ones failed (mist that only the TAF had,
+  "light rain" for `RA`). Guardrail rejections now keep the rejected briefing for grading.
 
 ### OFP-37 · `pnpm eval`
 - Runs every case (or `--case`, `--tag`) `--reps` times (default 3) on `--model` (default

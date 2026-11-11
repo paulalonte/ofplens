@@ -200,6 +200,7 @@ describe('runBriefing', () => {
     expect(result.error).toMatch(/^Guardrails rejected the briefing: /);
     expect(result.error).toContain('departure: says VFR, but the cited METAR is LIFR.');
     expect(result.error).toContain('mentions a weight or fuel quantity ("300 kg")');
+    expect(result.rejectedBriefing).toEqual(wrong);
   });
 
   it('fails a briefing that leaves out a hazard on the route', async () => {

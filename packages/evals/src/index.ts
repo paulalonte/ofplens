@@ -17,3 +17,4 @@ export {
   runAllTools,
   type PreparedCase,
 } from './setup';
+export * from './grade';
