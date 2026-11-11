@@ -1,6 +1,7 @@
 import type {
   BriefingRepository,
   FlightPlanRepository,
+  HazardRepository,
   ImportFlightPlanInput,
   PilotRepository,
   PilotSettingsRecord,
@@ -130,6 +131,15 @@ export function createNoWeatherRepository(): WeatherRepository {
   };
 }
 
+/** Hazard reads go to Postgres in the integration tests; route unit tests only need a stub. */
+export function createNoHazardRepository(): HazardRepository {
+  return {
+    route: () => Promise.resolve(null),
+    read: () => Promise.resolve(null),
+    replace: () => Promise.reject(new Error('replace was not expected in this test')),
+  };
+}
+
 /** A weather client answering from fixed reports, counting how often each kind is fetched. */
 export function createFakeWeatherClient(
   metars: LiveMetar[] = [],
@@ -163,7 +173,9 @@ export function testDeps(overrides: Partial<AppDeps> = {}): AppDeps {
     flightPlans: createInMemoryFlightPlanRepository(),
     weatherReports: createNoWeatherRepository(),
     briefings: createNoBriefingsRepository(),
+    hazards: createNoHazardRepository(),
     weather: createFakeWeatherClient(),
+    hazardFeeds: { fetchAdvisories: () => Promise.resolve({ advisories: [], unavailable: [] }) },
     simbrief: createFakeSimbrief(),
     ...overrides,
   };

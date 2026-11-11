@@ -7,6 +7,7 @@ import {
   createDb,
   createFlightPlanRepository,
   createPilotRepository,
+  createHazardRepository,
   createWeatherRepository,
   pingDb,
   type DbConnection,
@@ -71,6 +72,7 @@ async function start(replies: Parameters<typeof fakeClaude>[0] | null, { dailyLi
     pilots: createPilotRepository(conn.db),
     flightPlans: createFlightPlanRepository(conn.db),
     weatherReports: createWeatherRepository(conn.db),
+    hazards: createHazardRepository(conn.db),
     briefings: createBriefingRepository(conn.db),
     weather: createCachedWeatherClient(
       createWeatherClient({ fetch: weatherFetch, retryDelayMs: 0 }),

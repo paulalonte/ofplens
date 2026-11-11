@@ -284,20 +284,28 @@ CREATE TABLE weather_reports (
 );
 CREATE INDEX weather_reports_plan_idx ON weather_reports (flight_plan_id, station_icao, fetched_at DESC);
 
--- Phase 6
+-- Phase 6: replaced by each hazard check (see also flight_plans.hazards_checked_at,
+-- hazards_takeoff_at and hazards_unavailable)
 CREATE TABLE advisories (
   id                  bigint GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
   flight_plan_id      uuid NOT NULL REFERENCES flight_plans(id) ON DELETE CASCADE,
-  source              text NOT NULL,    -- sigmet, airmet, gairmet
-  hazard              text NOT NULL,    -- CONVECTIVE, TURB, ICE, ...
-  severity            text,
-  valid_from          timestamptz,
-  valid_to            timestamptz,
-  geometry            jsonb NOT NULL,   -- GeoJSON polygon
-  first_waypoint_seq  integer,          -- affected route segment
-  last_waypoint_seq   integer,
+  advisory_id         text NOT NULL,    -- stable id, e.g. isigmet:RPHI:3:1794384000
+  source              text NOT NULL,    -- isigmet, airsigmet, gairmet
+  hazard              text NOT NULL,    -- thunderstorm, turbulence, icing, ...
+  code                text NOT NULL,    -- the feed's code: TS, CONVECTIVE, TURB-HI, ...
+  severity            text,             -- moderate, severe
+  detail              text,             -- EMBD, volcano or storm name, G-AIRMET "due to"
+  valid_from          timestamptz NOT NULL,
+  valid_to            timestamptz NOT NULL,
+  base_ft             integer,
+  top_ft              integer,
+  polygons            jsonb NOT NULL,   -- [lon, lat] rings
+  segments            jsonb NOT NULL,   -- [{ fromSeq, toSeq, fromIdent, toIdent }], route order
+  first_waypoint_seq  integer NOT NULL, -- for ordering
+  fir                 text,
+  fir_name            text,
   raw_text            text,
-  fetched_at          timestamptz NOT NULL DEFAULT now()
+  UNIQUE (flight_plan_id, advisory_id)
 );
 
 -- Phase 5
@@ -381,7 +389,8 @@ A small REST API under `/api`. The browser never calls SimBrief, aviationweather
 | GET | /api/flight-plans/:id/weather | Weather snapshots, OFP vs live | 4 |
 | POST | /api/flight-plans/:id/briefings | Start an AI briefing; streams progress (SSE) | 5 |
 | GET | /api/flight-plans/:id/briefings/latest | Latest stored briefing | 5 |
-| GET | /api/flight-plans/:id/advisories | Hazards touching the route | 6 |
+| GET | /api/flight-plans/:id/hazards | Hazards on the route, from the last check | 6 |
+| POST | /api/flight-plans/:id/hazards/refresh | Fetch SIGMETs/G-AIRMETs, match them to the route, store | 6 |
 
 **Conventions**
 

@@ -49,3 +49,23 @@ export {
   type Severity,
 } from './hazards/advisory';
 export { createHazardClient, type HazardClient, type HazardFeeds } from './hazards/client';
+export { createCachedHazardClient } from './hazards/cache';
+export {
+  DEFAULT_MARGIN_MS,
+  LOW_VISIBILITY_TOP_FT,
+  matchRouteHazards,
+  type MatchOptions,
+  type RouteHazard,
+  type RoutePoint,
+  type RouteSegment,
+} from './hazards/route';
+export {
+  FlightPlanHazardsResponse,
+  readPlanHazards,
+  refreshPlanHazards,
+  RouteHazardView,
+  RouteSegmentView,
+  toPlanHazardsResponse,
+  type PlanHazards,
+  type PlanHazardStore,
+} from './hazards/planHazards';

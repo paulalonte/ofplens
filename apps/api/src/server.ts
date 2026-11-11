@@ -4,6 +4,7 @@ import {
   createDb,
   createFlightPlanRepository,
   createPilotRepository,
+  createHazardRepository,
   createWeatherRepository,
   pingDb,
 } from '@ofplens/db';
@@ -18,6 +19,7 @@ const app = await buildApp({
   pilots: createPilotRepository(db),
   flightPlans: createFlightPlanRepository(db),
   weatherReports: createWeatherRepository(db),
+  hazards: createHazardRepository(db),
   briefings: createBriefingRepository(db),
   // The SDK also reads ANTHROPIC_BASE_URL, which end-to-end tests point at a fake Claude.
   anthropic: env.ANTHROPIC_API_KEY ? new Anthropic({ apiKey: env.ANTHROPIC_API_KEY }) : null,
