@@ -381,6 +381,21 @@ mapped to the affected waypoints, shown on the plan page, and named by the AI br
 
 ---
 
+## Extras
+
+### OFP-34 · Countdown to pushback in the Times card
+- At the top of the Times card, the time left to Out (pushback), then to Off (takeoff), then to
+  On (landing), ticking every second by the computer's clock (not X-Plane's), with the target
+  in Zulu and local time.
+- **Done when:** it counts down and changes stage at each milestone, turns amber under ten
+  minutes before pushback and takeoff, and is hidden for a plan more than a day ahead or
+  already flown; tested with a fake clock.
+- *As built:* milestones are rounded to the minute as the card shows them, so 0:00 matches the
+  time on screen. The app cannot tell whether the pilot actually pushed back, so the takeoff
+  stage also says how long ago pushback was planned.
+
+---
+
 ## Later phases (not ticketed yet)
 
 | Next | Summary |
