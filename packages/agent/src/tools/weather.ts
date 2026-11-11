@@ -70,11 +70,11 @@ export const getWeather = defineTool({
       }),
     ),
   }),
-  async run({ flightPlanId }, { weatherReports, weather }) {
+  async run({ flightPlanId }, { weatherReports, weather, now }) {
     let result: FlightPlanWeatherResponse | null;
     let note: string | null = null;
     try {
-      result = await refreshPlanWeather(weatherReports, weather, flightPlanId);
+      result = await refreshPlanWeather(weatherReports, weather, flightPlanId, now?.());
     } catch (err) {
       if (!(err instanceof WeatherUnavailableError)) throw err;
       note = 'Live weather is unavailable right now; showing the last stored reports, if any.';

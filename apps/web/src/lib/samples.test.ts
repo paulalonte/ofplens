@@ -6,7 +6,11 @@ describe('sample plans', () => {
     expect(SAMPLE_NAMES).toEqual([
       'eddb-eddm-c750-kgs',
       'eddf-lepa-a339-noalt',
+      'egll-kjfk-a339-kgs',
+      'engm-bikf-a320-kgs',
       'ksfo-kjfk-b739-lbs',
+      'loww-lszh-c750-kgs',
+      'rjtt-vhhh-a339-noalt',
     ]);
   });
 

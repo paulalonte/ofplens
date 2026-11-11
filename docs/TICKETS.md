@@ -381,6 +381,75 @@ mapped to the affected waypoints, shown on the plan page, and named by the AI br
 
 ---
 
+## Phase 7 — Evals
+
+Goal (PLAN.md): `pnpm eval` runs the briefing agent on frozen cases and prints a pass rate per
+check and per prompt version, so prompt or model changes are measured, not guessed.
+
+**Ground rules for every Phase 7 ticket**
+
+- **Frozen inputs.** Each case is a captured OFP, a fixed clock and saved METARs, TAFs and
+  advisories, so a case gives the agent the same tool results every run. No live feeds.
+- **The real agent.** The eval calls `runBriefing()` with test dependencies, never its own copy
+  of the Claude call.
+- **Code checks only.** Grading is deterministic and free; no model judges a model. Checks are
+  tested with hand-written passing and failing briefings, without calling Claude.
+- **Paid runs are asked for.** A run prints its case count, repeats and estimated cost first,
+  and stops at a budget. Tests never call Claude.
+- **For flight simulation only**, like the rest of the app.
+
+### OFP-35 · Frozen eval cases
+- Agent tools take an injectable clock (`ToolDeps.now`), so ETAs, "today" and the hazard time
+  filter follow the case, not the computer.
+- Fixed weather and hazard clients that serve a case's reports and advisories (and can report
+  a feed as down).
+- Plans: the 3 captured OFPs plus 3–5 more varied ones captured with `pnpm fixture:capture`
+  (other regions, long haul, winter).
+- Scenarios, built from real captured reports re-dated to the case: quiet day; LIFR at the
+  destination; freezing fog or freezing rain; worse since dispatch; TAF worsening around
+  arrival; no live METAR; thunderstorm SIGMET on the route; severe turbulence; volcanic ash;
+  hazard feeds down; no alternate.
+- `packages/evals`: the cases in TypeScript (plan, clock, scenario, tags, and what a correct
+  briefing says), and `CASES.md` listing every case with what the agent will see, for review.
+- **Done when:** 18–24 cases load and their tool results are identical on every run (tested
+  without Claude), and the case list is reviewed.
+
+### OFP-36 · Graders
+- Per briefing, each check passes or fails with a reason:
+  - **guardrails:** the existing guardrails pass (citations, flight categories, hazard
+    coverage).
+  - **risk:** `overallRisk` matches the rule in the prompt, worked out in code from the case.
+  - **no invented weather:** each weather word in the text (freezing rain, thunderstorm, fog,
+    snow, hail, ...) is backed by a code in that airport's METAR or TAF (FZRA, TS, FG, ...).
+  - **numbers:** wind direction and speed and cloud heights in each summary match the cited
+    METAR.
+  - **no fuel or durations:** no fuel, weights, block or flight time in the text.
+  - **hazards in notes:** every hazard on the route is named in a pilot note.
+- Side measures per run: tokens, cost, latency, tool calls, turns.
+- **Done when:** every check is tested with a passing and a failing hand-written briefing, a
+  perfect briefing scores 100% and an empty or wrong one fails, with no Claude call.
+
+### OFP-37 · `pnpm eval`
+- Runs every case (or `--case`, `--tag`) `--reps` times (default 3) on `--model` (default
+  Haiku 5.5), a few at a time, with a time limit per run and retries with backoff on 429/529.
+- Shows the plan and an estimated cost and asks before running; refuses past `--budget`.
+- Writes `evals/runs/<prompt version>/<model>/`: one row per run (checks, tokens, cost,
+  latency), a trace per run (system prompt, tool calls and results, answer), failed attempts
+  separately, and resumes after a crash without repeating finished runs.
+- Prints the pass rate per check and overall, with a margin of error, and builds a
+  `report.html` linking every trace; compares prompt versions and models side by side.
+- **Done when:** a fake-Claude run writes complete rows and traces (tested), and a real
+  baseline run on Haiku 5.5 is recorded.
+
+### OFP-38 · Baseline and first improvements
+- Baseline on Haiku 5.5 (`briefing-v3`), and once on Sonnet 5.5 for comparison.
+- Fix the prompt for what the checks find (e.g. invented weather), as `briefing-v4`, and keep
+  it only if it scores better without making another check worse.
+- **Done when:** the results for v3 and v4 (and Sonnet) are recorded here, and the app uses the
+  better prompt.
+
+---
+
 ## Extras
 
 ### OFP-34 · Countdown to pushback in the Times card
@@ -401,6 +470,5 @@ mapped to the affected waypoints, shown on the plan page, and named by the AI br
 | Next | Summary |
 | --- | --- |
 | 3b Deploy | Budget alarm first; then CDK (RDS, Fargate, S3 + CloudFront) or the cheaper Lightsail + Compose fallback |
-| 7 Evals | `pnpm eval`: frozen plans, weather and hazards; pass rate per check and per prompt version; tracing |
 | 8 MCP | The `packages/agent` tools exposed to Claude Desktop / Claude Code |
 | Sharing | Auth and multi-pilot support before anyone else uses it |

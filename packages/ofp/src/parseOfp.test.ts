@@ -8,12 +8,10 @@ function parseFixture(name: string): FlightPlanSummary {
 }
 
 describe('parseOfp on every captured fixture', () => {
-  it('has the three fixtures this suite relies on', () => {
-    expect(FIXTURE_NAMES).toEqual([
-      'eddb-eddm-c750-kgs',
-      'eddf-lepa-a339-noalt',
-      'ksfo-kjfk-b739-lbs',
-    ]);
+  it('has the three fixtures this suite relies on (more are used by the evals)', () => {
+    expect(FIXTURE_NAMES).toEqual(
+      expect.arrayContaining(['eddb-eddm-c750-kgs', 'eddf-lepa-a339-noalt', 'ksfo-kjfk-b739-lbs']),
+    );
   });
 
   describe.each(FIXTURE_NAMES)('%s', (name) => {

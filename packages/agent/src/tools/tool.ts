@@ -19,6 +19,11 @@ export interface ToolDeps {
   hazards: PlanHazardStore;
   /** Use the cached client: the feeds cover the whole world and are shared by all plans. */
   hazardFeeds: HazardClient;
+  /**
+   * The current time, for when weather and hazards are checked (stored check times, and hazard
+   * ETAs when the planned takeoff has passed). The real clock when left out; evals fix it.
+   */
+  now?: () => Date;
 }
 
 /**

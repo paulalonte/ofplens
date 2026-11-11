@@ -1,0 +1,159 @@
+/**
+ * Writes packages/evals/CASES.md: every eval case with what the briefing agent will see (the
+ * real tool results at the case's time) and what a correct briefing says. For reviewing the
+ * cases; no Claude call.
+ *
+ *   pnpm eval:cases
+ *
+ * Needs Postgres (pnpm db:up): the plans are imported into a temporary database, dropped after.
+ */
+import { createTestDatabase } from '@ofplens/db/testing';
+import { writeFile } from 'node:fs/promises';
+import { resolve } from 'node:path';
+import { format, resolveConfig } from 'prettier';
+import { EVAL_CASES, prepareCase, runAllTools } from '../src';
+
+interface Report {
+  reportId: string;
+  raw: string;
+  flightCategory?: string | null;
+}
+interface Station {
+  role: string;
+  icao: string;
+  metar: Report | null;
+  taf: Report | null;
+  changedSinceDispatch?: boolean;
+}
+interface Tools {
+  get_flight_plan: {
+    callsign: string | null;
+    aircraft: { icao: string };
+    times: { out: string; off: string; on: string };
+  };
+  get_planned_weather: { stations: Station[] };
+  get_weather: { liveAvailable: boolean; note: string | null; stations: Station[] };
+  get_route_hazards: {
+    available: boolean;
+    note: string | null;
+    advisoriesChecked: number;
+    hazards: {
+      type: string;
+      code: string;
+      severity: string | null;
+      detail: string | null;
+      baseFt: number | null;
+      topFt: number | null;
+      validFrom: string;
+      validUntil: string;
+      issuedBy: string;
+      segments: { fromWaypoint: string; toWaypoint: string }[];
+    }[];
+  };
+}
+
+const OUT = resolve(import.meta.dirname, '../CASES.md');
+const zulu = (iso: string) => `${iso.slice(8, 10)} ${iso.slice(11, 16).replace(':', '')}Z`;
+const level = (ft: number | null) =>
+  ft === null ? 'SFC' : ft >= 18000 ? `FL${Math.round(ft / 100)}` : `${ft.toLocaleString('en')} ft`;
+const oneLine = (raw: string) => raw.replace(/\s+/g, ' ').trim();
+const fence = (text: string) => ['```', text, '```'].join('\n');
+
+const db = await createTestDatabase();
+const rows: string[] = [];
+const sections: string[] = [];
+try {
+  for (const evalCase of EVAL_CASES) {
+    const prepared = await prepareCase(db.db, evalCase);
+    const tools = (await runAllTools(prepared)) as unknown as Tools;
+    const plan = tools.get_flight_plan;
+    const live = tools.get_weather;
+    const dispatch = tools.get_planned_weather;
+    const hazards = tools.get_route_hazards;
+
+    rows.push(
+      `| [${evalCase.id}](#${evalCase.id}) | ${evalCase.tags.join(', ')} | ${hazards.hazards.length} | ${evalCase.title} |`,
+    );
+
+    const weatherLines = live.stations.map((s) => {
+      const planned = dispatch.stations.find((d) => d.role === s.role);
+      const now = s.metar
+        ? `${s.metar.flightCategory ?? '?'}${s.changedSinceDispatch ? ' (changed since dispatch)' : ''}`
+        : live.liveAvailable
+          ? 'no live METAR'
+          : 'live weather unavailable';
+      return [
+        `**${s.role} ${s.icao}**: now ${now}; at dispatch ${planned?.metar?.flightCategory ?? '-'}`,
+        fence(
+          [
+            `now      ${s.metar ? oneLine(s.metar.raw) : '-'}`,
+            `TAF now  ${s.taf ? oneLine(s.taf.raw) : '-'}`,
+            `dispatch ${planned?.metar ? oneLine(planned.metar.raw) : '-'}`,
+          ].join('\n'),
+        ),
+      ].join('\n');
+    });
+
+    const hazardLines = !hazards.available
+      ? ['All hazard feeds down: hazards on the route unknown.']
+      : [
+          ...(hazards.note ? [hazards.note] : []),
+          hazards.hazards.length === 0
+            ? `None on the route (${hazards.advisoriesChecked} advisories checked).`
+            : `${hazards.hazards.length} on the route (${hazards.advisoriesChecked} advisories checked):`,
+          ...hazards.hazards.map(
+            (h) =>
+              `- ${h.type}${h.severity ? ` (${h.severity})` : ''}${h.detail ? ` ${h.detail}` : ''}, ` +
+              `${h.segments.map((s) => `${s.fromWaypoint} → ${s.toWaypoint}`).join(', ')}, ` +
+              `${level(h.baseFt)} to ${level(h.topFt)}, ${zulu(h.validFrom)} to ${zulu(h.validUntil)}, ${h.issuedBy}`,
+          ),
+        ];
+
+    sections.push(
+      [
+        `## ${evalCase.id}`,
+        '',
+        `**${evalCase.title}**  `,
+        `Plan \`${evalCase.plan}\` (${plan.callsign ?? '-'}, ${plan.aircraft.icao}) · briefed ${zulu(prepared.briefAt.toISOString())} · ` +
+          `out ${zulu(plan.times.out)} · off ${zulu(plan.times.off)} · on ${zulu(plan.times.on)} · tags: ${evalCase.tags.join(', ')}`,
+        '',
+        `**A correct briefing:** ${evalCase.expect}`,
+        '',
+        '### Weather the agent sees',
+        '',
+        ...(live.note ? [live.note, ''] : []),
+        weatherLines.join('\n\n'),
+        '',
+        '### Hazards the agent sees',
+        '',
+        hazardLines.join('\n'),
+      ].join('\n'),
+    );
+  }
+} finally {
+  await db.destroy();
+}
+
+const markdown = [
+  '# Eval cases',
+  '',
+  'Generated by `pnpm eval:cases` from `packages/evals/src/cases/`. Each case is a captured',
+  'SimBrief OFP briefed at a fixed time, with frozen weather and advisories: the tools give the',
+  'agent exactly what is shown here, on every run. Airports a case does not set keep their',
+  'dispatch weather, newly observed. Made-up advisories are marked "(made up for evals)" in',
+  'their bulletin; the real SIGMETs captured in `fixtures/hazards/` are also checked, but none is',
+  'valid at the case time. For flight simulation only.',
+  '',
+  `${EVAL_CASES.length} cases.`,
+  '',
+  '| Case | Tags | Hazards on route | What it tests |',
+  '| --- | --- | --- | --- |',
+  ...rows,
+  '',
+  sections.join('\n\n'),
+  '',
+].join('\n');
+
+// Formatted like the rest of the repo, so `pnpm format:check` passes on the generated file.
+await writeFile(OUT, await format(markdown, { ...(await resolveConfig(OUT)), parser: 'markdown' }));
+console.log(`Wrote ${OUT} (${EVAL_CASES.length} cases).`);

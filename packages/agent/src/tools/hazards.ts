@@ -57,11 +57,11 @@ export const getRouteHazards = defineTool({
     /** Hazards beyond MAX_ROUTE_HAZARDS, left out. */
     moreNotShown: z.number(),
   }),
-  async run({ flightPlanId }, { hazards, hazardFeeds }) {
+  async run({ flightPlanId }, { hazards, hazardFeeds, now }) {
     let result: FlightPlanHazardsResponse | null;
     let note: string | null = null;
     try {
-      result = await refreshPlanHazards(hazards, hazardFeeds, flightPlanId);
+      result = await refreshPlanHazards(hazards, hazardFeeds, flightPlanId, now?.());
     } catch (err) {
       if (!(err instanceof WeatherUnavailableError)) throw err;
       note = 'Hazard advisories are unavailable right now; showing the last stored check, if any.';
