@@ -3,7 +3,8 @@
  *
  * - SimBrief's fetcher: the latest OFP as JSON v2, or HTTP 400 for an unknown user.
  * - aviationweather.gov's Data API: METARs and TAFs from fixtures/weather (real reports
- *   captured earlier), filtered by `ids`; HTTP 204 when none of the stations has one.
+ *   captured earlier), filtered by `ids`; HTTP 204 when none of the stations has one. The
+ *   hazard feeds from fixtures/hazards, plus one made-up SIGMET on the e2e route.
  * - Claude's Messages API (the API's ANTHROPIC_BASE_URL): first asks for all three briefing
  *   tools, then writes a briefing from their results, citing real report ids so it passes the
  *   guardrails. No key and no cost.
@@ -64,12 +65,46 @@ const server = createServer((req, res) => {
       return;
     }
 
+    // aviationweather.gov hazard feeds: the captured ones, plus a thunderstorm SIGMET over the
+    // EDDB → EDDM route (around PIKIB) valid around now, since the plan is flown "now".
+    const hazards = /^\/api\/data\/(isigmet|airsigmet|gairmet)$/.exec(url.pathname);
+    if (hazards && url.searchParams.get('format') === 'json') {
+      const captured = (await readJson(`hazards/${hazards[1]}.json`)) as unknown[];
+      json(200, hazards[1] === 'isigmet' ? [...captured, sigmetOverPikib()] : captured);
+      return;
+    }
+
     res.writeHead(404).end();
   })().catch((err: unknown) => {
     console.error(err);
     res.writeHead(500).end();
   });
 });
+
+/** Embedded thunderstorms up to FL380 around PIKIB, from an hour ago to four hours ahead. */
+function sigmetOverPikib() {
+  const hour = Math.floor(Date.now() / 3_600_000) * 3600;
+  return {
+    icaoId: 'EDZZ',
+    firId: 'EDUU',
+    firName: 'EDUU RHEIN UIR',
+    validTimeFrom: hour - 3600,
+    validTimeTo: hour + 4 * 3600,
+    seriesId: 'E2E',
+    hazard: 'TS',
+    qualifier: 'EMBD',
+    base: null,
+    top: 38000,
+    geom: 'AREA',
+    coords: [
+      { lon: 13.5, lat: 50.8 },
+      { lon: 13.8, lat: 50.8 },
+      { lon: 13.8, lat: 51.0 },
+      { lon: 13.5, lat: 51.0 },
+    ],
+    rawSigmet: 'EDUU SIGMET E2E VALID EDZZ- EDUU RHEIN UIR EMBD TS FCST TOP FL380 (made up)',
+  };
+}
 
 const readBody = async (req: AsyncIterable<Buffer>) => {
   const chunks: Buffer[] = [];

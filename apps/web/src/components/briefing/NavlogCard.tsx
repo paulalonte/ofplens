@@ -14,6 +14,8 @@ import { Card } from '../Card';
 interface Props {
   plan: FlightPlanSummary;
   displayUnit: WeightUnit;
+  /** Fixes inside a hazard on the route (by seq), with the hazards' codes. */
+  hazardMarks?: ReadonlyMap<number, readonly string[]> | undefined;
 }
 
 const altitude = new Intl.NumberFormat('en-US');
@@ -26,7 +28,7 @@ const isClimbDescentPoint = (w: Waypoint) =>
  * Every navlog fix with planned altitude, wind, ETA, fuel on board, elapsed time and fuel used.
  * ETA = takeoff + elapsed; ET and fuel used count from takeoff, like SimBrief's navlog.
  */
-export function NavlogCard({ plan, displayUnit }: Props) {
+export function NavlogCard({ plan, displayUnit, hazardMarks }: Props) {
   return (
     <Card title="Navigation log" aside={<RouteSummary plan={plan} />}>
       <p className="mb-3 font-mono text-xs break-words text-slate-600 dark:text-slate-400">
@@ -71,43 +73,60 @@ export function NavlogCard({ plan, displayUnit }: Props) {
             </tr>
           </thead>
           <tbody className="font-mono tabular-nums">
-            {plan.waypoints.map((w) => (
-              <tr
-                key={w.seq}
-                className={`border-b border-slate-100 last:border-0 dark:border-slate-800 ${
-                  isClimbDescentPoint(w) ? 'bg-sky-50 dark:bg-sky-950/40' : ''
-                }`}
-              >
-                <th scope="row" className="py-1.5 pr-3 text-left font-semibold">
-                  {w.ident}
-                  {w.name && w.name !== w.ident && (
-                    <>
-                      {' '}
-                      <span className="ml-1 font-sans text-xs font-normal text-slate-500 dark:text-slate-400">
-                        {w.name}
+            {plan.waypoints.map((w) => {
+              const hazards = hazardMarks?.get(w.seq);
+              return (
+                <tr
+                  key={w.seq}
+                  className={`border-b border-slate-100 last:border-0 dark:border-slate-800 ${
+                    hazards
+                      ? 'bg-amber-50 shadow-[inset_3px_0_0] shadow-amber-500 dark:bg-amber-950/30'
+                      : isClimbDescentPoint(w)
+                        ? 'bg-sky-50 dark:bg-sky-950/40'
+                        : ''
+                  }`}
+                >
+                  <th scope="row" className="py-1.5 pr-3 pl-2 text-left font-semibold">
+                    {w.ident}
+                    {hazards && (
+                      <span
+                        title={`Inside a hazard on the route: ${hazards.join(', ')}`}
+                        className="ml-1.5 rounded bg-amber-200 px-1 py-0.5 font-sans text-[10px] font-bold text-amber-900 dark:bg-amber-800 dark:text-amber-100"
+                      >
+                        ⚠ {hazards.join(' ')}
                       </span>
-                    </>
-                  )}
-                </th>
-                <td className="py-1.5 pr-3 text-slate-600 dark:text-slate-400">{w.via ?? ''}</td>
-                <td className="py-1.5 pr-3 text-slate-600 dark:text-slate-400">{w.stage ?? ''}</td>
-                <td className="py-1.5 pr-3 text-right">{altitude.format(w.altitudeFt)}</td>
-                <td className="py-1.5 pr-3 text-right">
-                  {String(w.windDirDeg).padStart(3, '0')}/{w.windSpeedKt}
-                </td>
-                <td className="py-1.5 pr-3 text-right">{w.oatC}°</td>
-                <td className="py-1.5 pr-3 text-right">
-                  {formatZulu(addSeconds(plan.times.off, w.elapsedS))}
-                </td>
-                <td className="py-1.5 pr-3 text-right">
-                  {formatWeightNumber(w.fuelOnBoard, plan.units, displayUnit)}
-                </td>
-                <td className="py-1.5 pr-3 text-right">{formatDuration(w.elapsedS)}</td>
-                <td className="py-1.5 text-right">
-                  {formatWeightNumber(fuelUsedAt(plan, w), plan.units, displayUnit)}
-                </td>
-              </tr>
-            ))}
+                    )}
+                    {w.name && w.name !== w.ident && (
+                      <>
+                        {' '}
+                        <span className="ml-1 font-sans text-xs font-normal text-slate-500 dark:text-slate-400">
+                          {w.name}
+                        </span>
+                      </>
+                    )}
+                  </th>
+                  <td className="py-1.5 pr-3 text-slate-600 dark:text-slate-400">{w.via ?? ''}</td>
+                  <td className="py-1.5 pr-3 text-slate-600 dark:text-slate-400">
+                    {w.stage ?? ''}
+                  </td>
+                  <td className="py-1.5 pr-3 text-right">{altitude.format(w.altitudeFt)}</td>
+                  <td className="py-1.5 pr-3 text-right">
+                    {String(w.windDirDeg).padStart(3, '0')}/{w.windSpeedKt}
+                  </td>
+                  <td className="py-1.5 pr-3 text-right">{w.oatC}°</td>
+                  <td className="py-1.5 pr-3 text-right">
+                    {formatZulu(addSeconds(plan.times.off, w.elapsedS))}
+                  </td>
+                  <td className="py-1.5 pr-3 text-right">
+                    {formatWeightNumber(w.fuelOnBoard, plan.units, displayUnit)}
+                  </td>
+                  <td className="py-1.5 pr-3 text-right">{formatDuration(w.elapsedS)}</td>
+                  <td className="py-1.5 text-right">
+                    {formatWeightNumber(fuelUsedAt(plan, w), plan.units, displayUnit)}
+                  </td>
+                </tr>
+              );
+            })}
           </tbody>
         </table>
       </div>

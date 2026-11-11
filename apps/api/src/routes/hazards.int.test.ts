@@ -151,7 +151,13 @@ describe('GET /api/flight-plans/:id/hazards', () => {
     const res = await read(await start(fakeFeeds()), id);
 
     expect(res.statusCode).toBe(200);
-    expect(res.json()).toEqual({ checkedAt: null, takeoffAt: null, unavailable: [], hazards: [] });
+    expect(res.json()).toEqual({
+      checkedAt: null,
+      takeoffAt: null,
+      unavailable: [],
+      advisoriesChecked: 0,
+      hazards: [],
+    });
   });
 
   it('answers 404 for an unknown plan and 400 for a bad id', async () => {
@@ -176,6 +182,8 @@ describe('POST /api/flight-plans/:id/hazards/refresh', () => {
       checkedAt: '2026-11-09T12:30:00.000Z',
       takeoffAt: '2026-11-09T14:10:00.000Z', // as planned: still ahead
       unavailable: [],
+      // The captured feeds (125 + 4 + 31) and the two made up here.
+      advisoriesChecked: 162,
     });
     // Only the thunderstorm: the turbulence is above FL280, and nothing else of the real
     // 11 Nov feeds is valid on 9 Nov.

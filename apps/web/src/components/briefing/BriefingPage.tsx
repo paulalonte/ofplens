@@ -24,9 +24,21 @@ interface Props {
   takeoffLanding?: ReactNode;
   /** The AI briefing, shown above the weather on saved plans. */
   aiBriefing?: ReactNode;
+  /** Hazards along the route (saved plans), shown after the weather. */
+  hazards?: ReactNode;
+  /** Navlog fixes inside a hazard, by seq, with the hazards' codes. */
+  navlogMarks?: ReadonlyMap<number, readonly string[]>;
 }
 
-export function BriefingPage({ plan, preferredUnit, weather, takeoffLanding, aiBriefing }: Props) {
+export function BriefingPage({
+  plan,
+  preferredUnit,
+  weather,
+  takeoffLanding,
+  aiBriefing,
+  hazards,
+  navlogMarks,
+}: Props) {
   const [displayUnit, setDisplayUnit] = useState<WeightUnit>(preferredUnit ?? plan.units);
 
   return (
@@ -46,7 +58,8 @@ export function BriefingPage({ plan, preferredUnit, weather, takeoffLanding, aiB
 
       {aiBriefing}
       {weather ?? <WeatherCard plan={plan} />}
-      <NavlogCard plan={plan} displayUnit={displayUnit} />
+      {hazards}
+      <NavlogCard plan={plan} displayUnit={displayUnit} hazardMarks={navlogMarks} />
 
       <p className="text-xs text-slate-500 dark:text-slate-400">
         Planned in {plan.units === 'kgs' ? 'kilograms' : 'pounds'}

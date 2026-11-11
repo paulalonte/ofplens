@@ -88,6 +88,17 @@ test('load a plan, find it in History, open it, delete it', async ({ page }) => 
     await expect(departure).toContainText('Changed since dispatch: IFR → LIFR');
   });
 
+  await test.step('hazards along the route, checked on open', async () => {
+    const card = page.getByRole('region', { name: 'Hazards along the route' });
+    // The fake's SIGMET around PIKIB, matched by the real API to the fixes around it.
+    await expect(card.getByText('BEBKU → MAREM')).toBeVisible();
+    await expect(card).toContainText('Thunderstorms');
+    await expect(card).toContainText('Up to FL380');
+    await expect(card).toContainText(/Checked \d\d:\d\dZ/);
+    const navlog = page.getByRole('region', { name: 'Navigation log' });
+    await expect(navlog.getByRole('rowheader', { name: /^PIKIB/ })).toContainText('⚠ TS');
+  });
+
   await test.step('AI briefing, generated only on a click (fake Claude)', async () => {
     const card = page.getByRole('region', { name: 'AI weather briefing' });
     await expect(card).toContainText('It runs only when you click');
