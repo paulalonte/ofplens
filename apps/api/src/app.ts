@@ -83,7 +83,8 @@ export async function buildApp(deps: AppDeps) {
     flightPlans: deps.flightPlans,
     simbrief,
   });
-  // One cached weather client, shared by the weather endpoints and the briefing agent.
+  // One cached weather client and one cached hazard client, shared by their endpoints and the
+  // briefing agent.
   const weather =
     deps.weather ??
     createCachedWeatherClient(
@@ -110,7 +111,13 @@ export async function buildApp(deps: AppDeps) {
   });
   await app.register(briefingRoutes, {
     briefings: deps.briefings,
-    tools: { flightPlans: deps.flightPlans, weatherReports: deps.weatherReports, weather },
+    tools: {
+      flightPlans: deps.flightPlans,
+      weatherReports: deps.weatherReports,
+      weather,
+      hazards: deps.hazards,
+      hazardFeeds,
+    },
     anthropic: deps.anthropic ?? null,
     config: { ...DEFAULT_BRIEFING_CONFIG, ...deps.briefingConfig },
     dailyLimit: deps.briefingDailyLimit ?? 20,

@@ -112,6 +112,10 @@ test('load a plan, find it in History, open it, delete it', async ({ page }) => 
     await expect(departure).toContainText('Changed since dispatch');
     await expect(departure).toContainText(/Based on the live METAR of 10 NOV 08:50Z/);
     await expect(card.getByRole('region', { name: 'Alternate briefing' })).toContainText('EDDF');
+    // The SIGMET on the route, cited by the briefing (the guardrails reject one left out).
+    await expect(card.getByRole('region', { name: 'Enroute hazards' })).toContainText(
+      'thunderstorm from BEBKU to MAREM',
+    );
     await expect(card).toContainText(
       'AI-generated · for flight simulation only · claude-haiku-5-5',
     );

@@ -2,6 +2,7 @@ import Anthropic from '@anthropic-ai/sdk';
 import {
   createDb,
   createFlightPlanRepository,
+  createHazardRepository,
   createPilotRepository,
   createWeatherRepository,
   type DbConnection,
@@ -9,13 +10,14 @@ import {
 import { createTestDatabase, truncateAll, type TestDatabase } from '@ofplens/db/testing';
 import { parseOfp } from '@ofplens/ofp';
 import { loadFixture } from '@ofplens/ofp/testing';
-import { createCachedWeatherClient, createWeatherClient } from '@ofplens/weather';
+import { createCachedWeatherClient, createWeatherClient, parseAdvisories } from '@ofplens/weather';
 import { loadWeatherFixture } from '@ofplens/weather/testing';
 import { afterAll, beforeAll, beforeEach, describe, expect, it } from 'vitest';
 import { BriefingPlanNotFoundError, runBriefing } from './agent';
 import type { Briefing } from './briefing';
 import { PROMPT_VERSION } from './prompt';
 import { answer, callTools, fakeClaude, type FakeReply } from './testing/fakeClaude';
+import { fixtureHazardClient, routeSigmets } from './testing/routeHazards';
 import type { ToolDeps } from './tools';
 
 /**
@@ -61,6 +63,8 @@ function deps(): ToolDeps {
   return {
     flightPlans: createFlightPlanRepository(conn.db),
     weatherReports: createWeatherRepository(conn.db),
+    hazards: createHazardRepository(conn.db),
+    hazardFeeds: fixtureHazardClient(NOW),
     weather: createCachedWeatherClient(
       createWeatherClient({ fetch: weatherFetch, retryDelayMs: 0 }),
     ),
@@ -80,7 +84,14 @@ async function run(replies: Parameters<typeof fakeClaude>[0], config = {}) {
   return { result, requests: claude.requests, progress };
 }
 
-/** What a careful model would write after reading the tools (EDDB IFR→LIFR, EDDF MVFR→VFR). */
+/** The made-up thunderstorm SIGMET over the route (BEBKU to MAREM), valid around now. */
+const NOW = Date.now();
+const thunderstorm = parseAdvisories('isigmet', routeSigmets(NOW)).find((a) => a.fir === 'EDUU')!;
+
+/**
+ * What a careful model would write after reading the tools (EDDB IFR→LIFR, EDDF MVFR→VFR,
+ * thunderstorms around PIKIB).
+ */
 const goodBriefing = (): Briefing => ({
   headline: 'Berlin has dropped to LIFR since dispatch; plan for a low-visibility departure.',
   overallRisk: 'moderate',
@@ -105,11 +116,24 @@ const goodBriefing = (): Briefing => ({
     changedSinceDispatch: true,
     sourceReportId: 'live:metar:EDDF:2026-11-10T0850Z',
   },
-  enrouteHazards: [],
-  pilotNotes: ['Frankfurt has improved to VFR since dispatch.'],
+  enrouteHazards: [
+    {
+      type: 'thunderstorm',
+      fromWaypoint: 'BEBKU',
+      toWaypoint: 'MAREM',
+      validUntil: thunderstorm.validTo,
+      severity: null,
+      advisoryId: thunderstorm.id,
+    },
+  ],
+  pilotNotes: [
+    'Frankfurt has improved to VFR since dispatch.',
+    'Embedded thunderstorms up to FL380 between BEBKU and MAREM.',
+  ],
 });
 
-const allTools = () => callTools('get_flight_plan', 'get_planned_weather', 'get_weather');
+const allTools = () =>
+  callTools('get_flight_plan', 'get_planned_weather', 'get_weather', 'get_route_hazards');
 
 describe('runBriefing', () => {
   it('reads the plan and weather through the tools and returns a checked briefing', async () => {
@@ -133,9 +157,15 @@ describe('runBriefing', () => {
     expect(result.toolCalls.map((c) => [c.name, c.ok]).sort()).toEqual([
       ['get_flight_plan', true],
       ['get_planned_weather', true],
+      ['get_route_hazards', true],
       ['get_weather', true],
     ]);
-    expect([...progress].sort()).toEqual(['get_flight_plan', 'get_planned_weather', 'get_weather']);
+    expect([...progress].sort()).toEqual([
+      'get_flight_plan',
+      'get_planned_weather',
+      'get_route_hazards',
+      'get_weather',
+    ]);
 
     // What was sent to Claude.
     const first = requests[0]!;
@@ -150,6 +180,7 @@ describe('runBriefing', () => {
       'get_flight_plan',
       'get_planned_weather',
       'get_weather',
+      'get_route_hazards',
     ]);
     // The second turn carries the tool results; the flight plan never includes fuel.
     const results = JSON.stringify(requests[1]!.messages);
@@ -169,6 +200,18 @@ describe('runBriefing', () => {
     expect(result.error).toMatch(/^Guardrails rejected the briefing: /);
     expect(result.error).toContain('departure: says VFR, but the cited METAR is LIFR.');
     expect(result.error).toContain('mentions a weight or fuel quantity ("300 kg")');
+  });
+
+  it('fails a briefing that leaves out a hazard on the route', async () => {
+    const quiet = goodBriefing();
+    quiet.enrouteHazards = [];
+
+    const { result } = await run([allTools(), answer(quiet)]);
+
+    expect(result.status).toBe('failed');
+    expect(result.status === 'failed' && result.error).toContain(
+      `Hazard "${thunderstorm.id}" (thunderstorm from BEBKU to MAREM) is missing from enrouteHazards.`,
+    );
   });
 
   it('fails a briefing written without calling the weather tools', async () => {

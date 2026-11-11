@@ -24,6 +24,7 @@ const STEP_LABEL: Record<string, string> = {
   get_flight_plan: 'Read the flight plan',
   get_planned_weather: 'Read the weather at dispatch',
   get_weather: 'Checked live weather',
+  get_route_hazards: 'Checked hazards along the route',
 };
 
 const RISK_STYLE: Record<Briefing['overallRisk'], string> = {
@@ -181,7 +182,7 @@ function BriefingBody({ planId, briefing }: { planId: string; briefing: Briefing
             {briefing.enrouteHazards.map((h, i) => (
               <li key={i}>
                 {h.severity && `${h.severity} `}
-                {h.type.replace('_', ' ')} from {h.fromWaypoint} to {h.toWaypoint}
+                {h.type.replaceAll('_', ' ')} from {h.fromWaypoint} to {h.toWaypoint}
                 {h.validUntil && ` until ${formatZulu(h.validUntil)}`}
               </li>
             ))}

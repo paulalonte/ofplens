@@ -3,7 +3,30 @@ import type { Briefing } from './briefing';
 import { checkBriefing, collectEvidence, type ToolCallRecord } from './guardrails';
 
 /** Tool results like a real run for the EDDB → EDDM C750 plan (see tools.int.test.ts). */
-const calls = ({ alternate = true, weather = true } = {}): ToolCallRecord[] => [
+/** A turbulence G-AIRMET crossing the route twice, as get_route_hazards returns it. */
+const TURBULENCE = {
+  advisoryId: 'gairmet:TANGO:1C:TURB-HI:2026-11-09T15Z:0a1b2c3d',
+  type: 'turbulence',
+  code: 'TURB-HI',
+  severity: 'moderate',
+  detail: null,
+  baseFt: 24000,
+  topFt: 36000,
+  validFrom: '2026-11-09T13:30:00.000Z',
+  validUntil: '2026-11-09T16:30:00.000Z',
+  segments: [
+    { fromWaypoint: 'LUROS', toWaypoint: 'PIKIB' },
+    { fromWaypoint: 'VESUB', toWaypoint: 'TOD' },
+  ],
+  issuedBy: 'US G-AIRMET',
+  rawText: null,
+};
+
+const calls = ({
+  alternate = true,
+  weather = true,
+  hazards = [] as unknown[],
+} = {}): ToolCallRecord[] => [
   {
     name: 'get_flight_plan',
     ok: true,
@@ -14,7 +37,9 @@ const calls = ({ alternate = true, weather = true } = {}): ToolCallRecord[] => [
         { role: 'destination', icao: 'EDDM' },
         ...(alternate ? [{ role: 'alternate', icao: 'EDDF' }] : []),
       ],
-      waypoints: [{ ident: 'DB068' }, { ident: 'TOC' }, { ident: 'EDDM' }],
+      waypoints: ['DB068', 'TOC', 'LUROS', 'PIKIB', 'VESUB', 'TOD', 'EDDM'].map((ident) => ({
+        ident,
+      })),
     },
   },
   {
@@ -83,6 +108,12 @@ const calls = ({ alternate = true, weather = true } = {}): ToolCallRecord[] => [
         },
       ]
     : []),
+  {
+    name: 'get_route_hazards',
+    ok: true,
+    ms: 5,
+    output: { available: true, hazards, moreNotShown: 0 },
+  },
 ];
 
 const good = (): Briefing => ({
@@ -195,9 +226,70 @@ describe('checkBriefing', () => {
       },
     ];
     expect(check(b)).toEqual([
-      'Hazard cites advisory "sigmet:X", which no tool returned.',
       'Hazard names waypoint "NOWHERE", which is not in the flight plan.',
+      'Hazard cites advisory "sigmet:X", which no tool returned.',
     ]);
+  });
+
+  describe('route hazards', () => {
+    const withTurbulence = calls({ hazards: [TURBULENCE] });
+    const entry = (overrides: Partial<Briefing['enrouteHazards'][number]> = {}) => ({
+      type: 'turbulence' as const,
+      fromWaypoint: 'LUROS',
+      toWaypoint: 'PIKIB',
+      validUntil: '2026-11-09T16:30:00Z',
+      severity: 'moderate' as const,
+      advisoryId: TURBULENCE.advisoryId,
+      ...overrides,
+    });
+
+    it('accepts a hazard copied from get_route_hazards, one entry per segment or not', () => {
+      const b = good();
+      b.enrouteHazards = [entry(), entry({ fromWaypoint: 'VESUB', toWaypoint: 'TOD' })];
+      expect(check(b, withTurbulence)).toEqual([]);
+      b.enrouteHazards = [entry()];
+      expect(check(b, withTurbulence)).toEqual([]);
+    });
+
+    it('rejects a briefing that leaves out a hazard the tool returned', () => {
+      expect(check(good(), withTurbulence)).toEqual([
+        `Hazard "${TURBULENCE.advisoryId}" (turbulence from LUROS to PIKIB) is missing from enrouteHazards.`,
+      ]);
+    });
+
+    it('rejects a hazard whose type, severity, validity or segment differs from the tool', () => {
+      const b = good();
+      b.enrouteHazards = [
+        entry({
+          type: 'icing',
+          severity: 'severe',
+          validUntil: '2026-11-09T18:00:00Z',
+          fromWaypoint: 'TOC',
+          toWaypoint: 'PIKIB',
+        }),
+      ];
+      const id = TURBULENCE.advisoryId;
+      expect(check(b, withTurbulence)).toEqual([
+        `Hazard "${id}": says icing, but the advisory is turbulence.`,
+        `Hazard "${id}": says severity severe, but the advisory has moderate.`,
+        `Hazard "${id}": says valid until 2026-11-09T18:00:00Z, but the advisory is valid until 2026-11-09T16:30:00.000Z.`,
+        `Hazard "${id}": TOC to PIKIB is not one of the advisory's route segments.`,
+      ]);
+    });
+
+    it('rejects a briefing written without checking route hazards', () => {
+      const noHazards = calls().filter((c) => c.name !== 'get_route_hazards');
+      expect(check(good(), noHazards)).toEqual([
+        'The briefing was written without checking route hazards (get_route_hazards).',
+      ]);
+    });
+
+    it('accepts no hazards when the tool failed (nothing to cite)', () => {
+      const failed = calls().map((c) =>
+        c.name === 'get_route_hazards' ? { ...c, ok: false, output: undefined, error: 'x' } : c,
+      );
+      expect(check(good(), failed)).toEqual([]);
+    });
   });
 
   it.each([

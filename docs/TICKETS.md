@@ -3,9 +3,9 @@
 Derived from [PLAN.md](PLAN.md). Work them in order, one ticket per branch/PR.
 Each ticket ends with tests green and its "Done when" shown working.
 
-> **Status (11 Nov 2026):** OFP-01 to OFP-31 are done: the MVP and Phase 4 (live weather) are
-> complete, and so is **Phase 5 — AI briefing** (OFP-24 to OFP-28). In progress: **Phase 6 —
-> hazards along the route** (OFP-32 and OFP-33 left). Deployment (3b) follows.
+> **Status (11 Nov 2026):** OFP-01 to OFP-32 are done: the MVP, Phase 4 (live weather),
+> **Phase 5 — AI briefing** (OFP-24 to OFP-28) and **Phase 6 — hazards along the route**
+> (OFP-29 to OFP-32) are complete; the optional route map (OFP-33) is left. Deployment (3b) follows.
 
 **MVP = Phases 0–3**: load my latest SimBrief OFP, see a clean briefing, and keep a
 history in Postgres, running locally. Deploy (3b), live weather (4) and everything AI
@@ -362,6 +362,12 @@ mapped to the affected waypoints, shown on the plan page, and named by the AI br
 - The e2e fake Claude and `pnpm briefing:try` cover a plan with a hazard.
 - **Done when:** guardrail tests pass, real briefings for the captured plans (with captured
   hazards) pass every guardrail within the cost limit, and e2e is green. 🎉 Phase 6 done.
+- *As built:* the tool returns at most 10 hazards (`moreNotShown` counts the rest); guardrails
+  also check each entry's type, severity, validUntil and that its from/to is one of the
+  advisory's segments, and that get_route_hazards was called. Captured plans get made-up
+  SIGMETs on their routes (`packages/agent/src/testing/routeHazards.ts`), since the captured
+  feeds expire. First run of `briefing-v3` on the three captured plans (11 Nov): all done,
+  every hazard cited, $0.0078 in total.
 
 ### OFP-33 · Optional: route map
 - A MapLibre map of the route with the hazard polygons drawn on it, on the plan page.

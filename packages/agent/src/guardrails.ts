@@ -1,4 +1,4 @@
-import type { Briefing, Conditions } from './briefing';
+import type { Briefing, Conditions, EnrouteHazard } from './briefing';
 
 /**
  * Checks a briefing against the tool results of the same run. Each problem is a sentence; an
@@ -29,9 +29,23 @@ export interface Evidence {
   reports: Map<string, ReportEvidence>;
   /** changedSinceDispatch per ICAO from get_weather; null when it was never called. */
   liveChanged: Map<string, boolean> | null;
-  /** Advisory ids a tool returned (route hazards arrive in Phase 6). */
-  advisoryIds: Set<string>;
+  /** Whether get_route_hazards was called at all (it may have failed). */
+  hazardsChecked: boolean;
+  /** Every advisory get_route_hazards returned, by advisoryId. */
+  advisories: Map<string, AdvisoryEvidence>;
 }
+
+interface AdvisoryEvidence {
+  type: string;
+  severity: string | null;
+  validUntil: string;
+  /** "FROM>TO" per segment. */
+  segments: Set<string>;
+  /** For messages: "turbulence from BEBKU to MAREM". */
+  label: string;
+}
+
+const segmentKey = (from: string, to: string) => `${from}>${to}`;
 
 type Station = {
   icao: string;
@@ -48,11 +62,34 @@ export function collectEvidence(calls: ToolCallRecord[]): Evidence {
     waypointIdents: new Set(),
     reports: new Map(),
     liveChanged: null,
-    advisoryIds: new Set(),
+    hazardsChecked: false,
+    advisories: new Map(),
   };
 
   for (const call of calls) {
+    if (call.name === 'get_route_hazards') evidence.hazardsChecked = true;
     if (!call.ok) continue;
+    if (call.name === 'get_route_hazards') {
+      const out = call.output as {
+        hazards: {
+          advisoryId: string;
+          type: string;
+          severity: string | null;
+          validUntil: string;
+          segments: { fromWaypoint: string; toWaypoint: string }[];
+        }[];
+      };
+      for (const h of out.hazards) {
+        const first = h.segments[0];
+        evidence.advisories.set(h.advisoryId, {
+          type: h.type,
+          severity: h.severity,
+          validUntil: h.validUntil,
+          segments: new Set(h.segments.map((s) => segmentKey(s.fromWaypoint, s.toWaypoint))),
+          label: `${h.type.replaceAll('_', ' ')}${first ? ` from ${first.fromWaypoint} to ${first.toWaypoint}` : ''}`,
+        });
+      }
+    }
     if (call.name === 'get_flight_plan') {
       const out = call.output as {
         airports: { role: string; icao: string }[];
@@ -134,14 +171,16 @@ export function checkBriefing(briefing: Briefing, evidence: Evidence): string[] 
     }
   }
 
+  if (!evidence.hazardsChecked) {
+    problems.push('The briefing was written without checking route hazards (get_route_hazards).');
+  }
   for (const hazard of briefing.enrouteHazards) {
-    if (!evidence.advisoryIds.has(hazard.advisoryId)) {
-      problems.push(`Hazard cites advisory "${hazard.advisoryId}", which no tool returned.`);
-    }
-    for (const waypoint of [hazard.fromWaypoint, hazard.toWaypoint]) {
-      if (!evidence.waypointIdents.has(waypoint)) {
-        problems.push(`Hazard names waypoint "${waypoint}", which is not in the flight plan.`);
-      }
+    problems.push(...checkHazard(hazard, evidence));
+  }
+  const cited = new Set(briefing.enrouteHazards.map((h) => h.advisoryId));
+  for (const [id, advisory] of evidence.advisories) {
+    if (!cited.has(id)) {
+      problems.push(`Hazard "${id}" (${advisory.label}) is missing from enrouteHazards.`);
     }
   }
 
@@ -159,6 +198,43 @@ export function checkBriefing(briefing: Briefing, evidence: Evidence): string[] 
     }
   }
 
+  return problems;
+}
+
+function checkHazard(hazard: EnrouteHazard, evidence: Evidence): string[] {
+  const problems: string[] = [];
+  for (const waypoint of [hazard.fromWaypoint, hazard.toWaypoint]) {
+    if (!evidence.waypointIdents.has(waypoint)) {
+      problems.push(`Hazard names waypoint "${waypoint}", which is not in the flight plan.`);
+    }
+  }
+  const advisory = evidence.advisories.get(hazard.advisoryId);
+  if (!advisory) {
+    problems.push(`Hazard cites advisory "${hazard.advisoryId}", which no tool returned.`);
+    return problems;
+  }
+  const id = hazard.advisoryId;
+  if (hazard.type !== advisory.type) {
+    problems.push(`Hazard "${id}": says ${hazard.type}, but the advisory is ${advisory.type}.`);
+  }
+  if (hazard.severity !== advisory.severity) {
+    problems.push(
+      `Hazard "${id}": says severity ${hazard.severity ?? 'none'}, but the advisory has ${advisory.severity ?? 'none'}.`,
+    );
+  }
+  if (
+    hazard.validUntil === null ||
+    Date.parse(hazard.validUntil) !== Date.parse(advisory.validUntil)
+  ) {
+    problems.push(
+      `Hazard "${id}": says valid until ${hazard.validUntil ?? 'unknown'}, but the advisory is valid until ${advisory.validUntil}.`,
+    );
+  }
+  if (!advisory.segments.has(segmentKey(hazard.fromWaypoint, hazard.toWaypoint))) {
+    problems.push(
+      `Hazard "${id}": ${hazard.fromWaypoint} to ${hazard.toWaypoint} is not one of the advisory's route segments.`,
+    );
+  }
   return problems;
 }
 

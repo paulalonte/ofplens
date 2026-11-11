@@ -73,6 +73,8 @@ async function start(replies: Parameters<typeof fakeClaude>[0] | null, { dailyLi
     flightPlans: createFlightPlanRepository(conn.db),
     weatherReports: createWeatherRepository(conn.db),
     hazards: createHazardRepository(conn.db),
+    // No hazards on the route here; the agent's own tests cover briefings with hazards.
+    hazardFeeds: { fetchAdvisories: () => Promise.resolve({ advisories: [], unavailable: [] }) },
     briefings: createBriefingRepository(conn.db),
     weather: createCachedWeatherClient(
       createWeatherClient({ fetch: weatherFetch, retryDelayMs: 0 }),
@@ -125,7 +127,8 @@ const goodBriefing = (): Briefing => ({
   pilotNotes: ['Frankfurt has improved to VFR since dispatch.'],
 });
 
-const allTools = () => callTools('get_flight_plan', 'get_planned_weather', 'get_weather');
+const allTools = () =>
+  callTools('get_flight_plan', 'get_planned_weather', 'get_weather', 'get_route_hazards');
 const post = (a: App, id = planId) =>
   a.inject({ method: 'POST', url: `/api/flight-plans/${id}/briefings` });
 const latest = (a: App, id = planId) =>
@@ -143,13 +146,13 @@ describe('POST /api/flight-plans/:id/briefings', () => {
     expect(res.statusCode).toBe(200);
     expect(res.headers['content-type']).toContain('text/event-stream');
     const stream = events(res.body);
-    expect(stream.map((e) => e.event)).toEqual(['started', 'tool', 'tool', 'tool', 'done']);
+    expect(stream.map((e) => e.event)).toEqual(['started', 'tool', 'tool', 'tool', 'tool', 'done']);
     expect(
       stream
         .filter((e) => e.event === 'tool')
         .map((e) => e.data.name)
         .sort(),
-    ).toEqual(['get_flight_plan', 'get_planned_weather', 'get_weather']);
+    ).toEqual(['get_flight_plan', 'get_planned_weather', 'get_route_hazards', 'get_weather']);
     const done = stream.at(-1)!.data;
     expect(done).toMatchObject({
       id: stream[0]!.data.id,

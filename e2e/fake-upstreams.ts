@@ -5,9 +5,9 @@
  * - aviationweather.gov's Data API: METARs and TAFs from fixtures/weather (real reports
  *   captured earlier), filtered by `ids`; HTTP 204 when none of the stations has one. The
  *   hazard feeds from fixtures/hazards, plus one made-up SIGMET on the e2e route.
- * - Claude's Messages API (the API's ANTHROPIC_BASE_URL): first asks for all three briefing
- *   tools, then writes a briefing from their results, citing real report ids so it passes the
- *   guardrails. No key and no cost.
+ * - Claude's Messages API (the API's ANTHROPIC_BASE_URL): first asks for all four briefing
+ *   tools, then writes a briefing from their results, citing real report and advisory ids so it
+ *   passes the guardrails. No key and no cost.
  */
 import { readFile } from 'node:fs/promises';
 import { createServer } from 'node:http';
@@ -130,7 +130,20 @@ interface ToolStation {
   changedSinceDispatch?: boolean;
 }
 
-const BRIEFING_TOOLS = ['get_flight_plan', 'get_planned_weather', 'get_weather'];
+interface ToolHazard {
+  advisoryId: string;
+  type: string;
+  severity: string | null;
+  validUntil: string;
+  segments: { fromWaypoint: string; toWaypoint: string }[];
+}
+
+const BRIEFING_TOOLS = [
+  'get_flight_plan',
+  'get_planned_weather',
+  'get_weather',
+  'get_route_hazards',
+];
 
 /** One Messages API reply: call the tools, or answer from what they returned. */
 function fakeClaudeReply(request: MessagesRequest) {
@@ -179,13 +192,25 @@ function fakeClaudeReply(request: MessagesRequest) {
       sourceReportId: station.metar.reportId,
     };
   };
+  // Every segment of every hazard on the route, copied as the guardrails require.
+  const hazards = (results.get('get_route_hazards') as { hazards: ToolHazard[] }).hazards;
+  const enrouteHazards = hazards.flatMap((h) =>
+    h.segments.map((s) => ({
+      type: h.type,
+      fromWaypoint: s.fromWaypoint,
+      toWaypoint: s.toWaypoint,
+      validUntil: h.validUntil,
+      severity: h.severity,
+      advisoryId: h.advisoryId,
+    })),
+  );
   const briefing = {
     headline: 'Scripted briefing from the fake Claude',
     overallRisk: 'moderate',
     departure: conditions('origin'),
     destination: conditions('destination'),
     alternate: conditions('alternate'),
-    enrouteHazards: [],
+    enrouteHazards,
     pilotNotes: ['This note comes from the end-to-end fake.'],
   };
   return message([{ type: 'text', text: JSON.stringify(briefing) }], 'end_turn');
