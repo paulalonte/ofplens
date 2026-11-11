@@ -4,8 +4,8 @@ Derived from [PLAN.md](PLAN.md). Work them in order, one ticket per branch/PR.
 Each ticket ends with tests green and its "Done when" shown working.
 
 > **Status (10 Nov 2026):** OFP-01 to OFP-28 are done: the MVP and Phase 4 (live weather) are
-> complete, and so is **Phase 5 — AI briefing** (OFP-24 to OFP-28). Next: deployment (3b), then
-> route hazards (Phase 6).
+> complete, and so is **Phase 5 — AI briefing** (OFP-24 to OFP-28). In progress: **Phase 6 —
+> hazards along the route** (OFP-29 to OFP-33). Deployment (3b) follows.
 
 **MVP = Phases 0–3**: load my latest SimBrief OFP, see a clean briefing, and keep a
 history in Postgres, running locally. Deploy (3b), live weather (4) and everything AI
@@ -285,11 +285,80 @@ time or weight figures come from the model.
 
 ---
 
+## Phase 6 — Hazards along the route
+
+Goal (PLAN.md): SIGMETs and similar advisories that touch the planned route are found in code,
+mapped to the affected waypoints, shown on the plan page, and named by the AI briefing.
+
+**Ground rules for every Phase 6 ticket**
+
+- **Geometry comes from code.** Whether a hazard touches the route, between which waypoints, and
+  at which levels and times is computed deterministically. The agent only describes what the
+  tools return, and the guardrails check every advisory id and waypoint it names.
+- **Real advisories, simulated flight.** The feeds are real, current aviationweather.gov data
+  (X-Plane 12 uses real weather by default); everything stays labelled "for flight simulation only".
+- **No network in tests.** Captured feeds in `fixtures/hazards/`, plus hand-made polygons over
+  known waypoints of the captured OFPs.
+- **Small and cached.** One request per feed covers the whole world; cached 5 minutes like METARs.
+
+### OFP-29 · Hazard feeds: SIGMETs and G-AIRMETs
+- `packages/weather`: a client for aviationweather.gov's `isigmet` (international SIGMETs,
+  worldwide), `airsigmet` (US SIGMETs, convective included) and `gairmet` (US G-AIRMETs), with
+  Zod schemas for each feed.
+- One normalised `Advisory`: stable id, source, hazard (`thunderstorm`, `turbulence`, `icing`,
+  `volcanic_ash`, `tropical_cyclone`, `mountain_wave`, `low_visibility`, `other`), severity,
+  valid from/to, base/top in feet (null when not given), polygon (`[lon, lat][]`, or null when
+  the feed gives no shape), FIR, raw text.
+- `pnpm fixture:hazards` captures the three feeds to `fixtures/hazards/`.
+- **Done when:** tests parse the captured feeds, map every hazard code seen in them (unknown
+  codes become `other`), and keep advisories without a polygon (listed, never matched).
+
+### OFP-30 · Match hazards to the route
+- A pure function: the plan's legs (consecutive waypoints, with altitude and ETA from takeoff
+  time + elapsed time) against each advisory, using Turf.js for the leg/polygon intersection.
+  - **Where:** first and last affected waypoint per advisory (one advisory can cross the route
+    more than once).
+  - **Altitude:** a leg counts only if its planned altitude overlaps base–top.
+  - **Time:** a leg counts only if its ETA falls in the valid window (with a small margin).
+  - Routes across the antimeridian (e.g. transpacific) work.
+- Migration: the `advisories` table from PLAN.md (per plan, with the matched waypoint range).
+- API: `GET /api/flight-plans/:id/hazards` (stored) and `POST …/hazards/refresh` (fetch, match,
+  store), next to the live weather endpoints.
+- **Done when:** fixture tests map a known polygon to the right waypoints of the EDDB → EDDM
+  and KSFO → KJFK plans, the altitude and time filters each exclude a case, an antimeridian
+  route matches, and the routes are tested with `app.inject()`.
+
+### OFP-31 · Web: hazards on the plan page
+- A **Hazards along the route** card: per hazard its type, severity, levels (FL), valid until
+  (Zulu), the affected legs ("LUROS → ERNAS"), and the raw SIGMET folded away; "None on your
+  route" with how many advisories were checked and when.
+- The affected navlog rows are marked.
+- Refreshes together with live weather (on open when stale, and on Refresh).
+- **Done when:** page tests (mock API) cover hazards found, none found, a feed that is down,
+  and the navlog marks.
+
+### OFP-32 · Hazards in the AI briefing
+- A `get_route_hazards` tool: each matched advisory with `advisoryId`, type, severity, levels,
+  valid until and the from/to waypoints.
+- Prompt `briefing-v3`: name each hazard in `enrouteHazards` and in the pilot notes when it
+  matters for the flight.
+- New guardrail: every hazard the tool returned must appear in `enrouteHazards` (the existing
+  checks already reject unknown advisory ids and waypoints).
+- The e2e fake Claude and `pnpm briefing:try` cover a plan with a hazard.
+- **Done when:** guardrail tests pass, real briefings for the captured plans (with captured
+  hazards) pass every guardrail within the cost limit, and e2e is green. 🎉 Phase 6 done.
+
+### OFP-33 · Optional: route map
+- A MapLibre map of the route with the hazard polygons drawn on it, on the plan page.
+- **Done when:** it renders the captured plans with and without hazards, on phone width too.
+
+---
+
 ## Later phases (not ticketed yet)
 
 | Next | Summary |
 | --- | --- |
 | 3b Deploy | Budget alarm first; then CDK (RDS, Fargate, S3 + CloudFront) or the cheaper Lightsail + Compose fallback |
-| 6–7 AI | Route hazards (SIGMETs on the route), evals and tracing |
+| 7 Evals | `pnpm eval`: frozen plans, weather and hazards; pass rate per check and per prompt version; tracing |
 | 8 MCP | The `packages/agent` tools exposed to Claude Desktop / Claude Code |
 | Sharing | Auth and multi-pilot support before anyone else uses it |
