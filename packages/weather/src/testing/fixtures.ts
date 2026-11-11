@@ -10,3 +10,10 @@ export function loadWeatherFixture(kind: 'metar' | 'taf'): Record<string, unknow
     unknown
   >[];
 }
+
+const HAZARDS_DIR = resolve(import.meta.dirname, '../../../../fixtures/hazards');
+
+/** Test-only: real hazard feeds captured by `pnpm fixture:hazards`. */
+export function loadHazardFixture(feed: 'isigmet' | 'airsigmet' | 'gairmet'): unknown[] {
+  return JSON.parse(readFileSync(resolve(HAZARDS_DIR, `${feed}.json`), 'utf8')) as unknown[];
+}

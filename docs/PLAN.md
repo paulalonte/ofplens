@@ -526,3 +526,14 @@ are hundreds of feet as strings), `coords` (`[{ lat, lon }]`, numbers or strings
 few given only as text ("N OF S0232", "WI 90NM OF LINE…") have no `coords` and are listed but
 not matched to the route.
 
+What the parser (OFP-29) found in the captured feeds (`fixtures/hazards/`):
+
+- `coords` is one list of points, or a list of lists when a SIGMET has several areas (`geom: "AREAS"`).
+  Rings are not always closed, and a few "areas" are a single repeated point; the parser closes
+  rings and drops slivers.
+- An area across the antimeridian continues past 180 (e.g. `190.5` for 169.5°W). Kept as sent.
+- A SIGMET and its forecast part are separate entries (`seriesId` "XRAY 21" and "XRAY 21F").
+- G-AIRMET `FZLVL` entries are freezing-level contour lines (`geom: "LINE"`), not hazard areas:
+  left out. `base`/`top` may be `"SFC"` or `"FZL"` (then `fzlbase`/`fzltop` give the level).
+- A G-AIRMET is a snapshot every 3 hours; we treat it as valid 90 minutes either side.
+

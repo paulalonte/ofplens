@@ -36,3 +36,16 @@ export {
   type ReportRole,
   type StoredReport,
 } from './planWeather';
+export {
+  HAZARD_KINDS,
+  HAZARD_SOURCES,
+  hazardKind,
+  parseAdvisories,
+  type Advisory,
+  type HazardKind,
+  type HazardSource,
+  type Position,
+  type Ring,
+  type Severity,
+} from './hazards/advisory';
+export { createHazardClient, type HazardClient, type HazardFeeds } from './hazards/client';
