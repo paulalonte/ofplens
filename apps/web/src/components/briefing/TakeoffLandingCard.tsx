@@ -88,9 +88,9 @@ function Phase({
   return (
     <section aria-label={`${label} runway`} className="min-w-0">
       <div className="mb-2 flex flex-wrap items-center gap-2">
-        <h3 className="text-sm font-semibold">
+        <h3 className="text-base font-semibold">
           {label}{' '}
-          <span className="font-mono">
+          <span className="font-mono text-xl font-bold tracking-tight">
             {[phase.airportIcao, phase.runway].filter(Boolean).join(' ')}
           </span>
         </h3>
