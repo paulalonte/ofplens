@@ -20,11 +20,13 @@ interface Props {
   preferredUnit?: WeightUnit;
   /** Replaces the OFP-only weather card, e.g. with dispatch vs live weather for saved plans. */
   weather?: ReactNode;
+  /** Replaces the planning-only takeoff & landing card, e.g. with the wind now on saved plans. */
+  takeoffLanding?: ReactNode;
   /** The AI briefing, shown above the weather on saved plans. */
   aiBriefing?: ReactNode;
 }
 
-export function BriefingPage({ plan, preferredUnit, weather, aiBriefing }: Props) {
+export function BriefingPage({ plan, preferredUnit, weather, takeoffLanding, aiBriefing }: Props) {
   const [displayUnit, setDisplayUnit] = useState<WeightUnit>(preferredUnit ?? plan.units);
 
   return (
@@ -40,7 +42,7 @@ export function BriefingPage({ plan, preferredUnit, weather, aiBriefing }: Props
         <PayloadCard plan={plan} displayUnit={displayUnit} />
       </div>
       <FlightDataCard plan={plan} />
-      <TakeoffLandingCard plan={plan} />
+      {takeoffLanding ?? <TakeoffLandingCard plan={plan} />}
 
       {aiBriefing}
       {weather ?? <WeatherCard plan={plan} />}

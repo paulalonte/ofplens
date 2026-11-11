@@ -7,6 +7,7 @@ import { planWeatherQuery } from '../../api/weather';
 import { BriefingPage } from '../../components/briefing/BriefingPage';
 import { AiBriefingCard } from './-components/AiBriefingCard';
 import { DeletePlan } from './-components/DeletePlan';
+import { LiveTakeoffLandingCard } from './-components/LiveTakeoffLandingCard';
 import { LiveWeatherCard } from './-components/LiveWeatherCard';
 
 type ImportOutcome = 'new' | 'existing';
@@ -70,6 +71,7 @@ function PlanPage() {
         plan={plan}
         {...(pilot && { preferredUnit: pilot.weightUnit })}
         weather={<LiveWeatherCard planId={planId} />}
+        takeoffLanding={<LiveTakeoffLandingCard planId={planId} plan={plan} />}
         aiBriefing={<AiBriefingCard planId={planId} />}
       />
     </div>
