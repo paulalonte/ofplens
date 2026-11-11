@@ -1,5 +1,6 @@
 import { formatZulu, formatZuluDate } from '@ofplens/ofp';
 import type { StationWeather, StationRole } from '@ofplens/weather';
+import { useRefreshHazards } from '../../../api/hazards';
 import { useAutoRefreshWeather, usePlanWeather, useRefreshWeather } from '../../../api/weather';
 import { Card } from '../../../components/Card';
 import { CategoryBadge } from './CategoryBadge';
@@ -17,6 +18,7 @@ const ROLE_LABEL: Record<StationRole, string> = {
 export function LiveWeatherCard({ planId }: { planId: string }) {
   const weather = usePlanWeather(planId);
   const refresh = useRefreshWeather(planId);
+  const refreshHazards = useRefreshHazards(planId);
   useAutoRefreshWeather(weather.liveCheckedAt, refresh);
 
   return (
@@ -33,7 +35,11 @@ export function LiveWeatherCard({ planId }: { planId: string }) {
           </span>
           <button
             type="button"
-            onClick={() => refresh.mutate()}
+            onClick={() => {
+              // Hazards along the route are checked again with the weather.
+              refresh.mutate();
+              refreshHazards.mutate();
+            }}
             disabled={refresh.isPending}
             className="rounded-md border border-slate-300 px-2 py-1 font-medium text-slate-700 hover:bg-slate-100 disabled:opacity-60 dark:border-slate-700 dark:text-slate-300 dark:hover:bg-slate-800"
           >

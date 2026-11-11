@@ -43,6 +43,13 @@
       "when": 1794402617021,
       "tag": "0005_route_hazards",
       "breakpoints": true
+    },
+    {
+      "idx": 6,
+      "version": "7",
+      "when": 1794403039842,
+      "tag": "0006_hazards_advisories_checked",
+      "breakpoints": true
     }
   ]
 }

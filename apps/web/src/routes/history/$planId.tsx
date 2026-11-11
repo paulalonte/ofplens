@@ -2,11 +2,13 @@ import { createFileRoute, Link, notFound } from '@tanstack/react-router';
 import { latestBriefingQuery } from '../../api/briefings';
 import { ApiError } from '../../api/client';
 import { flightPlanQuery, useFlightPlan } from '../../api/flightPlans';
+import { planHazardsQuery, usePlanHazards } from '../../api/hazards';
 import { pilotQuery, usePilot } from '../../api/pilot';
 import { planWeatherQuery } from '../../api/weather';
 import { BriefingPage } from '../../components/briefing/BriefingPage';
 import { AiBriefingCard } from './-components/AiBriefingCard';
 import { DeletePlan } from './-components/DeletePlan';
+import { HazardsCard, hazardMarks } from './-components/HazardsCard';
 import { LiveTakeoffLandingCard } from './-components/LiveTakeoffLandingCard';
 import { LiveWeatherCard } from './-components/LiveWeatherCard';
 
@@ -34,6 +36,8 @@ export const Route = createFileRoute('/history/$planId')({
       queryClient.ensureQueryData(pilotQuery),
       // Stored weather only; the card refreshes live weather itself when it is stale.
       orNotFound(queryClient.ensureQueryData(planWeatherQuery(params.planId))),
+      // Stored hazards only; the card checks again itself when the last check is stale.
+      orNotFound(queryClient.ensureQueryData(planHazardsQuery(params.planId))),
       orNotFound(queryClient.ensureQueryData(latestBriefingQuery(params.planId))),
     ]);
   },
@@ -46,6 +50,7 @@ function PlanPage() {
   const { imported } = Route.useSearch();
   const { plan } = useFlightPlan(planId);
   const pilot = usePilot();
+  const hazards = usePlanHazards(planId);
 
   return (
     <div className="space-y-6">
@@ -73,6 +78,8 @@ function PlanPage() {
         weather={<LiveWeatherCard planId={planId} />}
         takeoffLanding={<LiveTakeoffLandingCard planId={planId} plan={plan} />}
         aiBriefing={<AiBriefingCard planId={planId} />}
+        hazards={<HazardsCard planId={planId} />}
+        navlogMarks={hazardMarks(hazards)}
       />
     </div>
   );

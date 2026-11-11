@@ -37,6 +37,7 @@ export function createHazardRepository(db: Database): HazardRepository {
           checkedAt: flightPlans.hazardsCheckedAt,
           takeoffAt: flightPlans.hazardsTakeoffAt,
           unavailable: flightPlans.hazardsUnavailable,
+          advisoriesChecked: flightPlans.hazardsAdvisoriesChecked,
         })
         .from(flightPlans)
         .where(eq(flightPlans.id, flightPlanId));
@@ -53,6 +54,7 @@ export function createHazardRepository(db: Database): HazardRepository {
           checkedAt: plan.checkedAt.toISOString(),
           takeoffAt: plan.takeoffAt.toISOString(),
           unavailable: plan.unavailable as HazardSource[],
+          advisoriesChecked: plan.advisoriesChecked,
           hazards: rows.map((row) => ({
             advisory: {
               id: row.advisoryId,
@@ -108,6 +110,7 @@ export function createHazardRepository(db: Database): HazardRepository {
             hazardsCheckedAt: new Date(checked.checkedAt),
             hazardsTakeoffAt: new Date(checked.takeoffAt),
             hazardsUnavailable: checked.unavailable,
+            hazardsAdvisoriesChecked: checked.advisoriesChecked,
           })
           .where(eq(flightPlans.id, flightPlanId));
       }),

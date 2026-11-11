@@ -41,6 +41,8 @@ export const FlightPlanHazardsResponse = z.object({
   takeoffAt: iso.nullable(),
   /** Feeds that could not be read at that check, so their hazards may be missing. */
   unavailable: z.array(z.enum(HAZARD_SOURCES)),
+  /** How many advisories (worldwide, from the feeds that answered) were checked against the route. */
+  advisoriesChecked: z.number().int().nonnegative(),
   hazards: z.array(RouteHazardView),
 });
 export type FlightPlanHazardsResponse = z.infer<typeof FlightPlanHazardsResponse>;
@@ -50,6 +52,7 @@ export interface PlanHazards {
   checkedAt: string;
   takeoffAt: string;
   unavailable: HazardSource[];
+  advisoriesChecked: number;
   hazards: RouteHazard[];
 }
 
@@ -66,11 +69,14 @@ export interface PlanHazardStore {
 }
 
 export function toPlanHazardsResponse(checked: PlanHazards | null): FlightPlanHazardsResponse {
-  if (!checked) return { checkedAt: null, takeoffAt: null, unavailable: [], hazards: [] };
+  if (!checked) {
+    return { checkedAt: null, takeoffAt: null, unavailable: [], advisoriesChecked: 0, hazards: [] };
+  }
   return {
     checkedAt: checked.checkedAt,
     takeoffAt: checked.takeoffAt,
     unavailable: checked.unavailable,
+    advisoriesChecked: checked.advisoriesChecked,
     hazards: checked.hazards.map(({ advisory, segments }) => ({ ...advisory, segments })),
   };
 }
@@ -106,6 +112,7 @@ export async function refreshPlanHazards(
     checkedAt: now.toISOString(),
     takeoffAt: takeoffAt.toISOString(),
     unavailable,
+    advisoriesChecked: advisories.length,
     hazards: matchRouteHazards(route.waypoints, advisories, { takeoffAt }),
   };
   await store.replace(flightPlanId, checked);

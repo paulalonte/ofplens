@@ -1,0 +1,1 @@
+ALTER TABLE "flight_plans" ADD COLUMN "hazards_advisories_checked" integer DEFAULT 0 NOT NULL;

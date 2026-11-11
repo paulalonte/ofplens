@@ -127,6 +127,8 @@ export const flightPlans = pgTable(
       .array()
       .notNull()
       .default(sql`'{}'::text[]`),
+    /** How many advisories that check compared with the route. */
+    hazardsAdvisoriesChecked: integer('hazards_advisories_checked').notNull().default(0),
   },
   (t) => [
     check('flight_plans_units_check', sql`${t.units} in ('kgs', 'lbs')`),

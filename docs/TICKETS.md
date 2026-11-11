@@ -3,9 +3,9 @@
 Derived from [PLAN.md](PLAN.md). Work them in order, one ticket per branch/PR.
 Each ticket ends with tests green and its "Done when" shown working.
 
-> **Status (11 Nov 2026):** OFP-01 to OFP-30 are done: the MVP and Phase 4 (live weather) are
+> **Status (11 Nov 2026):** OFP-01 to OFP-31 are done: the MVP and Phase 4 (live weather) are
 > complete, and so is **Phase 5 — AI briefing** (OFP-24 to OFP-28). In progress: **Phase 6 —
-> hazards along the route** (OFP-31 to OFP-33 left). Deployment (3b) follows.
+> hazards along the route** (OFP-32 and OFP-33 left). Deployment (3b) follows.
 
 **MVP = Phases 0–3**: load my latest SimBrief OFP, see a clean briefing, and keep a
 history in Postgres, running locally. Deploy (3b), live weather (4) and everything AI
@@ -347,6 +347,10 @@ mapped to the affected waypoints, shown on the plan page, and named by the AI br
 - Refreshes together with live weather (on open when stale, and on Refresh).
 - **Done when:** page tests (mock API) cover hazards found, none found, a feed that is down,
   and the navlog marks.
+- *As built:* the card sits after the weather card; navlog rows inside a hazard get an amber
+  mark with the hazard codes ("⚠ TS"). Checked on open when the last check is over 10 minutes
+  old, and with the weather card's Refresh. The API now also returns `advisoriesChecked`
+  (migration 0006). The e2e fake serves the captured feeds plus a SIGMET over the e2e route.
 
 ### OFP-32 · Hazards in the AI briefing
 - A `get_route_hazards` tool: each matched advisory with `advisoryId`, type, severity, levels,
