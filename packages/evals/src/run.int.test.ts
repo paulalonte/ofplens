@@ -117,6 +117,7 @@ const options = (client: Anthropic, more: Partial<RunEvalOptions> = {}): RunEval
 describe('runEval', () => {
   it('runs, grades and writes every case and rep, then resumes without repeating', async () => {
     const result = await runEval(options(scriptedClaude()));
+    expect(await readErrors(outDir)).toEqual([]);
     expect(result).toMatchObject({ ran: 6, skipped: 0, errors: 0, stoppedForBudget: false });
     expect(result.spentUsd).toBeCloseTo((6 * 2 * (10_000 * 0.1 + 1_000 * 0.5)) / 1e6, 6);
 

@@ -12,6 +12,7 @@ export { dispatchTaf, liveMetar, liveTaf, metarBody, observedAt } from './report
 export {
   caseHazardClient,
   caseWeatherClient,
+  ensureEvalPilot,
   EVAL_PILOT,
   prepareCase,
   runAllTools,

@@ -11,7 +11,7 @@ import { appendFile, mkdir, readFile, writeFile } from 'node:fs/promises';
 import { join } from 'node:path';
 import type { EvalCase } from './case';
 import { gradeBriefing, gradeScores, type CheckId, type Grade, type Reference } from './grade';
-import { prepareCase, runAllTools } from './setup';
+import { ensureEvalPilot, prepareCase, runAllTools } from './setup';
 
 /**
  * Runs eval cases through the real briefing agent, grades each answer and writes the results:
@@ -143,6 +143,8 @@ export async function runEval(options: RunEvalOptions): Promise<RunEvalResult> {
     return ref;
   };
 
+  // Before the runs start in parallel: their first pilot saves would otherwise race.
+  await ensureEvalPilot(options.db);
   let next = 0;
   const worker = async () => {
     while (next < todo.length) {

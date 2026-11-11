@@ -41,7 +41,7 @@ export async function prepareCase(db: Database, evalCase: EvalCase): Promise<Pre
   const plan = { ...parseOfp(raw), simbriefRequestId: `eval:${evalCase.id}:${randomUUID()}` };
   const briefAt = briefingTime(evalCase, plan.times.out);
 
-  await createPilotRepository(db).save({ simbriefUsername: EVAL_PILOT, weightUnit: 'kgs' });
+  await ensureEvalPilot(db);
   const { id } = await createFlightPlanRepository(db).import({
     simbriefUsername: EVAL_PILOT,
     plan,
@@ -61,6 +61,14 @@ export async function prepareCase(db: Database, evalCase: EvalCase): Promise<Pre
       now: () => briefAt,
     },
   };
+}
+
+/**
+ * Creates the pilot the eval plans belong to. Call it once before preparing cases in parallel:
+ * on an empty database two first saves at the same time would both insert the pilot.
+ */
+export async function ensureEvalPilot(db: Database): Promise<void> {
+  await createPilotRepository(db).save({ simbriefUsername: EVAL_PILOT, weightUnit: 'kgs' });
 }
 
 const down = () =>

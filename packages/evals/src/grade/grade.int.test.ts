@@ -77,6 +77,10 @@ describe('each mistake fails its own check', () => {
       failing(changed('egll-kjfk-oceanic-turbulence', (b) => (b.overallRisk = 'low'))),
     ).toEqual(['risk']);
     expect(failing(changed('eddf-lepa-quiet', (b) => (b.overallRisk = 'high')))).toEqual(['risk']);
+    // Thunderstorms in the destination TAF (LEPA TEMPO TSRA): moderate, not low.
+    expect(failing(changed('eddf-lepa-arrival-storms', (b) => (b.overallRisk = 'low')))).toEqual([
+      'risk',
+    ]);
     // Hazards unknown: low and moderate are both fine.
     expect(
       failing(changed('eddf-lepa-hazard-feeds-down', (b) => (b.overallRisk = 'moderate'))),
@@ -113,6 +117,34 @@ describe('each mistake fails its own check', () => {
     });
     expect(failing(intensity)).toEqual(['no_invented_weather']);
     expect(reasons(intensity)).toContain('"heavy rain", but the METAR has -RA');
+  });
+
+  it('no invented weather: a note is checked against the airports it names, JFK for KJFK too', () => {
+    // KJFK (dispatch) is gusty; KSFO is not.
+    expect(
+      failing(
+        changed('ksfo-kjfk-severe-turbulence', (b) => {
+          b.headline = 'KSFO now VFR; JFK gusty.';
+        }),
+      ),
+    ).toEqual([]);
+    expect(
+      failing(
+        changed('ksfo-kjfk-severe-turbulence', (b) => {
+          b.headline = 'KSFO gusty.';
+        }),
+      ),
+    ).toEqual(['no_invented_weather']);
+  });
+
+  it('no invented weather: advice is not a claim', () => {
+    expect(
+      failing(
+        changed('ksfo-kjfk-us-feeds-down', (b) => {
+          b.pilotNotes.push('None were returned; check for turbulence and icing yourself.');
+        }),
+      ),
+    ).toEqual([]);
   });
 
   it('no invented weather: real weather and negations pass', () => {

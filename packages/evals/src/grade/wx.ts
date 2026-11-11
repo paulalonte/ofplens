@@ -107,7 +107,9 @@ export const WEATHER_WORDS: Phenomenon[] = [
   { word: /\bgust(?:s|ing|y)?\b/g, label: 'gusts', codes: [['GUST']] },
 ];
 
-const NEGATION = /\b(?:no|nil|without|free of|not|absence of|none|neither|nor)\b[^.;]{0,30}$/;
+/** Words before a weather word that make it not a claim: "no thunderstorms", "check for icing". */
+const NEGATION =
+  /\b(?:no|nil|without|free of|not|absence of|none|neither|nor|check for|check yourself for)\b[^.;]{0,30}$/;
 
 export interface WeatherMention {
   label: string;
