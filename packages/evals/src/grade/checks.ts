@@ -8,6 +8,7 @@ import { intensityMismatches, isBacked, metarNumbers, summaryNumbers, weatherMen
  */
 
 export const CHECK_IDS = [
+  'valid_answer',
   'guardrails',
   'risk',
   'no_invented_weather',
@@ -18,6 +19,7 @@ export const CHECK_IDS = [
 export type CheckId = (typeof CHECK_IDS)[number];
 
 export const CHECK_LABELS: Record<CheckId, string> = {
+  valid_answer: 'Valid answer',
   guardrails: 'Guardrails',
   risk: 'Risk level',
   no_invented_weather: 'No invented wx',
@@ -152,9 +154,13 @@ export function checkNoInventedWeather(briefing: Briefing, reference: Reference)
     { where: 'headline', text: briefing.headline },
     ...briefing.pilotNotes.map((text, i) => ({ where: `pilot note ${i + 1}`, text })),
   ];
+  // Hazard bulletins back notes too ("CB OBS WI 150NM OF CENTRE" in a cyclone SIGMET).
+  const bulletins = reference.get_route_hazards.hazards.flatMap((h) =>
+    h.rawText ? [h.rawText] : [],
+  );
   for (const { where, text } of free) {
     const named = weather.filter((a) => text.toUpperCase().includes(a.icao));
-    const sources = (named.length > 0 ? named : weather).flatMap((a) => a.raws);
+    const sources = [...(named.length > 0 ? named : weather).flatMap((a) => a.raws), ...bulletins];
     for (const mention of weatherMentions(text)) {
       if (!isBacked(mention, sources, hazardTypes)) {
         const whereFrom = named.length > 0 ? named.map((a) => a.icao).join('/') : 'any report';

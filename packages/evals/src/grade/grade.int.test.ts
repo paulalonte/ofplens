@@ -46,11 +46,23 @@ describe('the model answer', () => {
 });
 
 describe('each mistake fails its own check', () => {
-  it('no briefing at all fails everything', () => {
-    const grade = gradeBriefing(null, reference('eddf-lepa-quiet'), 'Claude API error 529');
+  it('no briefing at all fails "valid answer" and the whole run; the rest do not apply', () => {
+    const grade = gradeBriefing(null, reference('eddf-lepa-quiet'), 'headline: Too big');
     expect(grade.pass).toBe(false);
-    expect(grade.checks.every((c) => c.pass === false)).toBe(true);
-    expect(grade.checks[0]!.reasons).toEqual(['Claude API error 529']);
+    expect(failing(grade)).toEqual(['valid_answer']);
+    expect(grade.checks.filter((c) => c.pass === null)).toHaveLength(6);
+    expect(grade.checks[0]!.reasons).toEqual(['headline: Too big']);
+  });
+
+  it('no invented weather: a hazard bulletin backs a note', () => {
+    // The cyclone SIGMET says "CB OBS WI 150NM OF CENTRE".
+    expect(
+      failing(
+        changed('rjtt-vhhh-typhoon', (b) => {
+          b.pilotNotes.push('Cumulonimbus within 150 NM of the centre of TC NOVA.');
+        }),
+      ),
+    ).toEqual([]);
   });
 
   it('guardrails: a hazard left out of enrouteHazards', () => {

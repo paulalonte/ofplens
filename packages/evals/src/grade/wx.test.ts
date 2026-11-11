@@ -42,6 +42,7 @@ describe('weather words in prose', () => {
     const [turbulence] = weatherMentions('severe turbulence');
     expect(isBacked(turbulence!, ['EGLL 111820Z 36004KT 9999 NCD'], [])).toBe(false);
     expect(isBacked(turbulence!, ['EGLL 111820Z 36004KT 9999 NCD'], ['turbulence'])).toBe(true);
+    expect(isBacked(turbulence!, [], ['thunderstorm'])).toBe(true);
   });
 });
 
@@ -74,6 +75,8 @@ describe('numbers', () => {
       pressuresHpa: [{ hpa: 1010, text: '1010 hpa' }],
     });
     expect(summaryNumbers('Calm, 3/4 SM in mist.').wind?.calm).toBe(true);
+    expect(summaryNumbers('1.06 sm visibility').visibilitiesM[0]!.metres).toBeCloseTo(1706, 0);
+    expect(summaryNumbers('visibility 0.75 SM').visibilitiesM[0]!.metres).toBeCloseTo(1207, 0);
     expect(summaryNumbers('Wind 300/22G31 kt.').wind).toMatchObject({
       directionDeg: 300,
       speedKt: 22,
@@ -85,11 +88,11 @@ describe('numbers', () => {
     const numbers = metarNumbers(
       'KSFO 091856Z 00000KT 3/4SM R28R/1400VP6000FT BR FEW001 BKN002 14/14 A3013 RMK AO2 SLP202',
     );
-    expect([...numbers.heightsFt]).toEqual([100, 200]);
+    expect([...numbers.heightsFt].sort((a, b) => a - b)).toEqual([100, 200, 1400, 6000]);
     expect(numbers.visibilitiesM[0]!.metres).toBeCloseTo(1207, 0);
     expect(numbers.pressuresHpa[0]).toBeCloseTo(1020.3, 1);
-    expect(metarNumbers('BIKF 111850Z 05015KT CAVOK M01/M08 Q1022').visibilitiesM).toEqual([
-      { metres: 10000, orMore: true },
-    ]);
+    const cavok = metarNumbers('BIKF 111850Z 05015KT CAVOK M01/M08 Q1022');
+    expect(cavok.visibilitiesM).toEqual([{ metres: 10000, orMore: true }]);
+    expect([...cavok.heightsFt]).toEqual([5000]);
   });
 });
