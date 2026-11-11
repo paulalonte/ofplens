@@ -18,3 +18,15 @@ export {
   type PreparedCase,
 } from './setup';
 export * from './grade';
+export { buildReport, loadVariants } from './report';
+export {
+  readErrors,
+  readRows,
+  regrade,
+  runEval,
+  type EvalError,
+  type EvalRow,
+  type RunEvalOptions,
+  type RunEvalResult,
+} from './run';
+export { formatSummary, summarize, wilson, type Rate, type Summary } from './summary';

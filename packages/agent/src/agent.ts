@@ -18,6 +18,8 @@ export interface BriefingRunInfo {
   latencyMs: number;
   /** API requests made. */
   turns: number;
+  /** The model id the API says answered (the last response), or null before any answer. */
+  responseModel: string | null;
 }
 
 export type BriefingRun = BriefingRunInfo &
@@ -69,6 +71,7 @@ export async function runBriefing(
   let inputTokens = 0;
   let outputTokens = 0;
   let turns = 0;
+  let responseModel: string | null = null;
 
   const info = (): BriefingRunInfo => ({
     model: cfg.model,
@@ -79,6 +82,7 @@ export async function runBriefing(
     costUsd: costUsd(cfg.model, inputTokens, outputTokens),
     latencyMs: Date.now() - started,
     turns,
+    responseModel,
   });
   const failed = (error: string): BriefingRun => ({ ...info(), status: 'failed', error });
 
@@ -133,6 +137,7 @@ export async function runBriefing(
         (message.usage.cache_creation_input_tokens ?? 0) +
         (message.usage.cache_read_input_tokens ?? 0);
       outputTokens += message.usage.output_tokens;
+      responseModel = message.model;
       final = message;
     }
   } catch (err) {

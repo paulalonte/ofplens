@@ -13,14 +13,15 @@ import {
 import type { Reference } from './reference';
 
 export interface Grade {
-  /** Every applicable check passed (and there was a briefing to check). */
+  /** A briefing was produced and every applicable check passed. */
   pass: boolean;
   checks: CheckResult[];
 }
 
 /**
  * Grades one briefing against the case's tool data. `briefing` is null when the run produced
- * none (an API error, no JSON, a schema failure): every check then fails with `failure`.
+ * none (an API error, no JSON, a schema failure): "valid answer" then fails with `failure` and
+ * the other checks do not apply, so each check's rate measures only its own thing.
  */
 export function gradeBriefing(
   briefing: Briefing | null,
@@ -28,10 +29,15 @@ export function gradeBriefing(
   failure = 'No briefing was produced.',
 ): Grade {
   if (!briefing) {
-    const checks = CHECK_IDS.map((id): CheckResult => ({ id, pass: false, reasons: [failure] }));
+    const checks = CHECK_IDS.map((id): CheckResult =>
+      id === 'valid_answer'
+        ? { id, pass: false, reasons: [failure] }
+        : { id, pass: null, reasons: [] },
+    );
     return { pass: false, checks };
   }
-  const checks = [
+  const checks: CheckResult[] = [
+    { id: 'valid_answer', pass: true, reasons: [] },
     checkGuardrails(briefing, reference),
     checkRisk(briefing, reference),
     checkNoInventedWeather(briefing, reference),

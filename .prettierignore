@@ -12,3 +12,5 @@ apps/web/src/routeTree.gen.ts
 # Playwright output
 e2e/playwright-report/
 e2e/test-results/
+# Eval results (JSON lines written by pnpm eval)
+packages/evals/runs/

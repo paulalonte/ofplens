@@ -164,6 +164,7 @@ function crashedRun(model: string, err: unknown): BriefingRun {
     costUsd: null,
     latencyMs: 0,
     turns: 0,
+    responseModel: null,
   };
 }
 

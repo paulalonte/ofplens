@@ -23,6 +23,8 @@ export function weatherCodes(raw: string): Set<string> {
     )
       codes.add('GUST');
     if (/^(?:LLWS|WS)$/.test(token) || token.startsWith('WS')) codes.add('WS');
+    // SIGMET bulletins name CB and TCU on their own ("CB OBS WI 150NM OF CENTRE").
+    if (token === 'CB' || token === 'TCU') codes.add(token);
     const match = WX_GROUP.exec(token);
     const body = match?.[1];
     if (!body || body.length % 2 !== 0) continue;

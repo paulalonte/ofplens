@@ -9,3 +9,7 @@ coverage/
 .DS_Store
 playwright-report/
 test-results/
+# Eval output: results.jsonl, errors.jsonl and meta.json are kept; traces and the report are
+# rebuilt (pnpm eval:report)
+packages/evals/runs/*/traces/
+packages/evals/runs/report.html
