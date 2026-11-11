@@ -39,6 +39,7 @@ const OfpRunway = z.object({
   length_tora: int,
   length_lda: int,
   magnetic_course: int,
+  true_course: int,
   headwind_component: int,
   crosswind_component: int,
 });
@@ -64,6 +65,8 @@ const RunwayPlan = z.object({
   /** "dry", "wet", ... as SimBrief writes it, lower case. */
   surface: z.string().nullable(),
   magneticCourseDeg: nint,
+  /** For live METAR winds, which are true. */
+  trueCourseDeg: nint,
   /** Negative = tailwind. */
   headwindKt: nint,
   /** Always positive; the side is in `crosswindFrom`. */
@@ -116,6 +119,7 @@ function runwayPlan(conditions: Conditions, runway: Runway | undefined) {
     altimeterInHg: conditions.altimeter,
     surface: conditions.surface_condition?.toLowerCase() ?? null,
     magneticCourseDeg: course,
+    trueCourseDeg: runway?.true_course ?? null,
     headwindKt: runway?.headwind_component ?? null,
     crosswindKt: crosswind === null ? null : Math.abs(crosswind),
     crosswindFrom: crosswindSide(conditions.wind_direction, course, crosswind),
