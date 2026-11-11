@@ -1,0 +1,8908 @@
+[
+  {
+    "icaoId": "SVMI",
+    "firId": "SVZM",
+    "firName": "SVZM MAIQUETIA",
+    "receiptTime": "2026-11-11T07:56:39.292Z",
+    "validTimeFrom": 1794384000,
+    "validTimeTo": 1794402000,
+    "seriesId": "02",
+    "hazard": "TS",
+    "qualifier": "EMBD",
+    "base": null,
+    "top": null,
+    "geom": "AREA",
+    "coords": [
+      {
+        "lon": -67.633,
+        "lat": 11.65
+      },
+      {
+        "lon": -67.1,
+        "lat": 6.783
+      },
+      {
+        "lon": -65.417,
+        "lat": 4.833
+      },
+      {
+        "lon": -61.833,
+        "lat": 5.133
+      },
+      {
+        "lon": -62.65,
+        "lat": 9.4
+      },
+      {
+        "lon": -65.417,
+        "lat": 11.283
+      }
+    ],
+    "dir": null,
+    "spd": null,
+    "chng": null,
+    "rawSigmet": "WSVN31 SVMI 110800\nSVZM SIGMET 02 VALID 110800/111300 SVMI-\nSVZM MAIQUETIA FIR EMBD TS OBS AT 0800Z WI N1139 W06738 N0647 W06706 N0450 W06485 N0468 W06150 N0924 W06239 N1117 W06525 WI N1139 W06738 TOP FL240 MOV NW INTSF="
+  },
+  {
+    "icaoId": "MHTG",
+    "firId": "MHTG",
+    "firName": "MHCC CENTRAL AMERICAN",
+    "receiptTime": "2026-11-11T08:42:48.987Z",
+    "validTimeFrom": 1794386400,
+    "validTimeTo": 1794408000,
+    "seriesId": "A2",
+    "hazard": "VA",
+    "qualifier": "SANTA MARIA",
+    "base": 0,
+    "top": 13000,
+    "geom": "AREA",
+    "coords": [
+      {
+        "lon": -91.817,
+        "lat": 14.783
+      },
+      {
+        "lon": -91.533,
+        "lat": 14.783
+      },
+      {
+        "lon": -91.533,
+        "lat": 14.717
+      },
+      {
+        "lon": -91.883,
+        "lat": 14.633
+      },
+      {
+        "lon": -91.817,
+        "lat": 14.783
+      }
+    ],
+    "dir": "W",
+    "spd": "5",
+    "chng": null,
+    "rawSigmet": "WVHO31 MHTG 110840\nMHTG SIGMET A2 VALID 110840/111440 MHTG-\nMHCC CENTRAL AMERICAN FIR VA SANTA MARIA PSN N1445 W09133\nVA CLD OBS AT 0640Z SFC/FL130 N1447 W09149 - N1447 W09132\n- N1443 W09132 - N1438 W09153 - N1447 W09149 MOV W 5KT \nFCST 1230Z VA CLD SFC/FL130 N1446 W09134 - N1442 W09121 - \nN1435 W09125 - N1443 W09140 - N1446 W09134="
+  },
+  {
+    "icaoId": "MHTG",
+    "firId": "MHTG",
+    "firName": "MHCC CENTRAL AMERICAN",
+    "receiptTime": "2026-11-11T08:42:48.992Z",
+    "validTimeFrom": 1794386400,
+    "validTimeTo": 1794408000,
+    "seriesId": "A2F",
+    "hazard": "VA",
+    "qualifier": "SANTA MARIA",
+    "base": 0,
+    "top": 13000,
+    "geom": "AREA",
+    "coords": [
+      {
+        "lon": -91.567,
+        "lat": 14.767
+      },
+      {
+        "lon": -91.35,
+        "lat": 14.7
+      },
+      {
+        "lon": -91.417,
+        "lat": 14.583
+      },
+      {
+        "lon": -91.667,
+        "lat": 14.717
+      },
+      {
+        "lon": -91.567,
+        "lat": 14.767
+      }
+    ],
+    "dir": "W",
+    "spd": "5",
+    "chng": null,
+    "rawSigmet": "WVHO31 MHTG 110840\nMHTG SIGMET A2 VALID 110840/111440 MHTG-\nMHCC CENTRAL AMERICAN FIR VA SANTA MARIA PSN N1445 W09133\nVA CLD OBS AT 0640Z SFC/FL130 N1447 W09149 - N1447 W09132\n- N1443 W09132 - N1438 W09153 - N1447 W09149 MOV W 5KT \nFCST 1230Z VA CLD SFC/FL130 N1446 W09134 - N1442 W09121 - \nN1435 W09125 - N1443 W09140 - N1446 W09134="
+  },
+  {
+    "icaoId": "LEMM",
+    "firId": "GCCC",
+    "firName": "GCCC CANARIAS",
+    "receiptTime": "2026-11-11T08:37:57.285Z",
+    "validTimeFrom": 1794387600,
+    "validTimeTo": 1794402000,
+    "seriesId": "12",
+    "hazard": "MTW",
+    "qualifier": "SEV",
+    "base": null,
+    "top": null,
+    "geom": "AREA",
+    "coords": [
+      {
+        "lon": -15.9,
+        "lat": 28.35
+      },
+      {
+        "lon": -15.25,
+        "lat": 27.567
+      },
+      {
+        "lon": -14.75,
+        "lat": 28.5
+      },
+      {
+        "lon": -15.9,
+        "lat": 28.35
+      }
+    ],
+    "dir": null,
+    "spd": null,
+    "chng": null,
+    "rawSigmet": "WSCR31 LEMM 110900\nGCCC SIGMET 12 VALID 110900/111300 GCGC-\nGCCC CANARIAS FIR/UIR SEV MTW FCST WI N2821 W01554 - N2734\nW01515 - N2830 W01445 - N2821 W01554  FL020-040/300-350 STNR NC="
+  },
+  {
+    "icaoId": "LPMG",
+    "firId": "LPPC",
+    "firName": "LPPC LISBOA",
+    "receiptTime": "2026-11-11T08:50:31.679Z",
+    "validTimeFrom": 1794387600,
+    "validTimeTo": 1794402000,
+    "seriesId": "U05",
+    "hazard": "TURB",
+    "qualifier": "SEV",
+    "base": 20000,
+    "top": 43000,
+    "geom": "AREA",
+    "coords": [
+      {
+        "lon": -8.694,
+        "lat": 42.016
+      },
+      {
+        "lon": -8.85,
+        "lat": 41.86
+      },
+      {
+        "lon": -10.01,
+        "lat": 42
+      },
+      {
+        "lon": -11.151,
+        "lat": 42.382
+      },
+      {
+        "lon": -15,
+        "lat": 37.267
+      },
+      {
+        "lon": -15,
+        "lat": 36.95
+      },
+      {
+        "lon": -13.733,
+        "lat": 35.833
+      },
+      {
+        "lon": -8.583,
+        "lat": 42
+      },
+      {
+        "lon": -8.694,
+        "lat": 42.016
+      }
+    ],
+    "dir": "NNE",
+    "spd": "30",
+    "chng": "NC",
+    "rawSigmet": "WSPO31 LPMG 110850\nLPPC SIGMET U05 VALID 110900/111300 LPPT-\nLPPC LISBOA FIR SEV TURB FCST WI N42 W00835 - N4223 W01109 - N3716\nW015 - N3657 W015 - N3550 W01344 - N42 W00835 FL200/430 MOV NNE 30KT\nNC="
+  },
+  {
+    "icaoId": "CWAO",
+    "firId": "CZQX/O",
+    "firName": "CZQX GANDER OCEANIC",
+    "receiptTime": "2026-11-11T09:04:10.570Z",
+    "validTimeFrom": 1794387600,
+    "validTimeTo": 1794402000,
+    "seriesId": "K5",
+    "hazard": "TS",
+    "qualifier": "FRQ",
+    "base": null,
+    "top": 34000,
+    "geom": "AREA",
+    "coords": [
+      {
+        "lon": -42.793,
+        "lat": 45
+      },
+      {
+        "lon": -44.207,
+        "lat": 45
+      },
+      {
+        "lon": -44.207,
+        "lat": 45.218
+      },
+      {
+        "lon": -47.367,
+        "lat": 46.572
+      },
+      {
+        "lon": -46.633,
+        "lat": 47.428
+      },
+      {
+        "lon": -42.793,
+        "lat": 45.782
+      },
+      {
+        "lon": -42.793,
+        "lat": 45
+      }
+    ],
+    "dir": "E",
+    "spd": "20",
+    "chng": "WKN",
+    "rawSigmet": "WSNT01 CWAO 110903\nCZQX SIGMET K5 VALID 110900/111300 CWUL-\nCZQX GANDER OCEANIC FIR/CTA FRQ TS OBS WI 60NM WID LINE BTN N4500 W04330 - N4530\nW04330 - N4700 W04700 TOP FL340 MOV E 20KT WKN="
+  },
+  {
+    "icaoId": "MHTG",
+    "firId": "MHTG",
+    "firName": "MHCC CENTRAL AMERICAN",
+    "receiptTime": "2026-11-11T09:02:40.774Z",
+    "validTimeFrom": 1794387660,
+    "validTimeTo": 1794409260,
+    "seriesId": "2",
+    "hazard": "VA",
+    "qualifier": "FUEGO",
+    "base": 0,
+    "top": 14000,
+    "geom": "AREA",
+    "coords": [
+      {
+        "lon": -90.867,
+        "lat": 14.533
+      },
+      {
+        "lon": -90.817,
+        "lat": 14.5
+      },
+      {
+        "lon": -90.85,
+        "lat": 14.433
+      },
+      {
+        "lon": -90.9,
+        "lat": 14.45
+      },
+      {
+        "lon": -90.867,
+        "lat": 14.533
+      }
+    ],
+    "dir": "NE",
+    "spd": "5",
+    "chng": null,
+    "rawSigmet": "WVHO31 MHTG 110901\nMHTG SIGMET 2 VALID 110901/111501 MHTG-\nMHCC CENTRAL AMERICAN FIR VA FUEGO PSN N1428 W09052\nVA CLD OBS AT 0820Z SFC/FL140 N1432 W09052 - N1430 W09049\n- N1426 W09051 - N1427 W09054 - N1432 W09052 MOV NE 5KT \nFCST 1430Z VA CLD SFC/FL140 N1431 W09052 - N1428 W09046 - \nN1425 W09048 - N1427 W09053 - N1431 W09052="
+  },
+  {
+    "icaoId": "MHTG",
+    "firId": "MHTG",
+    "firName": "MHCC CENTRAL AMERICAN",
+    "receiptTime": "2026-11-11T09:02:40.780Z",
+    "validTimeFrom": 1794387660,
+    "validTimeTo": 1794409260,
+    "seriesId": "2F",
+    "hazard": "VA",
+    "qualifier": "FUEGO",
+    "base": 0,
+    "top": 14000,
+    "geom": "AREA",
+    "coords": [
+      {
+        "lon": -90.867,
+        "lat": 14.517
+      },
+      {
+        "lon": -90.767,
+        "lat": 14.467
+      },
+      {
+        "lon": -90.8,
+        "lat": 14.417
+      },
+      {
+        "lon": -90.883,
+        "lat": 14.45
+      },
+      {
+        "lon": -90.867,
+        "lat": 14.517
+      }
+    ],
+    "dir": "NE",
+    "spd": "5",
+    "chng": null,
+    "rawSigmet": "WVHO31 MHTG 110901\nMHTG SIGMET 2 VALID 110901/111501 MHTG-\nMHCC CENTRAL AMERICAN FIR VA FUEGO PSN N1428 W09052\nVA CLD OBS AT 0820Z SFC/FL140 N1432 W09052 - N1430 W09049\n- N1426 W09051 - N1427 W09054 - N1432 W09052 MOV NE 5KT \nFCST 1430Z VA CLD SFC/FL140 N1431 W09052 - N1428 W09046 - \nN1425 W09048 - N1427 W09053 - N1431 W09052="
+  },
+  {
+    "icaoId": "OOMS",
+    "firId": "OOMM",
+    "firName": "OOMM MUSCAT",
+    "receiptTime": "2026-11-11T09:03:21.048Z",
+    "validTimeFrom": 1794387900,
+    "validTimeTo": 1794402300,
+    "seriesId": "A1",
+    "hazard": "TS",
+    "qualifier": "EMBD",
+    "base": null,
+    "top": 39000,
+    "geom": "AREA",
+    "coords": [
+      {
+        "lon": 57.48,
+        "lat": 25.025
+      },
+      {
+        "lon": 56.71,
+        "lat": 25.59
+      },
+      {
+        "lon": 56.75,
+        "lat": 26.18
+      },
+      {
+        "lon": 56.596,
+        "lat": 26.438
+      },
+      {
+        "lon": 56.483,
+        "lat": 26.617
+      },
+      {
+        "lon": 56.1,
+        "lat": 26.317
+      },
+      {
+        "lon": 56.09,
+        "lat": 26.271
+      },
+      {
+        "lon": 56.21,
+        "lat": 25.59
+      },
+      {
+        "lon": 56.55,
+        "lat": 25.01
+      },
+      {
+        "lon": 55.62,
+        "lat": 24.02
+      },
+      {
+        "lon": 55.602,
+        "lat": 23.965
+      },
+      {
+        "lon": 58.683,
+        "lat": 22.233
+      },
+      {
+        "lon": 58.933,
+        "lat": 23.217
+      },
+      {
+        "lon": 57.033,
+        "lat": 24.017
+      },
+      {
+        "lon": 57.48,
+        "lat": 25.025
+      }
+    ],
+    "dir": "ENE",
+    "spd": "0",
+    "chng": "INTSF",
+    "rawSigmet": "WSOM31 OOMS 110903\nOOMM SIGMET A1 VALID 110905/111305 OOMS-\nOOMM MUSCAT FIR\nEMBD TS FCST WI N2637 E05629 - N2502 E05729 - N2401 E05702 - N2313\nE05856 - N2214 E05841 - N2358 E05536 - N2619 E05606 - N2637 E05629\nTOP FL390 MOV ENE INTSF="
+  },
+  {
+    "icaoId": "WIII",
+    "firId": "WIIF",
+    "firName": "WIIF JAKARTA",
+    "receiptTime": "2026-11-11T09:09:02.419Z",
+    "validTimeFrom": 1794388080,
+    "validTimeTo": 1794402300,
+    "seriesId": "03",
+    "hazard": "TS",
+    "qualifier": "EMBD",
+    "base": null,
+    "top": 52000,
+    "geom": "AREA",
+    "coords": [
+      {
+        "lon": 103.65,
+        "lat": -4.433
+      },
+      {
+        "lon": 103.267,
+        "lat": -5.217
+      },
+      {
+        "lon": 101.2,
+        "lat": -3.6
+      },
+      {
+        "lon": 98.783,
+        "lat": 0.067
+      },
+      {
+        "lon": 99.383,
+        "lat": 1.45
+      },
+      {
+        "lon": 103.65,
+        "lat": -4.433
+      }
+    ],
+    "dir": "S",
+    "spd": "10",
+    "chng": "INTSF",
+    "rawSigmet": "WSID20 WIII 110908\nWIIF SIGMET 03 VALID 110908/111305 WIII- WIIF JAKARTA FIR EMBD TS OBS\nWI S0426 E10339 - S0513 E10316 - S0336 E10112 - N0004 E09847 - N0127\nE09923 - S0426 E10339 TOP FL520 MOV S 10KT INTSF="
+  },
+  {
+    "icaoId": "PHFO",
+    "firId": "KZAK",
+    "firName": "OAKLAND OCEANIC",
+    "receiptTime": "2026-11-11T09:09:42.197Z",
+    "validTimeFrom": 1794388200,
+    "validTimeTo": 1794402600,
+    "seriesId": "OSCAR 6",
+    "hazard": "TS",
+    "qualifier": "EMBD",
+    "base": null,
+    "top": 56000,
+    "geom": "AREA",
+    "coords": [
+      {
+        "lon": -143.25,
+        "lat": 9.75
+      },
+      {
+        "lon": -140,
+        "lat": 11
+      },
+      {
+        "lon": -140,
+        "lat": 6.75
+      },
+      {
+        "lon": -143.75,
+        "lat": 7
+      },
+      {
+        "lon": -143.25,
+        "lat": 9.75
+      }
+    ],
+    "dir": "-",
+    "spd": "0",
+    "chng": "NC",
+    "rawSigmet": "WSPA02 PHFO 110909\nKZAK SIGMET OSCAR 6 VALID 110910/111310 PHFO-\nOAKLAND OCEANIC FIR EMBD TS OBS AT 0905Z WI N0945 W14315 - N1100\nW14000 - N0645 W14000 - N0700 W14345 - N0945 W14315. TOP FL560. STNR.\nNC."
+  },
+  {
+    "icaoId": "FSIA",
+    "firId": "FSSS",
+    "firName": "FSSS SEYCHELLES",
+    "receiptTime": "2026-11-11T09:14:10.003Z",
+    "validTimeFrom": 1794388200,
+    "validTimeTo": 1794402600,
+    "seriesId": "A03",
+    "hazard": "TS",
+    "qualifier": "EMBD",
+    "base": null,
+    "top": 39000,
+    "geom": "AREA",
+    "coords": [
+      {
+        "lon": 51.417,
+        "lat": -5.483
+      },
+      {
+        "lon": 51.467,
+        "lat": -9.133
+      },
+      {
+        "lon": 56.9,
+        "lat": -8.917
+      },
+      {
+        "lon": 51.417,
+        "lat": -5.483
+      }
+    ],
+    "dir": "-",
+    "spd": "0",
+    "chng": "WKN",
+    "rawSigmet": "WSSC31 FSIA 110905\nFSSS SIGMET A03 VALID 110910/111310 FSIA-\nFSSS SEYCHELLES FIR EMBD TS OBS WI S0529 E05125 - S0908 E05128 - S0855 E05654 - S0529 E05125 TOP ABV FL390 STNR WKN="
+  },
+  {
+    "icaoId": "WIII",
+    "firId": "WIIF",
+    "firName": "WIIF JAKARTA",
+    "receiptTime": "2026-11-11T09:15:53.461Z",
+    "validTimeFrom": 1794388500,
+    "validTimeTo": 1794402600,
+    "seriesId": "04",
+    "hazard": "TS",
+    "qualifier": "EMBD",
+    "base": null,
+    "top": 53000,
+    "geom": "AREAS",
+    "coords": [
+      [
+        {
+          "lon": 110.751,
+          "lat": -2.533
+        },
+        {
+          "lon": 113.62,
+          "lat": 1.23
+        },
+        {
+          "lon": 113.52,
+          "lat": 1.31
+        },
+        {
+          "lon": 113.4,
+          "lat": 1.29
+        },
+        {
+          "lon": 113.01,
+          "lat": 1.43
+        },
+        {
+          "lon": 113.01,
+          "lat": 1.55
+        },
+        {
+          "lon": 112.47,
+          "lat": 1.57
+        },
+        {
+          "lon": 112.18,
+          "lat": 1.45
+        },
+        {
+          "lon": 112.19,
+          "lat": 1.38
+        },
+        {
+          "lon": 112.09,
+          "lat": 1.14
+        },
+        {
+          "lon": 111.91,
+          "lat": 1.11
+        },
+        {
+          "lon": 111.81,
+          "lat": 1.01
+        },
+        {
+          "lon": 111.64,
+          "lat": 1.03
+        },
+        {
+          "lon": 111.5,
+          "lat": 0.96
+        },
+        {
+          "lon": 111.22,
+          "lat": 1.07
+        },
+        {
+          "lon": 110.88,
+          "lat": 1.01
+        },
+        {
+          "lon": 110.78,
+          "lat": 0.91
+        },
+        {
+          "lon": 110.61,
+          "lat": 0.89
+        },
+        {
+          "lon": 110.55,
+          "lat": 0.85
+        },
+        {
+          "lon": 110.46,
+          "lat": 0.88
+        },
+        {
+          "lon": 110.36,
+          "lat": 0.98
+        },
+        {
+          "lon": 110.27,
+          "lat": 0.99
+        },
+        {
+          "lon": 110.17,
+          "lat": 1.17
+        },
+        {
+          "lon": 110.04,
+          "lat": 1.25
+        },
+        {
+          "lon": 109.66,
+          "lat": 1.6
+        },
+        {
+          "lon": 109.64,
+          "lat": 1.78
+        },
+        {
+          "lon": 109.53,
+          "lat": 1.84
+        },
+        {
+          "lon": 109.54,
+          "lat": 1.92
+        },
+        {
+          "lon": 109.65,
+          "lat": 2.08
+        },
+        {
+          "lon": 109.32,
+          "lat": 1.93
+        },
+        {
+          "lon": 109.267,
+          "lat": 1.842
+        },
+        {
+          "lon": 109.267,
+          "lat": -2.533
+        },
+        {
+          "lon": 110.751,
+          "lat": -2.533
+        }
+      ],
+      [
+        {
+          "lon": 109.267,
+          "lat": 2.842
+        },
+        {
+          "lon": 109.29,
+          "lat": 2.86
+        },
+        {
+          "lon": 109.267,
+          "lat": 2.902
+        },
+        {
+          "lon": 109.267,
+          "lat": 2.842
+        }
+      ]
+    ],
+    "dir": "S",
+    "spd": "5",
+    "chng": "INTSF",
+    "rawSigmet": "WSID20 WIII 110915\nWIIF SIGMET 04 VALID 110915/111310 WIII- WIIF JAKARTA FIR EMBD TS OBS\nN OF S0232 AND E OF E10916 TOP FL530 MOV S 05KT INTSF="
+  },
+  {
+    "icaoId": "OEJD",
+    "firId": "OEJD",
+    "firName": "OEJD JEDDAH",
+    "receiptTime": "2026-11-11T09:23:04.106Z",
+    "validTimeFrom": 1794388800,
+    "validTimeTo": 1794402000,
+    "seriesId": "02",
+    "hazard": "TS",
+    "qualifier": "EMBD",
+    "base": null,
+    "top": 39000,
+    "geom": "AREA",
+    "coords": [
+      {
+        "lon": 50.907,
+        "lat": 24.621
+      },
+      {
+        "lon": 50.88,
+        "lat": 24.64
+      },
+      {
+        "lon": 50.79,
+        "lat": 24.78
+      },
+      {
+        "lon": 50.72,
+        "lat": 25.029
+      },
+      {
+        "lon": 50.345,
+        "lat": 25.725
+      },
+      {
+        "lon": 50.33,
+        "lat": 25.74
+      },
+      {
+        "lon": 50.331,
+        "lat": 25.752
+      },
+      {
+        "lon": 49.245,
+        "lat": 27.766
+      },
+      {
+        "lon": 49.181,
+        "lat": 27.838
+      },
+      {
+        "lon": 39.683,
+        "lat": 21.95
+      },
+      {
+        "lon": 42.286,
+        "lat": 16.14
+      },
+      {
+        "lon": 42.77,
+        "lat": 16.36
+      },
+      {
+        "lon": 43.17,
+        "lat": 16.67
+      },
+      {
+        "lon": 43.19,
+        "lat": 17.34
+      },
+      {
+        "lon": 43.44,
+        "lat": 17.52
+      },
+      {
+        "lon": 43.78,
+        "lat": 17.35
+      },
+      {
+        "lon": 42.783,
+        "lat": 21
+      },
+      {
+        "lon": 50.907,
+        "lat": 24.621
+      }
+    ],
+    "dir": "NE",
+    "spd": "0",
+    "chng": "INTSF",
+    "rawSigmet": "WSSD20 OEJD 110922\nOEJD SIGMET 02 VALID 110920/111300 OEJN-\nOEJD JEDDAH  FIR EMBD TS OBS WI N1651 E04355 - N1602 E04220 - N2157\nE03941 - N2751 E04912 - N2438 E05056 - N2100 E04247 - N1651 E04355\nTOP ABV FL390  MOV NE  INTSF ="
+  },
+  {
+    "icaoId": "VVGL",
+    "firId": "VVTS",
+    "firName": "VVHM HO CHI MINH",
+    "receiptTime": "2026-11-11T09:17:47.481Z",
+    "validTimeFrom": 1794388800,
+    "validTimeTo": 1794403200,
+    "seriesId": "4",
+    "hazard": "TS",
+    "qualifier": "EMBD",
+    "base": null,
+    "top": null,
+    "geom": "AREA",
+    "coords": [
+      {
+        "lon": 107.514,
+        "lat": 12.839
+      },
+      {
+        "lon": 107.54,
+        "lat": 12.8
+      },
+      {
+        "lon": 107.56,
+        "lat": 12.54
+      },
+      {
+        "lon": 107.5,
+        "lat": 12.33
+      },
+      {
+        "lon": 107.39,
+        "lat": 12.25
+      },
+      {
+        "lon": 107.32,
+        "lat": 12.33
+      },
+      {
+        "lon": 107.15,
+        "lat": 12.28
+      },
+      {
+        "lon": 106.93,
+        "lat": 12.07
+      },
+      {
+        "lon": 106.855,
+        "lat": 12.07
+      },
+      {
+        "lon": 106.067,
+        "lat": 11.15
+      },
+      {
+        "lon": 106.029,
+        "lat": 11.126
+      },
+      {
+        "lon": 106.19,
+        "lat": 10.98
+      },
+      {
+        "lon": 106.12,
+        "lat": 10.93
+      },
+      {
+        "lon": 106.18,
+        "lat": 10.77
+      },
+      {
+        "lon": 106.05,
+        "lat": 10.81
+      },
+      {
+        "lon": 105.93,
+        "lat": 10.9
+      },
+      {
+        "lon": 105.86,
+        "lat": 10.84
+      },
+      {
+        "lon": 105.787,
+        "lat": 10.97
+      },
+      {
+        "lon": 102.662,
+        "lat": 8.96
+      },
+      {
+        "lon": 102.999,
+        "lat": 7.084
+      },
+      {
+        "lon": 103.016,
+        "lat": 7.02
+      },
+      {
+        "lon": 103.423,
+        "lat": 7.017
+      },
+      {
+        "lon": 108,
+        "lat": 7.017
+      },
+      {
+        "lon": 113.9,
+        "lat": 10.55
+      },
+      {
+        "lon": 109.267,
+        "lat": 14.883
+      },
+      {
+        "lon": 107.514,
+        "lat": 12.839
+      }
+    ],
+    "dir": null,
+    "spd": null,
+    "chng": null,
+    "rawSigmet": "WSVS31 VVGL 110920\nVVHM SIGMET 4 VALID 110920/111320 VVGL-\nVVHM HO CHI MINH FIR EMBD TS OBS WI N1033 E11354 - N0701 E10800 -\nN0701 E10301 - N0852 E10231 - N1109 E10604 - N1453 E10916 - N1033\nE11354 TO="
+  },
+  {
+    "icaoId": "PHFO",
+    "firId": "KZAK",
+    "firName": "OAKLAND OCEANIC",
+    "receiptTime": "2026-11-11T09:19:00.604Z",
+    "validTimeFrom": 1794388800,
+    "validTimeTo": 1794410400,
+    "seriesId": "XRAY 21",
+    "hazard": "TC",
+    "qualifier": "PENA",
+    "base": null,
+    "top": 59000,
+    "geom": "AREA",
+    "coords": [
+      {
+        "lon": -169,
+        "lat": 12.25
+      },
+      {
+        "lon": -165.5,
+        "lat": 14.75
+      },
+      {
+        "lon": -162.75,
+        "lat": 11
+      },
+      {
+        "lon": -167.5,
+        "lat": 8.25
+      },
+      {
+        "lon": -169,
+        "lat": 12.25
+      }
+    ],
+    "dir": "W",
+    "spd": "8",
+    "chng": "NC",
+    "rawSigmet": "WCPA11 PHFO 110918\n\nKZAK SIGMET XRAY 21 VALID 110920/111520 PHFO-\nOAKLAND OCEANIC FIR TC PENA PSN N1006 W16642 CB OBS AT 0900Z WI N1215\nW16900 - N1445 W16530 - N1100 W16245 - N0815 W16730 - N1215 W16900.\nTOP FL590. MOV W 08KT. NC. FCST AT 1500Z TC CENTER PSN N1001 W16750."
+  },
+  {
+    "icaoId": "PHFO",
+    "firId": "KZAK",
+    "firName": "OAKLAND OCEANIC",
+    "receiptTime": "2026-11-11T09:19:00.614Z",
+    "validTimeFrom": 1794388800,
+    "validTimeTo": 1794410400,
+    "seriesId": "XRAY 21F",
+    "hazard": "TC",
+    "qualifier": "PENA",
+    "base": null,
+    "top": 59000,
+    "geom": "AREA",
+    "coords": [
+      {
+        "lon": -169,
+        "lat": 12.25
+      },
+      {
+        "lon": -165.5,
+        "lat": 14.75
+      },
+      {
+        "lon": -162.75,
+        "lat": 11
+      },
+      {
+        "lon": -167.5,
+        "lat": 8.25
+      },
+      {
+        "lon": -169,
+        "lat": 12.25
+      }
+    ],
+    "dir": "W",
+    "spd": "8",
+    "chng": "NC",
+    "rawSigmet": "WCPA11 PHFO 110918\n\nKZAK SIGMET XRAY 21 VALID 110920/111520 PHFO-\nOAKLAND OCEANIC FIR TC PENA PSN N1006 W16642 CB OBS AT 0900Z WI N1215\nW16900 - N1445 W16530 - N1100 W16245 - N0815 W16730 - N1215 W16900.\nTOP FL590. MOV W 08KT. NC. FCST AT 1500Z TC CENTER PSN N1001 W16750."
+  },
+  {
+    "icaoId": "CWAO",
+    "firId": "CZEG",
+    "firName": "CZEG EDMONTON",
+    "receiptTime": "2026-11-11T09:27:00.095Z",
+    "validTimeFrom": 1794389100,
+    "validTimeTo": 1794403500,
+    "seriesId": "Q1",
+    "hazard": "MTW",
+    "qualifier": "SEV",
+    "base": 34000,
+    "top": 42000,
+    "geom": "AREA",
+    "coords": [
+      {
+        "lon": -120.224,
+        "lat": 54.146
+      },
+      {
+        "lon": -119.01,
+        "lat": 53.4
+      },
+      {
+        "lon": -117.46,
+        "lat": 51.78
+      },
+      {
+        "lon": -117.216,
+        "lat": 51.521
+      },
+      {
+        "lon": -115.761,
+        "lat": 50.357
+      },
+      {
+        "lon": -115.64,
+        "lat": 50.36
+      },
+      {
+        "lon": -115.15,
+        "lat": 49.94
+      },
+      {
+        "lon": -115.152,
+        "lat": 49.87
+      },
+      {
+        "lon": -114.064,
+        "lat": 49
+      },
+      {
+        "lon": -112.999,
+        "lat": 49
+      },
+      {
+        "lon": -111.863,
+        "lat": 49.608
+      },
+      {
+        "lon": -118.613,
+        "lat": 55.008
+      },
+      {
+        "lon": -120.224,
+        "lat": 54.146
+      }
+    ],
+    "dir": "-",
+    "spd": "0",
+    "chng": "NC",
+    "rawSigmet": "WSCN02 CWAO 110926\nCZEG SIGMET Q1 VALID 110925/111325 CWEG-\nCZEG EDMONTON FIR SEV MTW OBS AT 0905Z WI 90NM WID LINE BTN N4908 W11245 - N5432\nW11930 FL340/420 STNR NC="
+  },
+  {
+    "icaoId": "CWAO",
+    "firId": "CZVR",
+    "firName": "CZVR VANCOUVER",
+    "receiptTime": "2026-11-11T09:27:01.015Z",
+    "validTimeFrom": 1794389100,
+    "validTimeTo": 1794403500,
+    "seriesId": "R1",
+    "hazard": "MTW",
+    "qualifier": "SEV",
+    "base": 34000,
+    "top": 42000,
+    "geom": "AREAS",
+    "coords": [
+      [
+        {
+          "lon": -115.152,
+          "lat": 49.87
+        },
+        {
+          "lon": -115.15,
+          "lat": 49.94
+        },
+        {
+          "lon": -115.64,
+          "lat": 50.36
+        },
+        {
+          "lon": -115.761,
+          "lat": 50.357
+        },
+        {
+          "lon": -115.152,
+          "lat": 49.87
+        }
+      ],
+      [
+        {
+          "lon": -117.216,
+          "lat": 51.521
+        },
+        {
+          "lon": -117.46,
+          "lat": 51.78
+        },
+        {
+          "lon": -119.01,
+          "lat": 53.4
+        },
+        {
+          "lon": -120.224,
+          "lat": 54.146
+        },
+        {
+          "lon": -120.387,
+          "lat": 54.059
+        },
+        {
+          "lon": -117.216,
+          "lat": 51.521
+        }
+      ]
+    ],
+    "dir": "-",
+    "spd": "0",
+    "chng": "NC",
+    "rawSigmet": "WSCN01 CWAO 110926\nCZVR SIGMET R1 VALID 110925/111325 CWEG-\nCZVR VANCOUVER FIR SEV MTW OBS AT 0905Z WI 90NM WID LINE BTN N4908 W11245 -\nN5432 W11930 FL340/420 STNR NC="
+  },
+  {
+    "icaoId": "NTAA",
+    "firId": "NTTT",
+    "firName": "NTTT TAHITI",
+    "receiptTime": "2026-11-11T09:28:13.307Z",
+    "validTimeFrom": 1794389400,
+    "validTimeTo": 1794403800,
+    "seriesId": "A5",
+    "hazard": "TS",
+    "qualifier": "EMBD",
+    "base": null,
+    "top": 55000,
+    "geom": "AREA",
+    "coords": [
+      {
+        "lon": -146,
+        "lat": -14.5
+      },
+      {
+        "lon": -148.25,
+        "lat": -4.5
+      },
+      {
+        "lon": -143,
+        "lat": -1
+      },
+      {
+        "lon": -141.75,
+        "lat": -12.5
+      },
+      {
+        "lon": -146,
+        "lat": -14.5
+      }
+    ],
+    "dir": "-",
+    "spd": "0",
+    "chng": "NC",
+    "rawSigmet": "WSPF21 NTAA 110927\nNTTT SIGMET A5 VALID 110930/111330 NTAA-\nNTTT TAHITI FIR/UIR EMBD TS FCST WI S1430 W14600 - S0430 W14815 -\nS0100 W14300 - S1230 W14145 - S1430 W14600 TOP FL550 STNR NC="
+  },
+  {
+    "icaoId": "VCBI",
+    "firId": "VCCF",
+    "firName": "VCCF COLOMBO",
+    "receiptTime": "2026-11-11T09:25:24.395Z",
+    "validTimeFrom": 1794389400,
+    "validTimeTo": 1794403800,
+    "seriesId": "B01",
+    "hazard": "TS",
+    "qualifier": "EMBD",
+    "base": null,
+    "top": 46000,
+    "geom": "AREA",
+    "coords": [
+      {
+        "lon": 79.767,
+        "lat": 8.95
+      },
+      {
+        "lon": 80.75,
+        "lat": 7.317
+      },
+      {
+        "lon": 81.85,
+        "lat": 7.3
+      },
+      {
+        "lon": 80.883,
+        "lat": 5.783
+      },
+      {
+        "lon": 79.733,
+        "lat": 6.567
+      },
+      {
+        "lon": 79.417,
+        "lat": 8.333
+      },
+      {
+        "lon": 79.767,
+        "lat": 8.95
+      }
+    ],
+    "dir": "-",
+    "spd": "0",
+    "chng": "NC",
+    "rawSigmet": "WSSB31 VCBI 110930\nVCCF SIGMET B01 VALID 110930/111330 VCBI-\nVCCF COLOMBO FIR EMBD TS OBS WI \nN0857 E07946- N0719 E08045-\nN0718 E08151- N0547 E08053-\nN0634 E07944- N0820 E07925-\nN0857 E07946 TOP FL460 STNR NC="
+  },
+  {
+    "icaoId": "RPLL",
+    "firId": "RPHI",
+    "firName": "RPHI MANILA",
+    "receiptTime": "2026-11-11T09:33:15.490Z",
+    "validTimeFrom": 1794389700,
+    "validTimeTo": 1794404100,
+    "seriesId": "A02",
+    "hazard": "TS",
+    "qualifier": "EMBD",
+    "base": null,
+    "top": 53000,
+    "geom": "AREA",
+    "coords": [
+      {
+        "lon": 115.943,
+        "lat": 8.867
+      },
+      {
+        "lon": 116.49,
+        "lat": 8.41
+      },
+      {
+        "lon": 117.48,
+        "lat": 7.57
+      },
+      {
+        "lon": 119.998,
+        "lat": 4.002
+      },
+      {
+        "lon": 120,
+        "lat": 4
+      },
+      {
+        "lon": 121.333,
+        "lat": 4
+      },
+      {
+        "lon": 120.517,
+        "lat": 9.517
+      },
+      {
+        "lon": 116.983,
+        "lat": 10.733
+      },
+      {
+        "lon": 115.943,
+        "lat": 8.867
+      }
+    ],
+    "dir": "-",
+    "spd": "0",
+    "chng": "NC",
+    "rawSigmet": "WSPH31 RPLL 110933\nRPHI SIGMET A02 VALID 110935/111335 RPLL-\nRPHI MANILA FIR EMBD TS OBS WI \nN0931 E12031 - N0400 E12120 - N0400 E12000 - \nN0730 E11730 - N0851 E11556 - N1044 E11659 - N0931 E12031 \nTOP FL530 STNR NC="
+  },
+  {
+    "icaoId": "RURD",
+    "firId": "URRV",
+    "firName": "URRV ROSTOV-NA-DONU",
+    "receiptTime": "2026-11-11T09:44:49.035Z",
+    "validTimeFrom": 1794390300,
+    "validTimeTo": 1794402000,
+    "seriesId": "1",
+    "hazard": "TURB",
+    "qualifier": "SEV",
+    "base": 0,
+    "top": 15000,
+    "geom": "AREA",
+    "coords": [
+      {
+        "lon": 40.384,
+        "lat": 43.526
+      },
+      {
+        "lon": 40.52,
+        "lat": 43.51
+      },
+      {
+        "lon": 40.75,
+        "lat": 43.53
+      },
+      {
+        "lon": 41.116,
+        "lat": 43.394
+      },
+      {
+        "lon": 41.267,
+        "lat": 43.367
+      },
+      {
+        "lon": 41.717,
+        "lat": 44.517
+      },
+      {
+        "lon": 36.9,
+        "lat": 45.617
+      },
+      {
+        "lon": 36.783,
+        "lat": 44.8
+      },
+      {
+        "lon": 39.7,
+        "lat": 43.317
+      },
+      {
+        "lon": 39.883,
+        "lat": 43.617
+      },
+      {
+        "lon": 40.384,
+        "lat": 43.526
+      }
+    ],
+    "dir": "-",
+    "spd": "0",
+    "chng": "NC",
+    "rawSigmet": "WSRS31 RURD 110944\nURRV SIGMET 1 VALID 110945/111300 URRR-\nURRV ROSTOV-NA-DONU FIR SEV TURB FCST WI N4537 E03654 - N4431 E04143\n- N4322 E04116 - N4337 E03953 - N4319 E03942 - N4448 E03647 - N4537\nE03654 SFC/FL150 STNR NC="
+  },
+  {
+    "icaoId": "VOMM",
+    "firId": "VOMF",
+    "firName": "VOMF CHENNAI",
+    "receiptTime": "2026-11-11T09:50:32.676Z",
+    "validTimeFrom": 1794390600,
+    "validTimeTo": 1794405000,
+    "seriesId": "B01",
+    "hazard": "TS",
+    "qualifier": "EMBD",
+    "base": null,
+    "top": 46000,
+    "geom": "AREA",
+    "coords": [
+      {
+        "lon": 78.342,
+        "lat": 6.921
+      },
+      {
+        "lon": 76.82,
+        "lat": 6.16
+      },
+      {
+        "lon": 74.217,
+        "lat": 6.217
+      },
+      {
+        "lon": 74.05,
+        "lat": 7.583
+      },
+      {
+        "lon": 76.333,
+        "lat": 8.183
+      },
+      {
+        "lon": 78.6,
+        "lat": 7.617
+      },
+      {
+        "lon": 78.342,
+        "lat": 6.921
+      }
+    ],
+    "dir": "-",
+    "spd": "0",
+    "chng": "NC",
+    "rawSigmet": "WSIN31 VOMM 110940\nVOMF SIGMET B01 VALID 110950/111350 VOMM- VOMF CHENNAI FIR EMBD TS\nFCST WI N0735 E07403 - N0811 E07620 - N0737 E07836 - N0608 E07803 -\nN0613 E07413 - N0735 E07403 TOP FL460 STNR NC="
+  },
+  {
+    "icaoId": "CWAO",
+    "firId": "CZUL",
+    "firName": "CZUL MONTREAL",
+    "receiptTime": "2026-11-11T09:56:04.573Z",
+    "validTimeFrom": 1794390900,
+    "validTimeTo": 1794405300,
+    "seriesId": "H3",
+    "hazard": "TURB",
+    "qualifier": "SEV",
+    "base": 0,
+    "top": 4000,
+    "geom": "AREA",
+    "coords": [
+      {
+        "lon": -63,
+        "lat": 63.702
+      },
+      {
+        "lon": -63,
+        "lat": 64
+      },
+      {
+        "lon": -62.58,
+        "lat": 64.14
+      },
+      {
+        "lon": -61.755,
+        "lat": 65
+      },
+      {
+        "lon": -67.122,
+        "lat": 65
+      },
+      {
+        "lon": -69.607,
+        "lat": 62.407
+      },
+      {
+        "lon": -64.926,
+        "lat": 61.693
+      },
+      {
+        "lon": -63,
+        "lat": 63.702
+      }
+    ],
+    "dir": "-",
+    "spd": "0",
+    "chng": "NC",
+    "rawSigmet": "WSCN05 CWAO 110955\nCZUL SIGMET H3 VALID 110955/111355 CWEG-\nCZUL MONTREAL FIR SEV TURB FCST WI 120NM WID LINE BTN N6629 W06301 - N6203\nW06716 SFC/FL040 STNR NC="
+  },
+  {
+    "icaoId": "CWAO",
+    "firId": "CZEG",
+    "firName": "CZEG EDMONTON",
+    "receiptTime": "2026-11-11T09:56:07.336Z",
+    "validTimeFrom": 1794390900,
+    "validTimeTo": 1794405300,
+    "seriesId": "I3",
+    "hazard": "TURB",
+    "qualifier": "SEV",
+    "base": 0,
+    "top": 4000,
+    "geom": "AREA",
+    "coords": [
+      {
+        "lon": -61.755,
+        "lat": 65
+      },
+      {
+        "lon": -67.122,
+        "lat": 65
+      },
+      {
+        "lon": -65.357,
+        "lat": 66.841
+      },
+      {
+        "lon": -60.676,
+        "lat": 66.126
+      },
+      {
+        "lon": -61.755,
+        "lat": 65
+      }
+    ],
+    "dir": "-",
+    "spd": "0",
+    "chng": "NC",
+    "rawSigmet": "WSCN02 CWAO 110955\nCZEG SIGMET I3 VALID 110955/111355 CWEG-\nCZEG EDMONTON FIR SEV TURB FCST WI 120NM WID LINE BTN N6629 W06301 - N6203\nW06716 SFC/FL040 STNR NC="
+  },
+  {
+    "icaoId": "KKCI",
+    "firId": "KZAK",
+    "firName": "OAKLAND OCEANIC",
+    "receiptTime": "2026-11-11T09:52:25.616Z",
+    "validTimeFrom": 1794390900,
+    "validTimeTo": 1794405300,
+    "seriesId": "DELTA 4",
+    "hazard": "TS",
+    "qualifier": "FRQ",
+    "base": null,
+    "top": 56000,
+    "geom": "AREA",
+    "coords": [
+      {
+        "lon": -127.867,
+        "lat": 13.167
+      },
+      {
+        "lon": -125.25,
+        "lat": 8.883
+      },
+      {
+        "lon": -134.883,
+        "lat": 3.367
+      },
+      {
+        "lon": -140.1,
+        "lat": 3.483
+      },
+      {
+        "lon": -139.833,
+        "lat": 11.8
+      },
+      {
+        "lon": -127.867,
+        "lat": 13.167
+      }
+    ],
+    "dir": "-",
+    "spd": "0",
+    "chng": "NC",
+    "rawSigmet": "WSPN04 KKCI 110955\nKZAK SIGMET DELTA 4 VALID 110955/111355 KKCI-\nOAKLAND OCEANIC FIR FRQ TS OBS AT 0955Z WI N1310 W12752 - N0853\nW12515 - N0322 W13453 - N0329 W14006 - N1148 W13950 - N1310\nW12752. TOP FL560. STNR. NC."
+  },
+  {
+    "icaoId": "LEMM",
+    "firId": "GCCC",
+    "firName": "GCCC CANARIAS",
+    "receiptTime": "2026-11-11T10:01:56.902Z",
+    "validTimeFrom": 1794391080,
+    "validTimeTo": 1794402000,
+    "seriesId": "15",
+    "hazard": "TURB",
+    "qualifier": "SEV",
+    "base": 0,
+    "top": 15000,
+    "geom": "AREA",
+    "coords": [
+      {
+        "lon": -19.6,
+        "lat": 30.25
+      },
+      {
+        "lon": -17.41,
+        "lat": 31.62
+      },
+      {
+        "lon": -16.76,
+        "lat": 31.37
+      },
+      {
+        "lon": -16.18,
+        "lat": 31.38
+      },
+      {
+        "lon": -15.74,
+        "lat": 31.48
+      },
+      {
+        "lon": -15.517,
+        "lat": 31.379
+      },
+      {
+        "lon": -15.517,
+        "lat": 28.6
+      },
+      {
+        "lon": -19.6,
+        "lat": 30.083
+      },
+      {
+        "lon": -19.6,
+        "lat": 30.25
+      }
+    ],
+    "dir": "E",
+    "spd": "0",
+    "chng": "NC",
+    "rawSigmet": "WSCR31 LEMM 110958\nGCCC SIGMET 15 VALID 110958/111300 GCGC-\nGCCC CANARIAS FIR SEV TURB FCST N OF LINE N3005 W01936 - N2836\nW01531 SFC/FL150 MOV E NC="
+  },
+  {
+    "icaoId": "WAAA",
+    "firId": "WAAF",
+    "firName": "WAAF UJUNG PANDANG",
+    "receiptTime": "2026-11-11T10:00:31.218Z",
+    "validTimeFrom": 1794391140,
+    "validTimeTo": 1794405540,
+    "seriesId": "09",
+    "hazard": "TS",
+    "qualifier": "EMBD",
+    "base": null,
+    "top": 53000,
+    "geom": "AREA",
+    "coords": [
+      {
+        "lon": 141,
+        "lat": -4.217
+      },
+      {
+        "lon": 141,
+        "lat": -6.583
+      },
+      {
+        "lon": 139.4,
+        "lat": -5.983
+      },
+      {
+        "lon": 138.817,
+        "lat": -4.133
+      },
+      {
+        "lon": 140.617,
+        "lat": -3.65
+      },
+      {
+        "lon": 141,
+        "lat": -4.217
+      }
+    ],
+    "dir": "NW",
+    "spd": "5",
+    "chng": "INTSF",
+    "rawSigmet": "WSID21 WAAA 110959\nWAAF SIGMET 09 VALID 110959/111359 WAAA- WAAF UJUNG PANDANG FIR EMBD\nTS OBS WI S0413 E14100 - S0635 E14100 - S0559 E13924 - S0408 E13849 -\nS0339 E14037 - S0413 E14100 TOP FL530 MOV NW 05KT INTSF="
+  },
+  {
+    "icaoId": "BICC",
+    "firId": "BIRD",
+    "firName": "BIRD REYKJAVIK",
+    "receiptTime": "2026-11-11T09:15:25.814Z",
+    "validTimeFrom": 1794391200,
+    "validTimeTo": 1794402000,
+    "seriesId": "U02",
+    "hazard": "TURB",
+    "qualifier": "SEV",
+    "base": 0,
+    "top": 8000,
+    "geom": "AREA",
+    "coords": [
+      {
+        "lon": -12.667,
+        "lat": 65.333
+      },
+      {
+        "lon": -15.333,
+        "lat": 63.833
+      },
+      {
+        "lon": -18,
+        "lat": 64.167
+      },
+      {
+        "lon": -14.5,
+        "lat": 66.167
+      },
+      {
+        "lon": -12.667,
+        "lat": 65.333
+      }
+    ],
+    "dir": "-",
+    "spd": "0",
+    "chng": "NC",
+    "rawSigmet": "WSIL31 BICC 110908\nBIRD SIGMET U02 VALID 111000/111300 BIRK-\nBIRD REYKJAVIK CTA\nSEV TURB FCST WI N6520 W01240 - N6350 W01520 - N6410 W01800 - N6610\nW01430 - N6520 W01240 SFC/FL080 STNR NC="
+  },
+  {
+    "icaoId": "FAOR",
+    "firId": "FAJO",
+    "firName": "FAJO JOHANNESBURG OCEANIC",
+    "receiptTime": "2026-11-11T09:51:28.865Z",
+    "validTimeFrom": 1794391200,
+    "validTimeTo": 1794405600,
+    "seriesId": "A03",
+    "hazard": "TURB",
+    "qualifier": "SEV",
+    "base": 24000,
+    "top": 34000,
+    "geom": "AREA",
+    "coords": [
+      {
+        "lon": -0.117,
+        "lat": -34.567
+      },
+      {
+        "lon": 12.75,
+        "lat": -37.667
+      },
+      {
+        "lon": 32.8,
+        "lat": -39.883
+      },
+      {
+        "lon": 34.1,
+        "lat": -45.267
+      },
+      {
+        "lon": -0.183,
+        "lat": -40.75
+      }
+    ],
+    "dir": null,
+    "spd": null,
+    "chng": null,
+    "rawSigmet": "WSZA21 FAOR 110949\nFAJO SIGMET A03 VALID 111000/111400 FAOR-\nFAJO JOHANNESBURG OCEANIC FIR SEV TURB FCST WI\nS3434 W00007 - S3740 E01245 - S3953 E03248 - S4516 E03406 -\nS4045 W00011 FL240/340="
+  },
+  {
+    "icaoId": "LEMM",
+    "firId": "LECM",
+    "firName": "LECM MADRID",
+    "receiptTime": "2026-11-11T09:40:36.544Z",
+    "validTimeFrom": 1794391200,
+    "validTimeTo": 1794405600,
+    "seriesId": "3",
+    "hazard": "TURB",
+    "qualifier": "SEV",
+    "base": 28000,
+    "top": 38000,
+    "geom": "AREA",
+    "coords": [
+      {
+        "lon": -3.406,
+        "lat": 44.129
+      },
+      {
+        "lon": -4,
+        "lat": 44.33
+      },
+      {
+        "lon": -8,
+        "lat": 45
+      },
+      {
+        "lon": -8.032,
+        "lat": 45
+      },
+      {
+        "lon": -9.983,
+        "lat": 43.983
+      },
+      {
+        "lon": -10.645,
+        "lat": 42.212
+      },
+      {
+        "lon": -10.583,
+        "lat": 42.192
+      },
+      {
+        "lon": -8.746,
+        "lat": 41.964
+      },
+      {
+        "lon": -8.64,
+        "lat": 42.07
+      },
+      {
+        "lon": -8.19,
+        "lat": 42.08
+      },
+      {
+        "lon": -8.08,
+        "lat": 42.06
+      },
+      {
+        "lon": -8.22,
+        "lat": 41.9
+      },
+      {
+        "lon": -8.218,
+        "lat": 41.898
+      },
+      {
+        "lon": -7.972,
+        "lat": 41.867
+      },
+      {
+        "lon": -7.965,
+        "lat": 41.87
+      },
+      {
+        "lon": -7.25,
+        "lat": 43.517
+      },
+      {
+        "lon": -3.15,
+        "lat": 44.017
+      },
+      {
+        "lon": -3.406,
+        "lat": 44.129
+      }
+    ],
+    "dir": "-",
+    "spd": "0",
+    "chng": "NC",
+    "rawSigmet": "WSSP31 LEMM 110937\nLECM SIGMET 3 VALID 111000/111400 LEVA-\nLECM MADRID UIR SEV TURB FCST WI N4401 W00309 - N4331 W00715 -\nN4152 W00758 - N4212 W01039 - N4359 W00959 - N4501 W008 - N4423\nW00359 - N4401 W00309  FL280/380 STNR NC="
+  },
+  {
+    "icaoId": "FAOR",
+    "firId": "FAJO",
+    "firName": "FAJO JOHANNESBURG OCEANIC",
+    "receiptTime": "2026-11-11T09:51:28.832Z",
+    "validTimeFrom": 1794391200,
+    "validTimeTo": 1794405600,
+    "seriesId": "C03",
+    "hazard": "TURB",
+    "qualifier": "SEV",
+    "base": 10000,
+    "top": 34000,
+    "geom": "AREA",
+    "coords": [
+      {
+        "lon": 55.683,
+        "lat": -37.417
+      },
+      {
+        "lon": 56.867,
+        "lat": -46.45
+      },
+      {
+        "lon": 54.567,
+        "lat": -51.517
+      },
+      {
+        "lon": 33.65,
+        "lat": -49.75
+      },
+      {
+        "lon": 33.783,
+        "lat": -42.917
+      },
+      {
+        "lon": 32.683,
+        "lat": -39.883
+      }
+    ],
+    "dir": null,
+    "spd": null,
+    "chng": null,
+    "rawSigmet": "WSZA21 FAOR 110948\nFAJO SIGMET C03 VALID 111000/111400 FAOR-\nFAJO JOHANNESBURG OCEANIC FIR SEV TURB FCST WI\nS3725 E05541 - S4627 E05652 - S5131 E05434 - S4945 E03339 -\nS4255 E03347 - S3953 E03241 FL100/340="
+  },
+  {
+    "icaoId": "FAOR",
+    "firId": "FACA",
+    "firName": "FACA CAPE TOWN",
+    "receiptTime": "2026-11-11T09:54:27.473Z",
+    "validTimeFrom": 1794391200,
+    "validTimeTo": 1794405600,
+    "seriesId": "B01",
+    "hazard": "TURB",
+    "qualifier": "SEV",
+    "base": 6500,
+    "top": 10000,
+    "geom": "AREA",
+    "coords": [
+      {
+        "lon": 29.538,
+        "lat": -31.657
+      },
+      {
+        "lon": 27.99,
+        "lat": -30.81
+      },
+      {
+        "lon": 25.064,
+        "lat": -31.129
+      },
+      {
+        "lon": 23.75,
+        "lat": -31.317
+      },
+      {
+        "lon": 23.467,
+        "lat": -31.217
+      },
+      {
+        "lon": 20.167,
+        "lat": -32.517
+      },
+      {
+        "lon": 19.883,
+        "lat": -34.183
+      },
+      {
+        "lon": 26.3,
+        "lat": -33.633
+      },
+      {
+        "lon": 29.538,
+        "lat": -31.657
+      }
+    ],
+    "dir": null,
+    "spd": null,
+    "chng": null,
+    "rawSigmet": "WSZA21 FAOR 110951\nFACA SIGMET B01 VALID 111000/111400 FAOR-\nFACA CAPE TOWN FIR SEV TURB FCST WI\nS3046 E02801 - S3138 E02933 - S3139 E02933 - S3338 E02618 -\nS3411 E01953 - S3231 E02010 - S3113 E02328 - S3119 E02345 -\nS3057 E02619 FL065/100="
+  },
+  {
+    "icaoId": "FAOR",
+    "firId": "FAJA",
+    "firName": "FAJA JOHANNESBURG",
+    "receiptTime": "2026-11-11T09:57:28.814Z",
+    "validTimeFrom": 1794391200,
+    "validTimeTo": 1794405600,
+    "seriesId": "A01",
+    "hazard": "TURB",
+    "qualifier": "SEV",
+    "base": 6500,
+    "top": 10000,
+    "geom": "AREA",
+    "coords": [
+      {
+        "lon": 23.523,
+        "lat": -31.194
+      },
+      {
+        "lon": 23.77,
+        "lat": -31.27
+      },
+      {
+        "lon": 25.064,
+        "lat": -31.129
+      },
+      {
+        "lon": 26.317,
+        "lat": -30.95
+      },
+      {
+        "lon": 28.017,
+        "lat": -30.767
+      },
+      {
+        "lon": 29.55,
+        "lat": -31.633
+      },
+      {
+        "lon": 31.133,
+        "lat": -29.067
+      },
+      {
+        "lon": 29.65,
+        "lat": -28.783
+      },
+      {
+        "lon": 23.523,
+        "lat": -31.194
+      }
+    ],
+    "dir": null,
+    "spd": null,
+    "chng": null,
+    "rawSigmet": "WSZA21 FAOR 110952\nFAJA SIGMET A01 VALID 111000/111400 FAOR-\nFAJA JOHANNESBURG FIR SEV TURB FCST WI\nS2847 E02939 - S2904 E03108 - S3138 E02933 - S3046 E02801 -\nS3057 E02619 - S3119 E02345 - S3113 E02328 FL065/100="
+  },
+  {
+    "icaoId": "YMMC",
+    "firId": "YMMM",
+    "firName": "YMMM MELBOURNE",
+    "receiptTime": "2026-11-11T09:56:59.011Z",
+    "validTimeFrom": 1794391500,
+    "validTimeTo": 1794405900,
+    "seriesId": "V19",
+    "hazard": "TURB",
+    "qualifier": "SEV",
+    "base": 24000,
+    "top": 40000,
+    "geom": "AREA",
+    "coords": [
+      {
+        "lon": 152.233,
+        "lat": -34.763
+      },
+      {
+        "lon": 151.69,
+        "lat": -34.34
+      },
+      {
+        "lon": 152,
+        "lat": -33.98
+      },
+      {
+        "lon": 151.83,
+        "lat": -33.52
+      },
+      {
+        "lon": 151.43,
+        "lat": -33.21
+      },
+      {
+        "lon": 150.97,
+        "lat": -33.24
+      },
+      {
+        "lon": 150.53,
+        "lat": -33.43
+      },
+      {
+        "lon": 149.73,
+        "lat": -32.8
+      },
+      {
+        "lon": 148.84,
+        "lat": -32.14
+      },
+      {
+        "lon": 148.21,
+        "lat": -31.3
+      },
+      {
+        "lon": 147.809,
+        "lat": -30.758
+      },
+      {
+        "lon": 134.5,
+        "lat": -35.333
+      },
+      {
+        "lon": 123.3,
+        "lat": -32.717
+      },
+      {
+        "lon": 118,
+        "lat": -25
+      },
+      {
+        "lon": 112.833,
+        "lat": -26.667
+      },
+      {
+        "lon": 116,
+        "lat": -36.833
+      },
+      {
+        "lon": 131.833,
+        "lat": -40.5
+      },
+      {
+        "lon": 152.233,
+        "lat": -34.763
+      }
+    ],
+    "dir": "E",
+    "spd": "15",
+    "chng": "NC",
+    "rawSigmet": "WSAU21 YMMC 110956\nYMMM SIGMET V19 VALID 111005/111405 YMMC-\nYMMM MELBOURNE FIR SEV TURB FCST WI S3430 E15310 - S4030 E13150 -\nS3650 E11600 - S2640 E11250 - S2500 E11800 - S3243 E12318 - S3520\nE13430 - S2950 E15030 FL240/400 MOV E 15KT NC="
+  },
+  {
+    "icaoId": "YMMC",
+    "firId": "YBBB",
+    "firName": "YBBB BRISBANE",
+    "receiptTime": "2026-11-11T09:57:07.118Z",
+    "validTimeFrom": 1794391500,
+    "validTimeTo": 1794405900,
+    "seriesId": "C01",
+    "hazard": "TURB",
+    "qualifier": "SEV",
+    "base": 24000,
+    "top": 40000,
+    "geom": "AREA",
+    "coords": [
+      {
+        "lon": 147.809,
+        "lat": -30.758
+      },
+      {
+        "lon": 148.21,
+        "lat": -31.3
+      },
+      {
+        "lon": 148.84,
+        "lat": -32.14
+      },
+      {
+        "lon": 149.73,
+        "lat": -32.8
+      },
+      {
+        "lon": 150.53,
+        "lat": -33.43
+      },
+      {
+        "lon": 150.97,
+        "lat": -33.24
+      },
+      {
+        "lon": 151.43,
+        "lat": -33.21
+      },
+      {
+        "lon": 151.83,
+        "lat": -33.52
+      },
+      {
+        "lon": 152,
+        "lat": -33.98
+      },
+      {
+        "lon": 151.69,
+        "lat": -34.34
+      },
+      {
+        "lon": 152.233,
+        "lat": -34.763
+      },
+      {
+        "lon": 153.167,
+        "lat": -34.5
+      },
+      {
+        "lon": 150.5,
+        "lat": -29.833
+      },
+      {
+        "lon": 147.809,
+        "lat": -30.758
+      }
+    ],
+    "dir": "E",
+    "spd": "15",
+    "chng": "NC",
+    "rawSigmet": "WSAU21 YMMC 110956\nYBBB SIGMET C01 VALID 111005/111405 YMMC-\nYBBB BRISBANE FIR SEV TURB FCST WI S3430 E15310 - S4030 E13150 -\nS3650 E11600 - S2640 E11250 - S2500 E11800 - S3243 E12318 - S3520\nE13430 - S2950 E15030 FL240/400 MOV E 15KT NC="
+  },
+  {
+    "icaoId": "VOMM",
+    "firId": "VOMF",
+    "firName": "VOMF CHENNAI",
+    "receiptTime": "2026-11-11T10:22:32.730Z",
+    "validTimeFrom": 1794391800,
+    "validTimeTo": 1794406200,
+    "seriesId": "A02",
+    "hazard": "TS",
+    "qualifier": "EMBD",
+    "base": null,
+    "top": 50000,
+    "geom": "AREA",
+    "coords": [
+      {
+        "lon": 92.72,
+        "lat": 13.85
+      },
+      {
+        "lon": 92.372,
+        "lat": 13.922
+      },
+      {
+        "lon": 91.65,
+        "lat": 13.967
+      },
+      {
+        "lon": 90.967,
+        "lat": 11.433
+      },
+      {
+        "lon": 91.967,
+        "lat": 10.817
+      },
+      {
+        "lon": 92.783,
+        "lat": 11.317
+      },
+      {
+        "lon": 92.783,
+        "lat": 13.833
+      },
+      {
+        "lon": 92.72,
+        "lat": 13.85
+      }
+    ],
+    "dir": "-",
+    "spd": "0",
+    "chng": "NC",
+    "rawSigmet": "WSIN31 VOMM 111000\nVOMF SIGMET A02 VALID 111010/111410 VOMM- VOMF CHENNAI FIR EMBD TS\nFCST WI N1355 E09228 - N1350 E09247 - N1119 E09247 - N1049 E09158 -\nN1126 E09058 - N1358 E09139 - N1355 E09228 TOP FL500 STNR NC="
+  },
+  {
+    "icaoId": "YMMC",
+    "firId": "YMMM",
+    "firName": "YMMM MELBOURNE",
+    "receiptTime": "2026-11-11T10:13:51.396Z",
+    "validTimeFrom": 1794392100,
+    "validTimeTo": 1794406500,
+    "seriesId": "E02",
+    "hazard": "TS",
+    "qualifier": "EMBD",
+    "base": null,
+    "top": 50000,
+    "geom": "AREA",
+    "coords": [
+      {
+        "lon": 92,
+        "lat": -2
+      },
+      {
+        "lon": 93.167,
+        "lat": -2.833
+      },
+      {
+        "lon": 91.667,
+        "lat": -4.667
+      },
+      {
+        "lon": 89.333,
+        "lat": -4.5
+      },
+      {
+        "lon": 87.5,
+        "lat": -2
+      }
+    ],
+    "dir": "-",
+    "spd": "0",
+    "chng": "NC",
+    "rawSigmet": "WSAU21 YMMC 111013\nYMMM SIGMET E02 VALID 111015/111415 YMMC-\nYMMM MELBOURNE FIR EMBD TS OBS WI S0200 E09200 - S0250 E09310 -\nS0440 E09140 - S0430 E08920 - S0200 E08730 TOP FL500 STNR NC="
+  },
+  {
+    "icaoId": "VECC",
+    "firId": "VECF",
+    "firName": "VECF KOLKATA",
+    "receiptTime": "2026-11-11T10:17:02.876Z",
+    "validTimeFrom": 1794392100,
+    "validTimeTo": 1794406500,
+    "seriesId": "2",
+    "hazard": "TS",
+    "qualifier": "EMBD",
+    "base": null,
+    "top": 42000,
+    "geom": "AREA",
+    "coords": [
+      {
+        "lon": 88.422,
+        "lat": 26.538
+      },
+      {
+        "lon": 88.4,
+        "lat": 26.61
+      },
+      {
+        "lon": 89.21,
+        "lat": 26.11
+      },
+      {
+        "lon": 89.59,
+        "lat": 25.97
+      },
+      {
+        "lon": 89.69,
+        "lat": 26.21
+      },
+      {
+        "lon": 89.83,
+        "lat": 25.94
+      },
+      {
+        "lon": 89.87,
+        "lat": 25.32
+      },
+      {
+        "lon": 90.6,
+        "lat": 25.14
+      },
+      {
+        "lon": 92.15,
+        "lat": 25.19
+      },
+      {
+        "lon": 92.49,
+        "lat": 24.86
+      },
+      {
+        "lon": 92.31,
+        "lat": 24.86
+      },
+      {
+        "lon": 91.96,
+        "lat": 24.19
+      },
+      {
+        "lon": 91.34,
+        "lat": 24.09
+      },
+      {
+        "lon": 91.215,
+        "lat": 23.805
+      },
+      {
+        "lon": 91.842,
+        "lat": 23.191
+      },
+      {
+        "lon": 91.95,
+        "lat": 23.68
+      },
+      {
+        "lon": 92.27,
+        "lat": 23.7
+      },
+      {
+        "lon": 92.44,
+        "lat": 22.79
+      },
+      {
+        "lon": 92.494,
+        "lat": 22.549
+      },
+      {
+        "lon": 92.917,
+        "lat": 22.133
+      },
+      {
+        "lon": 93.142,
+        "lat": 22.44
+      },
+      {
+        "lon": 93.11,
+        "lat": 22.48
+      },
+      {
+        "lon": 93.08,
+        "lat": 22.77
+      },
+      {
+        "lon": 93.18,
+        "lat": 22.9
+      },
+      {
+        "lon": 93.15,
+        "lat": 23.05
+      },
+      {
+        "lon": 93.27,
+        "lat": 23.01
+      },
+      {
+        "lon": 93.36,
+        "lat": 23.11
+      },
+      {
+        "lon": 93.43,
+        "lat": 23.65
+      },
+      {
+        "lon": 93.37,
+        "lat": 23.74
+      },
+      {
+        "lon": 93.35,
+        "lat": 24.09
+      },
+      {
+        "lon": 93.46,
+        "lat": 23.96
+      },
+      {
+        "lon": 93.71,
+        "lat": 24.01
+      },
+      {
+        "lon": 94.14,
+        "lat": 23.84
+      },
+      {
+        "lon": 94.33,
+        "lat": 24.37
+      },
+      {
+        "lon": 94.74,
+        "lat": 25.07
+      },
+      {
+        "lon": 94.54,
+        "lat": 25.28
+      },
+      {
+        "lon": 95.03,
+        "lat": 25.77
+      },
+      {
+        "lon": 95,
+        "lat": 25.92
+      },
+      {
+        "lon": 95.15,
+        "lat": 26.07
+      },
+      {
+        "lon": 95.05,
+        "lat": 26.49
+      },
+      {
+        "lon": 95.22,
+        "lat": 26.67
+      },
+      {
+        "lon": 95.41,
+        "lat": 26.7
+      },
+      {
+        "lon": 95.89,
+        "lat": 27.03
+      },
+      {
+        "lon": 96.07,
+        "lat": 27.23
+      },
+      {
+        "lon": 96.53,
+        "lat": 27.3
+      },
+      {
+        "lon": 96.69,
+        "lat": 27.36
+      },
+      {
+        "lon": 96.74,
+        "lat": 27.34
+      },
+      {
+        "lon": 96.875,
+        "lat": 27.523
+      },
+      {
+        "lon": 96.87,
+        "lat": 27.62
+      },
+      {
+        "lon": 97.037,
+        "lat": 27.743
+      },
+      {
+        "lon": 97.25,
+        "lat": 28.033
+      },
+      {
+        "lon": 88.157,
+        "lat": 26.82
+      },
+      {
+        "lon": 88.162,
+        "lat": 26.789
+      },
+      {
+        "lon": 88.422,
+        "lat": 26.538
+      }
+    ],
+    "dir": "-",
+    "spd": "0",
+    "chng": "NC",
+    "rawSigmet": "WSIN31 VECC 111015\nVECF SIGMET 2 VALID 111015/111415 VECC- VECF KOLKATA FIR EMBD TS OBS WI N2713 E09639 - N2208 E09255 - N2310 E09152 - N2620 E08838 - N2649 E08808 - N2802 E09715 - N2713 E09639 TOP FL420 STNR NC="
+  },
+  {
+    "icaoId": "WMKK",
+    "firId": "WMFC",
+    "firName": "WMFC KUALA LUMPUR",
+    "receiptTime": "2026-11-11T10:21:32.497Z",
+    "validTimeFrom": 1794392460,
+    "validTimeTo": 1794403260,
+    "seriesId": "11",
+    "hazard": "TS",
+    "qualifier": "EMBD",
+    "base": null,
+    "top": null,
+    "geom": "AREA",
+    "coords": [
+      {
+        "lon": 99.705,
+        "lat": 4.005
+      },
+      {
+        "lon": 99.766,
+        "lat": 3.95
+      },
+      {
+        "lon": 103.674,
+        "lat": 3.95
+      },
+      {
+        "lon": 103.72,
+        "lat": 4.83
+      },
+      {
+        "lon": 103.19,
+        "lat": 5.8
+      },
+      {
+        "lon": 102.79,
+        "lat": 6.483
+      },
+      {
+        "lon": 102.368,
+        "lat": 6.483
+      },
+      {
+        "lon": 102.11,
+        "lat": 6.24
+      },
+      {
+        "lon": 101.86,
+        "lat": 5.76
+      },
+      {
+        "lon": 101.58,
+        "lat": 5.92
+      },
+      {
+        "lon": 101.21,
+        "lat": 5.63
+      },
+      {
+        "lon": 101.01,
+        "lat": 5.81
+      },
+      {
+        "lon": 101.12,
+        "lat": 6.26
+      },
+      {
+        "lon": 100.9,
+        "lat": 6.21
+      },
+      {
+        "lon": 100.81,
+        "lat": 6.48
+      },
+      {
+        "lon": 100.54,
+        "lat": 6.45
+      },
+      {
+        "lon": 100.499,
+        "lat": 6.483
+      },
+      {
+        "lon": 100.131,
+        "lat": 6.483
+      },
+      {
+        "lon": 100.13,
+        "lat": 6.48
+      },
+      {
+        "lon": 100.097,
+        "lat": 6.483
+      },
+      {
+        "lon": 99.933,
+        "lat": 6.483
+      },
+      {
+        "lon": 99.705,
+        "lat": 4.005
+      }
+    ],
+    "dir": null,
+    "spd": null,
+    "chng": null,
+    "rawSigmet": "WSMS31 WMKK 111021\nWMFC SIGMET 11 VALID 111021/111321 WMKK-\nWMFC KUALA LUMPUR FIR EMBD TS\nOBS E OF LINE N0629 E09956 - N0357 E09942 AND W OF LINE N0120 E10415\n- N0509 E10306 - N0557 E10157 TOP FL520 MOV SW 10KT INTSF="
+  },
+  {
+    "icaoId": "FAOR",
+    "firId": "FAJO",
+    "firName": "FAJO JOHANNESBURG OCEANIC",
+    "receiptTime": "2026-11-11T10:22:35.823Z",
+    "validTimeFrom": 1794392460,
+    "validTimeTo": 1794405600,
+    "seriesId": "B01",
+    "hazard": "TURB",
+    "qualifier": "SEV",
+    "base": 24000,
+    "top": 34000,
+    "geom": "AREA",
+    "coords": [
+      {
+        "lon": -10,
+        "lat": -31.567
+      },
+      {
+        "lon": -0.683,
+        "lat": -34.767
+      },
+      {
+        "lon": -0.017,
+        "lat": -40.45
+      },
+      {
+        "lon": -6.767,
+        "lat": -40.633
+      },
+      {
+        "lon": -9.967,
+        "lat": -39.2
+      },
+      {
+        "lon": -10,
+        "lat": -31.733
+      }
+    ],
+    "dir": null,
+    "spd": null,
+    "chng": null,
+    "rawSigmet": "WSZA21 FAOR 111016\nFAJO SIGMET B01 VALID 111021/111400 FAOR-\nFAJO JOHANNESBURG OCEANIC FIR SEV TURB FCST WI\nS3134 W01000 - S3446 W00041 - S4027 W00001 - S4038 W00646 -\nS3912 W00958 - S3144 W01000 FL240/340="
+  },
+  {
+    "icaoId": "SKBO",
+    "firId": "SKED",
+    "firName": "SKED BOGOTA",
+    "receiptTime": "2026-11-11T10:24:43.978Z",
+    "validTimeFrom": 1794392700,
+    "validTimeTo": 1794403500,
+    "seriesId": "B1",
+    "hazard": "TS",
+    "qualifier": "FRQ",
+    "base": null,
+    "top": 41000,
+    "geom": "AREA",
+    "coords": [
+      {
+        "lon": -82.617,
+        "lat": 1.717
+      },
+      {
+        "lon": -82.617,
+        "lat": 3.333
+      },
+      {
+        "lon": -77.617,
+        "lat": 3
+      },
+      {
+        "lon": -78.133,
+        "lat": 1.55
+      },
+      {
+        "lon": -82.617,
+        "lat": 1.717
+      }
+    ],
+    "dir": "NE",
+    "spd": "5",
+    "chng": "INTSF",
+    "rawSigmet": "WSCO31 SKBO 111024\nSKED SIGMET B1 VALID 111025/111325 SKBO-?\nSKED BOGOTA FIR FRQ TS OBS AT 1020Z WI N0143 W08237 - N0320 W08237 - N0300 W07737 - N0133 W07808 - N0143 W08237 FL410 MOV NE 05KT INTSF="
+  },
+  {
+    "icaoId": "SPIM",
+    "firId": "SPIM",
+    "firName": "SPIM LIMA",
+    "receiptTime": "2026-11-11T10:28:45.370Z",
+    "validTimeFrom": 1794393000,
+    "validTimeTo": 1794403800,
+    "seriesId": "A7",
+    "hazard": "TS",
+    "qualifier": "EMBD",
+    "base": null,
+    "top": 48000,
+    "geom": "AREA",
+    "coords": [
+      {
+        "lon": -72.094,
+        "lat": -4.651
+      },
+      {
+        "lon": -71.88,
+        "lat": -4.52
+      },
+      {
+        "lon": -71.62,
+        "lat": -4.49
+      },
+      {
+        "lon": -71.38,
+        "lat": -4.44
+      },
+      {
+        "lon": -71.29,
+        "lat": -4.38
+      },
+      {
+        "lon": -70.97,
+        "lat": -4.39
+      },
+      {
+        "lon": -70.78,
+        "lat": -4.16
+      },
+      {
+        "lon": -70.52,
+        "lat": -4.18
+      },
+      {
+        "lon": -70.43,
+        "lat": -4.13
+      },
+      {
+        "lon": -70.33,
+        "lat": -4.14
+      },
+      {
+        "lon": -70.31,
+        "lat": -4.26
+      },
+      {
+        "lon": -70.21,
+        "lat": -4.34
+      },
+      {
+        "lon": -70.12,
+        "lat": -4.26
+      },
+      {
+        "lon": -70.02,
+        "lat": -4.34
+      },
+      {
+        "lon": -69.96,
+        "lat": -4.26
+      },
+      {
+        "lon": -69.99,
+        "lat": -4.18
+      },
+      {
+        "lon": -70.03,
+        "lat": -4.13
+      },
+      {
+        "lon": -70.16,
+        "lat": -4.06
+      },
+      {
+        "lon": -70.22,
+        "lat": -3.92
+      },
+      {
+        "lon": -70.29,
+        "lat": -3.85
+      },
+      {
+        "lon": -70.38,
+        "lat": -3.82
+      },
+      {
+        "lon": -70.5,
+        "lat": -3.88
+      },
+      {
+        "lon": -70.73,
+        "lat": -3.78
+      },
+      {
+        "lon": -70.47,
+        "lat": -3.36
+      },
+      {
+        "lon": -70.23,
+        "lat": -3
+      },
+      {
+        "lon": -70.05,
+        "lat": -2.76
+      },
+      {
+        "lon": -70.22,
+        "lat": -2.64
+      },
+      {
+        "lon": -70.29,
+        "lat": -2.51
+      },
+      {
+        "lon": -70.46,
+        "lat": -2.45
+      },
+      {
+        "lon": -70.63,
+        "lat": -2.48
+      },
+      {
+        "lon": -70.68,
+        "lat": -2.35
+      },
+      {
+        "lon": -70.93,
+        "lat": -2.26
+      },
+      {
+        "lon": -71.03,
+        "lat": -2.2
+      },
+      {
+        "lon": -71.19,
+        "lat": -2.38
+      },
+      {
+        "lon": -71.23,
+        "lat": -2.34
+      },
+      {
+        "lon": -71.39,
+        "lat": -2.35
+      },
+      {
+        "lon": -71.48,
+        "lat": -2.26
+      },
+      {
+        "lon": -71.701,
+        "lat": -2.167
+      },
+      {
+        "lon": -71.767,
+        "lat": -2.167
+      },
+      {
+        "lon": -72.094,
+        "lat": -4.651
+      }
+    ],
+    "dir": "-",
+    "spd": "0",
+    "chng": "NC",
+    "rawSigmet": "WSPR31 SPIM 111028\nSPIM SIGMET A7 VALID 111030/111330 SPJC-\nSPIM LIMA FIR EMBD TS OBS AT 1010Z E OF LINE S0442 W07206 -\nS0210 W07146\nTOP FL480 STNR NC="
+  },
+  {
+    "icaoId": "UAII",
+    "firId": "UAII",
+    "firName": "UAII SHYMKENT",
+    "receiptTime": "2026-11-11T10:36:46.024Z",
+    "validTimeFrom": 1794393360,
+    "validTimeTo": 1794405600,
+    "seriesId": "1",
+    "hazard": "ICE",
+    "qualifier": "SEV",
+    "base": null,
+    "top": null,
+    "geom": "AREA",
+    "coords": [
+      {
+        "lon": 66,
+        "lat": 46.688
+      },
+      {
+        "lon": 66.21,
+        "lat": 46.62
+      },
+      {
+        "lon": 67.89,
+        "lat": 45.98
+      },
+      {
+        "lon": 69.42,
+        "lat": 45.41
+      },
+      {
+        "lon": 70.59,
+        "lat": 45.25
+      },
+      {
+        "lon": 71.93,
+        "lat": 45.07
+      },
+      {
+        "lon": 74.92,
+        "lat": 44.26
+      },
+      {
+        "lon": 74.16,
+        "lat": 43.75
+      },
+      {
+        "lon": 74.29,
+        "lat": 43.21
+      },
+      {
+        "lon": 74.04,
+        "lat": 43.18
+      },
+      {
+        "lon": 73.59,
+        "lat": 43.04
+      },
+      {
+        "lon": 73.49,
+        "lat": 42.89
+      },
+      {
+        "lon": 73.5,
+        "lat": 42.79
+      },
+      {
+        "lon": 73.41,
+        "lat": 42.59
+      },
+      {
+        "lon": 73.51,
+        "lat": 42.4
+      },
+      {
+        "lon": 73.33,
+        "lat": 42.43
+      },
+      {
+        "lon": 73.12,
+        "lat": 42.55
+      },
+      {
+        "lon": 72.91,
+        "lat": 42.54
+      },
+      {
+        "lon": 72.76,
+        "lat": 42.64
+      },
+      {
+        "lon": 72.29,
+        "lat": 42.75
+      },
+      {
+        "lon": 71.83,
+        "lat": 42.83
+      },
+      {
+        "lon": 71.41,
+        "lat": 42.79
+      },
+      {
+        "lon": 71.22,
+        "lat": 42.72
+      },
+      {
+        "lon": 70.91,
+        "lat": 42.39
+      },
+      {
+        "lon": 70.97,
+        "lat": 42.23
+      },
+      {
+        "lon": 70.57,
+        "lat": 42.03
+      },
+      {
+        "lon": 70.49,
+        "lat": 42.12
+      },
+      {
+        "lon": 70.344,
+        "lat": 42
+      },
+      {
+        "lon": 66.01,
+        "lat": 42
+      },
+      {
+        "lon": 66.01,
+        "lat": 42.4
+      },
+      {
+        "lon": 66.05,
+        "lat": 42.44
+      },
+      {
+        "lon": 66.1,
+        "lat": 42.99
+      },
+      {
+        "lon": 66,
+        "lat": 42.953
+      },
+      {
+        "lon": 66,
+        "lat": 46.688
+      }
+    ],
+    "dir": null,
+    "spd": null,
+    "chng": null,
+    "rawSigmet": "WSKZ31 UAII 111035\nUAII SIGMET 1 VALID 111036/111400 UAII-\nUAII SHYMKENT FIR SEV ICE FCST N OF N42 AND E OF E066 3000/7000FT MOV\nNE 20KMH NC="
+  },
+  {
+    "icaoId": "WAAA",
+    "firId": "WAAF",
+    "firName": "WAAF UJUNG PANDANG",
+    "receiptTime": "2026-11-11T11:00:28.700Z",
+    "validTimeFrom": 1794393600,
+    "validTimeTo": 1794415200,
+    "seriesId": "10",
+    "hazard": "VA",
+    "qualifier": "ERUPTION MT DUKONO",
+    "base": 0,
+    "top": 9000,
+    "geom": "AREA",
+    "coords": [
+      {
+        "lon": 127.967,
+        "lat": 1.783
+      },
+      {
+        "lon": 128,
+        "lat": 1.617
+      },
+      {
+        "lon": 126.817,
+        "lat": 1.133
+      },
+      {
+        "lon": 126.667,
+        "lat": 1.95
+      },
+      {
+        "lon": 127.967,
+        "lat": 1.783
+      }
+    ],
+    "dir": "SW",
+    "spd": "10",
+    "chng": "NC",
+    "rawSigmet": "WVID21 WAAA 111040\nWAAF SIGMET 10 VALID 111040/111640 WAAA-\nWAAF UJUNG PANDANG  FIR VA\nERUPTION MT DUKONO PSN N0142 E12754 VA CLD OBS AT 1020Z WI N0147\nE12758 - N0137 E12800 - N0108 E12649 - N0157 E12640 - N0147 E12758\nSFC/FL090 MOV SW 10KT NC="
+  },
+  {
+    "icaoId": "UAAA",
+    "firId": "UAAA",
+    "firName": "UAAA ALMATY",
+    "receiptTime": "2026-11-11T10:43:38.585Z",
+    "validTimeFrom": 1794393780,
+    "validTimeTo": 1794402000,
+    "seriesId": "1",
+    "hazard": "ICE",
+    "qualifier": "SEV",
+    "base": 8000,
+    "top": 15000,
+    "geom": "AREA",
+    "coords": [
+      {
+        "lon": 74.533,
+        "lat": 44
+      },
+      {
+        "lon": 74.16,
+        "lat": 43.75
+      },
+      {
+        "lon": 74.29,
+        "lat": 43.21
+      },
+      {
+        "lon": 74.95,
+        "lat": 42.94
+      },
+      {
+        "lon": 75.2,
+        "lat": 42.85
+      },
+      {
+        "lon": 75.67,
+        "lat": 42.81
+      },
+      {
+        "lon": 75.78,
+        "lat": 42.93
+      },
+      {
+        "lon": 76.43,
+        "lat": 42.89
+      },
+      {
+        "lon": 76.96,
+        "lat": 42.99
+      },
+      {
+        "lon": 78.29,
+        "lat": 42.86
+      },
+      {
+        "lon": 79.03,
+        "lat": 42.76
+      },
+      {
+        "lon": 79.17,
+        "lat": 42.79
+      },
+      {
+        "lon": 79.19,
+        "lat": 42.67
+      },
+      {
+        "lon": 79.32,
+        "lat": 42.6
+      },
+      {
+        "lon": 79.43,
+        "lat": 42.47
+      },
+      {
+        "lon": 79.7,
+        "lat": 42.46
+      },
+      {
+        "lon": 79.92,
+        "lat": 42.42
+      },
+      {
+        "lon": 80.21,
+        "lat": 42.19
+      },
+      {
+        "lon": 80.27,
+        "lat": 42.24
+      },
+      {
+        "lon": 80.19,
+        "lat": 42.45
+      },
+      {
+        "lon": 80.21,
+        "lat": 42.49
+      },
+      {
+        "lon": 80.14,
+        "lat": 42.64
+      },
+      {
+        "lon": 80.26,
+        "lat": 42.82
+      },
+      {
+        "lon": 80.55,
+        "lat": 42.88
+      },
+      {
+        "lon": 80.52,
+        "lat": 42.93
+      },
+      {
+        "lon": 80.37,
+        "lat": 42.98
+      },
+      {
+        "lon": 80.37,
+        "lat": 43.03
+      },
+      {
+        "lon": 80.62,
+        "lat": 43.13
+      },
+      {
+        "lon": 80.73,
+        "lat": 43.1
+      },
+      {
+        "lon": 80.79,
+        "lat": 43.15
+      },
+      {
+        "lon": 80.75,
+        "lat": 43.28
+      },
+      {
+        "lon": 80.64,
+        "lat": 43.33
+      },
+      {
+        "lon": 80.71,
+        "lat": 43.46
+      },
+      {
+        "lon": 80.406,
+        "lat": 44
+      },
+      {
+        "lon": 74.533,
+        "lat": 44
+      }
+    ],
+    "dir": "NE",
+    "spd": "10",
+    "chng": "NC",
+    "rawSigmet": "WSKZ31 UAAA 111043\nUAAA SIGMET 1 VALID 111043/111300 UAAA-\nUAAA ALMATY FIR SEV ICE FCST S OF N44 8000FT/FL150 MOV NE 20KMH NC="
+  },
+  {
+    "icaoId": "FIMP",
+    "firId": "FIMM",
+    "firName": "FIMM MAURITIUS",
+    "receiptTime": "2026-11-11T10:44:54.662Z",
+    "validTimeFrom": 1794393900,
+    "validTimeTo": 1794408300,
+    "seriesId": "A02",
+    "hazard": "TS",
+    "qualifier": "EMBD",
+    "base": null,
+    "top": 39000,
+    "geom": "AREA",
+    "coords": [
+      {
+        "lon": 61,
+        "lat": -7
+      },
+      {
+        "lon": 67,
+        "lat": -9.5
+      },
+      {
+        "lon": 65,
+        "lat": -11.5
+      },
+      {
+        "lon": 60,
+        "lat": -8
+      },
+      {
+        "lon": 61,
+        "lat": -7
+      }
+    ],
+    "dir": "-",
+    "spd": "0",
+    "chng": "NC",
+    "rawSigmet": "WSMA31 FIMP 111040\nFIMM SIGMET A02 VALID 111045/111445 FIMP-\nFIMM MAURITIUS FIR EMBD TS OBS AT 1030Z WI S0700 E06100 - S0930\nE06700 - S1130 E06500 - S0800 E06000 - S0700 E06100 TOP ABV FL390\nSTNR NC="
+  },
+  {
+    "icaoId": "AYPY",
+    "firId": "AYPM",
+    "firName": "AYPM PORT MORESBY",
+    "receiptTime": "2026-11-11T10:55:17.305Z",
+    "validTimeFrom": 1794393960,
+    "validTimeTo": 1794408360,
+    "seriesId": "01",
+    "hazard": "TS",
+    "qualifier": "EMBD",
+    "base": null,
+    "top": 53000,
+    "geom": "AREA",
+    "coords": [
+      {
+        "lon": 141,
+        "lat": -3.333
+      },
+      {
+        "lon": 145,
+        "lat": -3.967
+      },
+      {
+        "lon": 148.033,
+        "lat": -8.417
+      },
+      {
+        "lon": 145.167,
+        "lat": -8.333
+      },
+      {
+        "lon": 142.8,
+        "lat": -7
+      },
+      {
+        "lon": 141,
+        "lat": -3.333
+      }
+    ],
+    "dir": "WNW",
+    "spd": "10",
+    "chng": "NC",
+    "rawSigmet": "WSNG20 AYPY 111053\nAYPM SIGMET 01 VALID 111046/111446 AYPY-\nAYPM PORT MORESBY FIR EMBD TS OBS WI S0320 E14100 - S0358 E14500 -\nS0825 E14802 - S0820 E14510 - S0700 E14248 - S0320 E14100 TOP FL530\nMOV WNW 10KT NC"
+  },
+  {
+    "icaoId": "BICC",
+    "firId": "BIRD",
+    "firName": "BIRD REYKJAVIK",
+    "receiptTime": "2026-11-11T10:50:43.681Z",
+    "validTimeFrom": 1794394140,
+    "validTimeTo": 1794407400,
+    "seriesId": "M02",
+    "hazard": "MTW",
+    "qualifier": "SEV",
+    "base": 30000,
+    "top": 40000,
+    "geom": "AREA",
+    "coords": [
+      {
+        "lon": -17.667,
+        "lat": 64
+      },
+      {
+        "lon": -13.667,
+        "lat": 66
+      },
+      {
+        "lon": -10.333,
+        "lat": 64.667
+      },
+      {
+        "lon": -14,
+        "lat": 63
+      },
+      {
+        "lon": -17.667,
+        "lat": 64
+      }
+    ],
+    "dir": "-",
+    "spd": "0",
+    "chng": "NC",
+    "rawSigmet": "WSIL31 BICC 111000\nBIRD SIGMET M02 VALID 111049/111430 BIRK-\nBIRD REYKJAVIK CTA\nSEV MTW OBS WI N6400 W01740 - N6600 W01340 - N6440 W01020 - N6300\nW01400 - N6400 W01740 FL300/400 STNR NC="
+  },
+  {
+    "icaoId": "SABE",
+    "firId": "SAVF",
+    "firName": "SAVF COMODORO RIVADAVIA",
+    "receiptTime": "2026-11-11T10:53:08.156Z",
+    "validTimeFrom": 1794394500,
+    "validTimeTo": 1794408900,
+    "seriesId": "A1",
+    "hazard": "MTW",
+    "qualifier": "SEV",
+    "base": null,
+    "top": 15000,
+    "geom": "AREA",
+    "coords": [
+      {
+        "lon": -72.301,
+        "lat": -48.318
+      },
+      {
+        "lon": -72.3,
+        "lat": -48.33
+      },
+      {
+        "lon": -72.315,
+        "lat": -48.336
+      },
+      {
+        "lon": -72.593,
+        "lat": -48.694
+      },
+      {
+        "lon": -72.59,
+        "lat": -48.79
+      },
+      {
+        "lon": -72.77,
+        "lat": -48.921
+      },
+      {
+        "lon": -73.117,
+        "lat": -49.367
+      },
+      {
+        "lon": -73.033,
+        "lat": -50.483
+      },
+      {
+        "lon": -72.25,
+        "lat": -50.483
+      },
+      {
+        "lon": -70.4,
+        "lat": -49.65
+      },
+      {
+        "lon": -70.1,
+        "lat": -42.067
+      },
+      {
+        "lon": -71.9,
+        "lat": -42.517
+      },
+      {
+        "lon": -71.017,
+        "lat": -44.417
+      },
+      {
+        "lon": -72.067,
+        "lat": -48.017
+      },
+      {
+        "lon": -72.301,
+        "lat": -48.318
+      }
+    ],
+    "dir": "-",
+    "spd": "0",
+    "chng": "NC",
+    "rawSigmet": "WSAG31 SABE 111055\nSAVF SIGMET A1 VALID 111055/111455 SABE-\nSAVF COMODORO RIVADAVIA FIR SEV MTW OBS AT 1055Z\nWI S4231 W07154 - S4204 W07006 - S4939 W07024 - S5029 W07215 - S5029\nW07302 - S4922 W07307 - S4801 W07204 - S4425 W07101 - S4231 W07154 \nTOP FL150 STNR NC="
+  },
+  {
+    "icaoId": "SABE",
+    "firId": "SAVF",
+    "firName": "SAVF COMODORO RIVADAVIA",
+    "receiptTime": "2026-11-11T10:54:07.053Z",
+    "validTimeFrom": 1794394560,
+    "validTimeTo": 1794408960,
+    "seriesId": "B1",
+    "hazard": "TURB",
+    "qualifier": "SEV",
+    "base": null,
+    "top": 24000,
+    "geom": "AREA",
+    "coords": [
+      {
+        "lon": -71.536,
+        "lat": -45.055
+      },
+      {
+        "lon": -71.49,
+        "lat": -45.12
+      },
+      {
+        "lon": -71.36,
+        "lat": -45.21
+      },
+      {
+        "lon": -71.31,
+        "lat": -45.3
+      },
+      {
+        "lon": -71.51,
+        "lat": -45.41
+      },
+      {
+        "lon": -71.49,
+        "lat": -45.5
+      },
+      {
+        "lon": -71.654,
+        "lat": -45.518
+      },
+      {
+        "lon": -71.682,
+        "lat": -45.887
+      },
+      {
+        "lon": -71.64,
+        "lat": -45.91
+      },
+      {
+        "lon": -71.65,
+        "lat": -46
+      },
+      {
+        "lon": -71.693,
+        "lat": -46.039
+      },
+      {
+        "lon": -71.724,
+        "lat": -46.442
+      },
+      {
+        "lon": -71.68,
+        "lat": -46.54
+      },
+      {
+        "lon": -71.68,
+        "lat": -46.66
+      },
+      {
+        "lon": -71.745,
+        "lat": -46.715
+      },
+      {
+        "lon": -71.85,
+        "lat": -48.1
+      },
+      {
+        "lon": -73.3,
+        "lat": -49.75
+      },
+      {
+        "lon": -73.217,
+        "lat": -50.067
+      },
+      {
+        "lon": -72.344,
+        "lat": -50.64
+      },
+      {
+        "lon": -72.3,
+        "lat": -50.65
+      },
+      {
+        "lon": -72.308,
+        "lat": -50.663
+      },
+      {
+        "lon": -72.15,
+        "lat": -50.767
+      },
+      {
+        "lon": -71.583,
+        "lat": -51.817
+      },
+      {
+        "lon": -67.983,
+        "lat": -47.467
+      },
+      {
+        "lon": -69.117,
+        "lat": -45.717
+      },
+      {
+        "lon": -71.536,
+        "lat": -45.055
+      }
+    ],
+    "dir": "-",
+    "spd": "0",
+    "chng": "NC",
+    "rawSigmet": "WSAG31 SABE 111056\nSAVF SIGMET B1 VALID 111056/111456 SABE-\nSAVF COMODORO RIVADAVIA FIR SEV TURB FCST AT 1056Z\nWI S4502 W07137 - S4543 W06907 - S4728 W06759 - S5149 W07135 - S5046\nW07209 - S5004 W07313 - S4945 W07318 - S4806 W07151 - S4502 W07137 \nABV FL240 STNR NC="
+  },
+  {
+    "icaoId": "AYPY",
+    "firId": "AYPM",
+    "firName": "AYPM PORT MORESBY",
+    "receiptTime": "2026-11-11T11:02:41.082Z",
+    "validTimeFrom": 1794394560,
+    "validTimeTo": 1794408960,
+    "seriesId": "02",
+    "hazard": "TS",
+    "qualifier": "EMBD",
+    "base": null,
+    "top": 51000,
+    "geom": "AREA",
+    "coords": [
+      {
+        "lon": 150.333,
+        "lat": -2.883
+      },
+      {
+        "lon": 158.35,
+        "lat": -2.417
+      },
+      {
+        "lon": 159.033,
+        "lat": -4.283
+      },
+      {
+        "lon": 152.8,
+        "lat": -6.633
+      },
+      {
+        "lon": 149.233,
+        "lat": -5.333
+      },
+      {
+        "lon": 150.333,
+        "lat": -2.883
+      }
+    ],
+    "dir": "SSE",
+    "spd": "5",
+    "chng": "NC",
+    "rawSigmet": "WSNG20 AYPY 111100\nAYPM SIGMET 02 VALID 111056/111456 AYPY-\nAYPM PORT MORESBY FIR EMBD TS OBS WI S0253 E15020 - S0225 E15821 -\nS0417 E15902 - S0638 E15248 - S0520 E14914 - S0253 E15020 TOP FL510\nMOV SSE 05KT NC="
+  },
+  {
+    "icaoId": "LPMG",
+    "firId": "LPPC",
+    "firName": "LPPC LISBOA",
+    "receiptTime": "2026-11-11T10:50:26.959Z",
+    "validTimeFrom": 1794394800,
+    "validTimeTo": 1794405600,
+    "seriesId": "U06",
+    "hazard": "TURB",
+    "qualifier": "SEV",
+    "base": 0,
+    "top": 12000,
+    "geom": "AREA",
+    "coords": [
+      {
+        "lon": -10,
+        "lat": 36
+      },
+      {
+        "lon": -10,
+        "lat": 38.5
+      },
+      {
+        "lon": -7.667,
+        "lat": 38.5
+      },
+      {
+        "lon": -7.667,
+        "lat": 36
+      },
+      {
+        "lon": -10,
+        "lat": 36
+      }
+    ],
+    "dir": "NNE",
+    "spd": "30",
+    "chng": "NC",
+    "rawSigmet": "WSPO31 LPMG 111050\nLPPC SIGMET U06 VALID 111100/111400 LPPT-\nLPPC LISBOA FIR SEV TURB FCST WI N36 W010 - N3830 W010 - N3830 W00740\n - N36 W00740 - N36 W010 SFC/FL120 MOV NNE 30KT NC="
+  },
+  {
+    "icaoId": "CWAO",
+    "firId": "CZWG",
+    "firName": "CZWG WINNIPEG",
+    "receiptTime": "2026-11-11T11:08:34.245Z",
+    "validTimeFrom": 1794395100,
+    "validTimeTo": 1794409500,
+    "seriesId": "S1",
+    "hazard": "ICE",
+    "qualifier": "SEV",
+    "base": 0,
+    "top": 3000,
+    "geom": "AREA",
+    "coords": [
+      {
+        "lon": -95.484,
+        "lat": 59.267
+      },
+      {
+        "lon": -94.083,
+        "lat": 59.7
+      },
+      {
+        "lon": -91.083,
+        "lat": 57.2
+      },
+      {
+        "lon": -92.484,
+        "lat": 56.767
+      },
+      {
+        "lon": -95.484,
+        "lat": 59.267
+      }
+    ],
+    "dir": "-",
+    "spd": "0",
+    "chng": "WKN",
+    "rawSigmet": "WSCN03 CWAO 111108\nCZWG SIGMET S1 VALID 111105/111505 CWEG-\nCZWG WINNIPEG FIR SEV ICE (FZRA) FCST WI 50NM WID LINE BTN N5929 W09447 - N5659\nW09147 SFC/FL030 STNR WKN="
+  },
+  {
+    "icaoId": "SEQU",
+    "firId": "SEFG",
+    "firName": "SEFG GUAYAQUIL",
+    "receiptTime": "2026-11-11T11:10:41.738Z",
+    "validTimeFrom": 1794395280,
+    "validTimeTo": 1794416880,
+    "seriesId": "A2",
+    "hazard": "VA",
+    "qualifier": "ERUPTION MT REVENTADOR",
+    "base": 0,
+    "top": 14000,
+    "geom": "AREA",
+    "coords": [
+      {
+        "lon": -77.867,
+        "lat": 0
+      },
+      {
+        "lon": -77.65,
+        "lat": -0.067
+      },
+      {
+        "lon": -77.667,
+        "lat": -0.083
+      },
+      {
+        "lon": -77.883,
+        "lat": -0.05
+      },
+      {
+        "lon": -77.867,
+        "lat": 0
+      }
+    ],
+    "dir": "NW",
+    "spd": "10",
+    "chng": null,
+    "rawSigmet": "WVEQ31 SEQU 111108\nSEFG SIGMET A2 VALID 111108/111708 SEGU-\nSEFG GUAYAQUIL FIR VA ERUPTION MT REVENTADOR PSN S0004 W07739\nVA CLD OBS AT 1030Z WI S0000 W07752 - S0004 W07739 - S0005 W07740 - \nS0003 W07753 - S0000 W07752 SFC/FL140 MOV NW 10KT \nFCST AT 1630Z WI N0002 W07755 - S0004 W07738 - S0006 W07740 - S0001 \nW07756 - N0002 W07755="
+  },
+  {
+    "icaoId": "SEQU",
+    "firId": "SEFG",
+    "firName": "SEFG GUAYAQUIL",
+    "receiptTime": "2026-11-11T11:10:41.743Z",
+    "validTimeFrom": 1794395280,
+    "validTimeTo": 1794416880,
+    "seriesId": "A2F",
+    "hazard": "VA",
+    "qualifier": "ERUPTION MT REVENTADOR",
+    "base": 0,
+    "top": 14000,
+    "geom": "AREA",
+    "coords": [
+      {
+        "lon": -77.917,
+        "lat": 0.033
+      },
+      {
+        "lon": -77.633,
+        "lat": -0.067
+      },
+      {
+        "lon": -77.667,
+        "lat": -0.1
+      },
+      {
+        "lon": -77.933,
+        "lat": -0.017
+      },
+      {
+        "lon": -77.917,
+        "lat": 0.033
+      }
+    ],
+    "dir": "NW",
+    "spd": "10",
+    "chng": null,
+    "rawSigmet": "WVEQ31 SEQU 111108\nSEFG SIGMET A2 VALID 111108/111708 SEGU-\nSEFG GUAYAQUIL FIR VA ERUPTION MT REVENTADOR PSN S0004 W07739\nVA CLD OBS AT 1030Z WI S0000 W07752 - S0004 W07739 - S0005 W07740 - \nS0003 W07753 - S0000 W07752 SFC/FL140 MOV NW 10KT \nFCST AT 1630Z WI N0002 W07755 - S0004 W07738 - S0006 W07740 - S0001 \nW07756 - N0002 W07755="
+  },
+  {
+    "icaoId": "YBRF",
+    "firId": "YBBB",
+    "firName": "YBBB BRISBANE",
+    "receiptTime": "2026-11-11T11:10:21.916Z",
+    "validTimeFrom": 1794395400,
+    "validTimeTo": 1794402420,
+    "seriesId": "D01",
+    "hazard": "TS",
+    "qualifier": "FRQ",
+    "base": null,
+    "top": 52000,
+    "geom": "AREA",
+    "coords": [
+      {
+        "lon": 137,
+        "lat": -18
+      },
+      {
+        "lon": 136.167,
+        "lat": -19.5
+      },
+      {
+        "lon": 133,
+        "lat": -17.167
+      },
+      {
+        "lon": 134,
+        "lat": -16.333
+      }
+    ],
+    "dir": "-",
+    "spd": "0",
+    "chng": "NC",
+    "rawSigmet": "WSAU21 YBRF 111110\nYBBB SIGMET D01 VALID 111110/111307 YBRF-\nYBBB BRISBANE FIR FRQ TS FCST WI S1800 E13700 - S1930 E13610 - S1710\nE13300 - S1620 E13400 TOP FL520 STNR NC="
+  },
+  {
+    "icaoId": "SCIP",
+    "firId": "SCIZ",
+    "firName": "SCIZ ISLA DE PASCUA",
+    "receiptTime": "2026-11-11T11:10:41.733Z",
+    "validTimeFrom": 1794395400,
+    "validTimeTo": 1794409800,
+    "seriesId": "03",
+    "hazard": "TURB",
+    "qualifier": "SEV",
+    "base": 18000,
+    "top": 38000,
+    "geom": "AREA",
+    "coords": [
+      {
+        "lon": -131,
+        "lat": -37
+      },
+      {
+        "lon": -119,
+        "lat": -38
+      },
+      {
+        "lon": -109,
+        "lat": -28
+      },
+      {
+        "lon": -120,
+        "lat": -30
+      },
+      {
+        "lon": -131,
+        "lat": -30
+      }
+    ],
+    "dir": "E",
+    "spd": "0",
+    "chng": "NC",
+    "rawSigmet": "WSCH31 SCIP 111110\nSCIZ SIGMET 03 VALID 111110/111510 SCIP-\nSCIZ ISLA DE PASCUA FIR SEV TURB FCST WI S3700 W13100 - S3800 W11900 \n- S2800 W10900 - S3000 W12000 - S3000 W13100 FL180/380 MOV E NC="
+  },
+  {
+    "icaoId": "WAAA",
+    "firId": "WAAF",
+    "firName": "WAAF UJUNG PANDANG",
+    "receiptTime": "2026-11-11T11:15:11.312Z",
+    "validTimeFrom": 1794395400,
+    "validTimeTo": 1794417000,
+    "seriesId": "11",
+    "hazard": "VA",
+    "qualifier": "ERUPTION MT SEMERU",
+    "base": 0,
+    "top": 15000,
+    "geom": "AREA",
+    "coords": [
+      {
+        "lon": 113.033,
+        "lat": -8.083
+      },
+      {
+        "lon": 112.65,
+        "lat": -8.85
+      },
+      {
+        "lon": 112.117,
+        "lat": -8.383
+      },
+      {
+        "lon": 112.917,
+        "lat": -7.967
+      },
+      {
+        "lon": 113.033,
+        "lat": -8.083
+      }
+    ],
+    "dir": "SW",
+    "spd": "10",
+    "chng": "NC",
+    "rawSigmet": "WVID21 WAAA 111110\nWAAF SIGMET 11 VALID 111110/111710 WAAA-\nWAAF UJUNG PANDANG  FIR VA\nERUPTION MT SEMERU PSN S0806 E11255 VA CLD OBS AT 1050Z WI S0805\nE11302 - S0851 E11239 - S0823 E11207 - S0758 E11255 - S0805 E11302\nSFC/FL150 MOV SW 10KT NC="
+  },
+  {
+    "icaoId": "SARE",
+    "firId": "SARR",
+    "firName": "SARR RESISTENCIA",
+    "receiptTime": "2026-11-11T11:10:09.075Z",
+    "validTimeFrom": 1794395520,
+    "validTimeTo": 1794402720,
+    "seriesId": "2",
+    "hazard": "TS",
+    "qualifier": "FRQ",
+    "base": null,
+    "top": 34000,
+    "geom": "AREA",
+    "coords": [
+      {
+        "lon": -59.294,
+        "lat": -30.397
+      },
+      {
+        "lon": -58.31,
+        "lat": -30.599
+      },
+      {
+        "lon": -57.9,
+        "lat": -30.667
+      },
+      {
+        "lon": -57.867,
+        "lat": -30.626
+      },
+      {
+        "lon": -57.89,
+        "lat": -30.59
+      },
+      {
+        "lon": -57.88,
+        "lat": -30.51
+      },
+      {
+        "lon": -57.65,
+        "lat": -30.33
+      },
+      {
+        "lon": -57.61,
+        "lat": -30.18
+      },
+      {
+        "lon": -57.48,
+        "lat": -30.13
+      },
+      {
+        "lon": -57.44,
+        "lat": -30.05
+      },
+      {
+        "lon": -57.365,
+        "lat": -30.016
+      },
+      {
+        "lon": -57.327,
+        "lat": -29.97
+      },
+      {
+        "lon": -57.32,
+        "lat": -29.89
+      },
+      {
+        "lon": -57.24,
+        "lat": -29.79
+      },
+      {
+        "lon": -57.167,
+        "lat": -29.774
+      },
+      {
+        "lon": -56.9,
+        "lat": -29.45
+      },
+      {
+        "lon": -58.683,
+        "lat": -29.417
+      },
+      {
+        "lon": -59.294,
+        "lat": -30.397
+      }
+    ],
+    "dir": "-",
+    "spd": "0",
+    "chng": "NC",
+    "rawSigmet": "WSAG31 SARE 111112\nSARR SIGMET 2 VALID 111112/111312 SARE-\nSARR RESISTENCIA FIR FRQ TS OBS AT 1050Z\nWI S2927 W05654 - S2925 W05841 - S3026 W05919 - S3040 W05754 - S2927\nW05654 TOP FL340 STNR NC="
+  },
+  {
+    "icaoId": "FMMI",
+    "firId": "FMMM",
+    "firName": "FMMM ANTANANARIVO",
+    "receiptTime": "2026-11-11T11:10:50.505Z",
+    "validTimeFrom": 1794395520,
+    "validTimeTo": 1794409920,
+    "seriesId": "B1",
+    "hazard": "TS",
+    "qualifier": "EMBD",
+    "base": null,
+    "top": 45000,
+    "geom": "AREA",
+    "coords": [
+      {
+        "lon": 46.8,
+        "lat": -16.3
+      },
+      {
+        "lon": 48.033,
+        "lat": -20.283
+      },
+      {
+        "lon": 47.25,
+        "lat": -21.8
+      },
+      {
+        "lon": 44.4,
+        "lat": -24.283
+      },
+      {
+        "lon": 42.1,
+        "lat": -21.683
+      },
+      {
+        "lon": 44.95,
+        "lat": -20.95
+      },
+      {
+        "lon": 44.133,
+        "lat": -17.833
+      },
+      {
+        "lon": 45.55,
+        "lat": -16.133
+      }
+    ],
+    "dir": "-",
+    "spd": "0",
+    "chng": "INTSF",
+    "rawSigmet": "WSMG31 FMMI 111111\nFMMM SIGMET B1 VALID 111112/111512 FMMI-\nFMMM ANTANANARIVO FIR/UIR EMBD TS FCST WI \nS1618 E04648 - S2017 E04802 - S2148 E04715 - \nS2417 E04424 - S2141 E04206 - S2057 E04457 - \nS1750 E04408 - S1608 E04533 TOP ABV FL450 \nSTNR INTSF="
+  },
+  {
+    "icaoId": "SARE",
+    "firId": "SARR",
+    "firName": "SARR RESISTENCIA",
+    "receiptTime": "2026-11-11T11:11:08.618Z",
+    "validTimeFrom": 1794395580,
+    "validTimeTo": 1794402780,
+    "seriesId": "A1",
+    "hazard": "TS",
+    "qualifier": "EMBD",
+    "base": null,
+    "top": 34000,
+    "geom": "AREA",
+    "coords": [
+      {
+        "lon": -58.305,
+        "lat": -24.982
+      },
+      {
+        "lon": -58.34,
+        "lat": -25.01
+      },
+      {
+        "lon": -58.372,
+        "lat": -24.947
+      },
+      {
+        "lon": -58.608,
+        "lat": -24.82
+      },
+      {
+        "lon": -58.8,
+        "lat": -24.79
+      },
+      {
+        "lon": -59.31,
+        "lat": -24.5
+      },
+      {
+        "lon": -59.463,
+        "lat": -24.363
+      },
+      {
+        "lon": -60.017,
+        "lat": -24.067
+      },
+      {
+        "lon": -60.18,
+        "lat": -24.042
+      },
+      {
+        "lon": -60.27,
+        "lat": -24.06
+      },
+      {
+        "lon": -60.365,
+        "lat": -24.014
+      },
+      {
+        "lon": -60.567,
+        "lat": -23.983
+      },
+      {
+        "lon": -61.267,
+        "lat": -24.533
+      },
+      {
+        "lon": -60.483,
+        "lat": -25.1
+      },
+      {
+        "lon": -58.117,
+        "lat": -25.083
+      },
+      {
+        "lon": -58.305,
+        "lat": -24.982
+      }
+    ],
+    "dir": "-",
+    "spd": "0",
+    "chng": "WKN",
+    "rawSigmet": "WSAG31 SARE 111113\nSARR SIGMET A1 VALID 111113/111313 SARE-\nSARR RESISTENCIA FIR EMBD TS OBS AT 1050Z\nWI S2359 W06034 - S2432 W06116 - S2506 W06029 - S2505 W05807 - S2404\nW06001 - S2359 W06034 TOP FL340 STNR WKN="
+  },
+  {
+    "icaoId": "YMMC",
+    "firId": "YBBB",
+    "firName": "YBBB BRISBANE",
+    "receiptTime": "2026-11-11T11:19:33.733Z",
+    "validTimeFrom": 1794396000,
+    "validTimeTo": 1794403200,
+    "seriesId": "E01",
+    "hazard": "TS",
+    "qualifier": "FRQ",
+    "base": null,
+    "top": 42000,
+    "geom": "AREA",
+    "coords": [
+      {
+        "lon": 158.167,
+        "lat": -31.333
+      },
+      {
+        "lon": 159.333,
+        "lat": -31.667
+      },
+      {
+        "lon": 159.833,
+        "lat": -33
+      },
+      {
+        "lon": 159,
+        "lat": -33.667
+      },
+      {
+        "lon": 157.167,
+        "lat": -33.167
+      },
+      {
+        "lon": 157,
+        "lat": -31.833
+      }
+    ],
+    "dir": "NE",
+    "spd": "30",
+    "chng": "NC",
+    "rawSigmet": "WSAU21 YMMC 111119\nYBBB SIGMET E01 VALID 111120/111320 YMMC-\nYBBB BRISBANE FIR FRQ TS OBS WI S3120 E15810 - S3140 E15920 - S3300\nE15950 - S3340 E15900 - S3310 E15710 - S3150 E15700 TOP FL420 MOV NE\n30KT NC="
+  },
+  {
+    "icaoId": "CWAO",
+    "firId": "CZEG",
+    "firName": "CZEG EDMONTON",
+    "receiptTime": "2026-11-11T11:30:03.174Z",
+    "validTimeFrom": 1794396300,
+    "validTimeTo": 1794410700,
+    "seriesId": "F4",
+    "hazard": "MTW",
+    "qualifier": "SEV",
+    "base": 0,
+    "top": 14000,
+    "geom": "AREA",
+    "coords": [
+      {
+        "lon": -124.014,
+        "lat": 56.103
+      },
+      {
+        "lon": -123.26,
+        "lat": 56.01
+      },
+      {
+        "lon": -119.01,
+        "lat": 53.4
+      },
+      {
+        "lon": -117.46,
+        "lat": 51.78
+      },
+      {
+        "lon": -117.19,
+        "lat": 51.494
+      },
+      {
+        "lon": -114.917,
+        "lat": 49.959
+      },
+      {
+        "lon": -114.815,
+        "lat": 49.025
+      },
+      {
+        "lon": -113.285,
+        "lat": 49.075
+      },
+      {
+        "lon": -113.416,
+        "lat": 50.274
+      },
+      {
+        "lon": -123.837,
+        "lat": 57.311
+      },
+      {
+        "lon": -125.03,
+        "lat": 56.789
+      },
+      {
+        "lon": -124.014,
+        "lat": 56.103
+      }
+    ],
+    "dir": "-",
+    "spd": "0",
+    "chng": "NC",
+    "rawSigmet": "WSCN02 CWAO 111129\nCZEG SIGMET F4 VALID 111125/111525 CWEG-\nCZEG EDMONTON FIR SEV MTW FCST WI 50NM WID LINE BTN N5703 W12426 - N5007 W11410\n- N4903 W11403 SFC/FL140 STNR NC="
+  },
+  {
+    "icaoId": "CWAO",
+    "firId": "CZVR",
+    "firName": "CZVR VANCOUVER",
+    "receiptTime": "2026-11-11T11:30:03.197Z",
+    "validTimeFrom": 1794396300,
+    "validTimeTo": 1794410700,
+    "seriesId": "G4",
+    "hazard": "MTW",
+    "qualifier": "SEV",
+    "base": 0,
+    "top": 14000,
+    "geom": "AREA",
+    "coords": [
+      {
+        "lon": -117.19,
+        "lat": 51.494
+      },
+      {
+        "lon": -117.46,
+        "lat": 51.78
+      },
+      {
+        "lon": -119.01,
+        "lat": 53.4
+      },
+      {
+        "lon": -123.26,
+        "lat": 56.01
+      },
+      {
+        "lon": -124.014,
+        "lat": 56.103
+      },
+      {
+        "lon": -117.19,
+        "lat": 51.494
+      }
+    ],
+    "dir": "-",
+    "spd": "0",
+    "chng": "NC",
+    "rawSigmet": "WSCN01 CWAO 111129\nCZVR SIGMET G4 VALID 111125/111525 CWEG-\nCZVR VANCOUVER FIR SEV MTW FCST WI 50NM WID LINE BTN N5703 W12426 - N5007 W11410\n- N4903 W11403 SFC/FL140 STNR NC="
+  },
+  {
+    "icaoId": "ZSSS",
+    "firId": "ZSHA",
+    "firName": "ZSHA SHANGHAI",
+    "receiptTime": "2026-11-11T11:04:51.358Z",
+    "validTimeFrom": 1794396600,
+    "validTimeTo": 1794411000,
+    "seriesId": "5",
+    "hazard": "ICE",
+    "qualifier": "SEV",
+    "base": 12000,
+    "top": 27000,
+    "geom": "AREA",
+    "coords": [
+      {
+        "lon": 121.99,
+        "lat": 27
+      },
+      {
+        "lon": 124,
+        "lat": 29
+      },
+      {
+        "lon": 124,
+        "lat": 30.02
+      },
+      {
+        "lon": 124,
+        "lat": 33
+      },
+      {
+        "lon": 115.806,
+        "lat": 33
+      },
+      {
+        "lon": 115.77,
+        "lat": 32.57
+      },
+      {
+        "lon": 115.88,
+        "lat": 31.28
+      },
+      {
+        "lon": 115.95,
+        "lat": 30.06
+      },
+      {
+        "lon": 114.57,
+        "lat": 29.06
+      },
+      {
+        "lon": 114.051,
+        "lat": 27
+      },
+      {
+        "lon": 121.99,
+        "lat": 27
+      }
+    ],
+    "dir": "E",
+    "spd": "10",
+    "chng": "NC",
+    "rawSigmet": "WSCI34 ZSSS 111104\nZSHA SIGMET 5 VALID 111130/111530 ZSSS-\nZSHA SHANGHAI FIR SEV ICE FCST\nN OF N27 AND S OF N33 FL120/270\nMOV E 20KMH NC="
+  },
+  {
+    "icaoId": "ZSSS",
+    "firId": "ZSHA",
+    "firName": "ZSHA SHANGHAI",
+    "receiptTime": "2026-11-11T11:06:22.290Z",
+    "validTimeFrom": 1794396600,
+    "validTimeTo": 1794411000,
+    "seriesId": "6",
+    "hazard": "TURB",
+    "qualifier": "SEV",
+    "base": 16000,
+    "top": 40000,
+    "geom": "AREA",
+    "coords": [
+      {
+        "lon": 124,
+        "lat": 29
+      },
+      {
+        "lon": 124,
+        "lat": 30.02
+      },
+      {
+        "lon": 124,
+        "lat": 38
+      },
+      {
+        "lon": 123,
+        "lat": 38.25
+      },
+      {
+        "lon": 120,
+        "lat": 38.25
+      },
+      {
+        "lon": 118.49,
+        "lat": 37.8
+      },
+      {
+        "lon": 117.49,
+        "lat": 37.46
+      },
+      {
+        "lon": 116.18,
+        "lat": 36.95
+      },
+      {
+        "lon": 115.35,
+        "lat": 36.67
+      },
+      {
+        "lon": 115.4,
+        "lat": 35.9
+      },
+      {
+        "lon": 115.42,
+        "lat": 35.14
+      },
+      {
+        "lon": 115.93,
+        "lat": 34.5
+      },
+      {
+        "lon": 115.77,
+        "lat": 32.57
+      },
+      {
+        "lon": 115.88,
+        "lat": 31.28
+      },
+      {
+        "lon": 115.95,
+        "lat": 30.06
+      },
+      {
+        "lon": 114.57,
+        "lat": 29.06
+      },
+      {
+        "lon": 114.555,
+        "lat": 29
+      },
+      {
+        "lon": 124,
+        "lat": 29
+      }
+    ],
+    "dir": "E",
+    "spd": "10",
+    "chng": "NC",
+    "rawSigmet": "WSCI34 ZSSS 111105\nZSHA SIGMET 6 VALID 111130/111530 ZSSS-\nZSHA SHANGHAI FIR SEV TURB FCST\nN OF N29 FL160/400\nMOV E 20KMH NC="
+  },
+  {
+    "icaoId": "SBGL",
+    "firId": "SBAZ",
+    "firName": "SBAZ AMAZONICA",
+    "receiptTime": "2026-11-11T11:19:21.917Z",
+    "validTimeFrom": 1794396600,
+    "validTimeTo": 1794411000,
+    "seriesId": "25",
+    "hazard": "TS",
+    "qualifier": "EMBD",
+    "base": null,
+    "top": 48000,
+    "geom": "AREA",
+    "coords": [
+      {
+        "lon": -69.965,
+        "lat": -4.247
+      },
+      {
+        "lon": -69.96,
+        "lat": -4.26
+      },
+      {
+        "lon": -70.02,
+        "lat": -4.34
+      },
+      {
+        "lon": -70.12,
+        "lat": -4.26
+      },
+      {
+        "lon": -70.21,
+        "lat": -4.34
+      },
+      {
+        "lon": -70.31,
+        "lat": -4.26
+      },
+      {
+        "lon": -70.326,
+        "lat": -4.165
+      },
+      {
+        "lon": -70.445,
+        "lat": -4.139
+      },
+      {
+        "lon": -70.52,
+        "lat": -4.18
+      },
+      {
+        "lon": -70.76,
+        "lat": -4.162
+      },
+      {
+        "lon": -70.793,
+        "lat": -4.175
+      },
+      {
+        "lon": -70.97,
+        "lat": -4.39
+      },
+      {
+        "lon": -71.271,
+        "lat": -4.381
+      },
+      {
+        "lon": -71.326,
+        "lat": -4.404
+      },
+      {
+        "lon": -71.38,
+        "lat": -4.44
+      },
+      {
+        "lon": -71.438,
+        "lat": -4.452
+      },
+      {
+        "lon": -71.9,
+        "lat": -4.65
+      },
+      {
+        "lon": -72.133,
+        "lat": -6.617
+      },
+      {
+        "lon": -70.967,
+        "lat": -7.217
+      },
+      {
+        "lon": -69.867,
+        "lat": -7.217
+      },
+      {
+        "lon": -69.717,
+        "lat": -4.433
+      },
+      {
+        "lon": -69.933,
+        "lat": -4.2
+      },
+      {
+        "lon": -69.95,
+        "lat": -4.25
+      },
+      {
+        "lon": -69.965,
+        "lat": -4.247
+      }
+    ],
+    "dir": "-",
+    "spd": "0",
+    "chng": "NC",
+    "rawSigmet": "WSBZ23 SBGL 111125\nSBAZ SIGMET 25 VALID 111130/111530 SBAZ - SBAZ AMAZONICA FIR EMBD TS FCST WI S0637 W07208 - S0713 W07058 - S0713 W06952 - S0426 W06943 - S0412 W06956 - S0415 W06957 - S0406 W07037 - S0439 W07154 - S0637 W07208 TOP FL480 STNR NC="
+  },
+  {
+    "icaoId": "SBGL",
+    "firId": "SBAZ",
+    "firName": "SBAZ AMAZONICA",
+    "receiptTime": "2026-11-11T11:19:33.546Z",
+    "validTimeFrom": 1794396600,
+    "validTimeTo": 1794411000,
+    "seriesId": "28",
+    "hazard": "TS",
+    "qualifier": "EMBD",
+    "base": null,
+    "top": 48000,
+    "geom": "AREA",
+    "coords": [
+      {
+        "lon": -58.45,
+        "lat": -16.326
+      },
+      {
+        "lon": -58.32,
+        "lat": -16.28
+      },
+      {
+        "lon": -58.35,
+        "lat": -16.52
+      },
+      {
+        "lon": -58.439,
+        "lat": -16.615
+      },
+      {
+        "lon": -58.417,
+        "lat": -17.183
+      },
+      {
+        "lon": -58.248,
+        "lat": -17.34
+      },
+      {
+        "lon": -58.14,
+        "lat": -17.4
+      },
+      {
+        "lon": -58.01,
+        "lat": -17.51
+      },
+      {
+        "lon": -57.88,
+        "lat": -17.46
+      },
+      {
+        "lon": -57.78,
+        "lat": -17.55
+      },
+      {
+        "lon": -57.79,
+        "lat": -17.6
+      },
+      {
+        "lon": -57.69,
+        "lat": -17.818
+      },
+      {
+        "lon": -57,
+        "lat": -16.783
+      },
+      {
+        "lon": -56.733,
+        "lat": -14.533
+      },
+      {
+        "lon": -58.683,
+        "lat": -13.717
+      },
+      {
+        "lon": -59.417,
+        "lat": -15.9
+      },
+      {
+        "lon": -59.333,
+        "lat": -16.283
+      },
+      {
+        "lon": -58.45,
+        "lat": -16.317
+      },
+      {
+        "lon": -58.45,
+        "lat": -16.326
+      }
+    ],
+    "dir": "-",
+    "spd": "0",
+    "chng": "NC",
+    "rawSigmet": "WSBZ23 SBGL 111125\nSBAZ SIGMET 28 VALID 111130/111530 SBAZ - SBAZ AMAZONICA FIR EMBD TS FCST WI S1554 W05925 - S1617 W05920 - S1619 W05827 - S1711 W05825 - S1750 W05743 - S1750 W05742 - S1647 W05700 - S1432 W05644 - S1343 W05841 - S1554 W05925 TOP FL480 STNR NC="
+  },
+  {
+    "icaoId": "SBGL",
+    "firId": "SBAZ",
+    "firName": "SBAZ AMAZONICA",
+    "receiptTime": "2026-11-11T11:19:33.705Z",
+    "validTimeFrom": 1794396600,
+    "validTimeTo": 1794411000,
+    "seriesId": "26",
+    "hazard": "TS",
+    "qualifier": "EMBD",
+    "base": null,
+    "top": 48000,
+    "geom": "AREA",
+    "coords": [
+      {
+        "lon": -64.378,
+        "lat": 3.744
+      },
+      {
+        "lon": -64.29,
+        "lat": 3.7
+      },
+      {
+        "lon": -64.17,
+        "lat": 3.53
+      },
+      {
+        "lon": -64.24,
+        "lat": 3.45
+      },
+      {
+        "lon": -64.22,
+        "lat": 3.12
+      },
+      {
+        "lon": -64.09,
+        "lat": 2.91
+      },
+      {
+        "lon": -64,
+        "lat": 2.71
+      },
+      {
+        "lon": -64.01,
+        "lat": 2.6
+      },
+      {
+        "lon": -64.019,
+        "lat": 2.582
+      },
+      {
+        "lon": -63.972,
+        "lat": 2.473
+      },
+      {
+        "lon": -63.83,
+        "lat": 2.43
+      },
+      {
+        "lon": -63.7,
+        "lat": 2.44
+      },
+      {
+        "lon": -63.36,
+        "lat": 2.4
+      },
+      {
+        "lon": -63.37,
+        "lat": 2.27
+      },
+      {
+        "lon": -63.41,
+        "lat": 2.15
+      },
+      {
+        "lon": -63.62,
+        "lat": 2.1
+      },
+      {
+        "lon": -63.78,
+        "lat": 1.97
+      },
+      {
+        "lon": -63.96,
+        "lat": 1.97
+      },
+      {
+        "lon": -64.05,
+        "lat": 1.89
+      },
+      {
+        "lon": -64.08,
+        "lat": 1.66
+      },
+      {
+        "lon": -64.13,
+        "lat": 1.58
+      },
+      {
+        "lon": -64.31,
+        "lat": 1.44
+      },
+      {
+        "lon": -64.41,
+        "lat": 1.51
+      },
+      {
+        "lon": -64.55,
+        "lat": 1.42
+      },
+      {
+        "lon": -64.6,
+        "lat": 1.33
+      },
+      {
+        "lon": -64.73,
+        "lat": 1.25
+      },
+      {
+        "lon": -64.84,
+        "lat": 1.27
+      },
+      {
+        "lon": -64.955,
+        "lat": 1.212
+      },
+      {
+        "lon": -63.967,
+        "lat": -0.617
+      },
+      {
+        "lon": -61.617,
+        "lat": -0.667
+      },
+      {
+        "lon": -60.733,
+        "lat": -2.217
+      },
+      {
+        "lon": -57.567,
+        "lat": -1.75
+      },
+      {
+        "lon": -59.517,
+        "lat": 1.083
+      },
+      {
+        "lon": -60.717,
+        "lat": 1.733
+      },
+      {
+        "lon": -61.683,
+        "lat": 3.2
+      },
+      {
+        "lon": -64.333,
+        "lat": 3.783
+      },
+      {
+        "lon": -64.378,
+        "lat": 3.744
+      }
+    ],
+    "dir": "-",
+    "spd": "0",
+    "chng": "NC",
+    "rawSigmet": "WSBZ23 SBGL 111125\nSBAZ SIGMET 26 VALID 111130/111530 SBAZ - SBAZ AMAZONICA FIR EMBD TS FCST WI S0037 W06358 - S0040 W06137 - S0213 W06044 - S0145 W05734 - N0105 W05931 - N0144 W06043 - N0312 W06141 - N0347 W06420 - N0339 W06429 - N0207 W06349 - N0114 W06458 - S0037 W06358 TOP FL480 STNR NC="
+  },
+  {
+    "icaoId": "SBGL",
+    "firId": "SBAZ",
+    "firName": "SBAZ AMAZONICA",
+    "receiptTime": "2026-11-11T11:19:33.821Z",
+    "validTimeFrom": 1794396600,
+    "validTimeTo": 1794411000,
+    "seriesId": "27",
+    "hazard": "TS",
+    "qualifier": "EMBD",
+    "base": null,
+    "top": 48000,
+    "geom": "AREA",
+    "coords": [
+      {
+        "lon": -63.067,
+        "lat": -10.017
+      },
+      {
+        "lon": -63.017,
+        "lat": -8.317
+      },
+      {
+        "lon": -59.333,
+        "lat": -8.4
+      },
+      {
+        "lon": -59.333,
+        "lat": -10.233
+      },
+      {
+        "lon": -63.067,
+        "lat": -10.017
+      }
+    ],
+    "dir": "-",
+    "spd": "0",
+    "chng": "NC",
+    "rawSigmet": "WSBZ23 SBGL 111125\nSBAZ SIGMET 27 VALID 111130/111530 SBAZ - SBAZ AMAZONICA FIR EMBD TS FCST WI S1001 W06304 - S0819 W06301 - S0824 W05920 - S1014 W05920 - S1001 W06304 TOP FL480 STNR NC="
+  },
+  {
+    "icaoId": "SBGL",
+    "firId": "SBCW",
+    "firName": "SBCW CURITIBA",
+    "receiptTime": "2026-11-11T11:24:04.919Z",
+    "validTimeFrom": 1794396600,
+    "validTimeTo": 1794411000,
+    "seriesId": "10",
+    "hazard": "TS",
+    "qualifier": "EMBD",
+    "base": null,
+    "top": 46000,
+    "geom": "AREA",
+    "coords": [
+      {
+        "lon": -53.714,
+        "lat": -26.917
+      },
+      {
+        "lon": -53.81,
+        "lat": -27.17
+      },
+      {
+        "lon": -53.85,
+        "lat": -27.14
+      },
+      {
+        "lon": -54.11,
+        "lat": -27.29
+      },
+      {
+        "lon": -54.19,
+        "lat": -27.26
+      },
+      {
+        "lon": -54.26,
+        "lat": -27.39
+      },
+      {
+        "lon": -54.36,
+        "lat": -27.46
+      },
+      {
+        "lon": -54.61,
+        "lat": -27.53
+      },
+      {
+        "lon": -54.667,
+        "lat": -27.536
+      },
+      {
+        "lon": -54.9,
+        "lat": -27.687
+      },
+      {
+        "lon": -54.9,
+        "lat": -27.73
+      },
+      {
+        "lon": -55.01,
+        "lat": -27.79
+      },
+      {
+        "lon": -55.03,
+        "lat": -27.85
+      },
+      {
+        "lon": -55.13,
+        "lat": -27.89
+      },
+      {
+        "lon": -55.17,
+        "lat": -27.863
+      },
+      {
+        "lon": -55.373,
+        "lat": -27.995
+      },
+      {
+        "lon": -55.38,
+        "lat": -28.03
+      },
+      {
+        "lon": -55.58,
+        "lat": -28.15
+      },
+      {
+        "lon": -55.66,
+        "lat": -28.182
+      },
+      {
+        "lon": -55.759,
+        "lat": -28.247
+      },
+      {
+        "lon": -55.67,
+        "lat": -28.32
+      },
+      {
+        "lon": -55.72,
+        "lat": -28.36
+      },
+      {
+        "lon": -55.88,
+        "lat": -28.36
+      },
+      {
+        "lon": -55.91,
+        "lat": -28.46
+      },
+      {
+        "lon": -56.02,
+        "lat": -28.51
+      },
+      {
+        "lon": -56,
+        "lat": -28.58
+      },
+      {
+        "lon": -56.2,
+        "lat": -28.76
+      },
+      {
+        "lon": -56.27,
+        "lat": -28.78
+      },
+      {
+        "lon": -56.32,
+        "lat": -28.92
+      },
+      {
+        "lon": -56.42,
+        "lat": -28.96
+      },
+      {
+        "lon": -56.41,
+        "lat": -29.07
+      },
+      {
+        "lon": -56.59,
+        "lat": -29.13
+      },
+      {
+        "lon": -56.67,
+        "lat": -29.29
+      },
+      {
+        "lon": -56.85,
+        "lat": -29.5
+      },
+      {
+        "lon": -57.1,
+        "lat": -29.76
+      },
+      {
+        "lon": -57.24,
+        "lat": -29.79
+      },
+      {
+        "lon": -57.32,
+        "lat": -29.89
+      },
+      {
+        "lon": -57.33,
+        "lat": -30
+      },
+      {
+        "lon": -57.44,
+        "lat": -30.05
+      },
+      {
+        "lon": -57.441,
+        "lat": -30.052
+      },
+      {
+        "lon": -57.4,
+        "lat": -30.283
+      },
+      {
+        "lon": -57.372,
+        "lat": -30.296
+      },
+      {
+        "lon": -57.2,
+        "lat": -30.28
+      },
+      {
+        "lon": -57.07,
+        "lat": -30.1
+      },
+      {
+        "lon": -56.87,
+        "lat": -30.09
+      },
+      {
+        "lon": -56.58,
+        "lat": -30.3
+      },
+      {
+        "lon": -56.35,
+        "lat": -30.51
+      },
+      {
+        "lon": -56.2,
+        "lat": -30.61
+      },
+      {
+        "lon": -56.13,
+        "lat": -30.73
+      },
+      {
+        "lon": -56,
+        "lat": -30.82
+      },
+      {
+        "lon": -56,
+        "lat": -30.891
+      },
+      {
+        "lon": -55.757,
+        "lat": -30.996
+      },
+      {
+        "lon": -55.65,
+        "lat": -30.94
+      },
+      {
+        "lon": -55.66,
+        "lat": -30.86
+      },
+      {
+        "lon": -55.57,
+        "lat": -30.84
+      },
+      {
+        "lon": -55.34,
+        "lat": -31.06
+      },
+      {
+        "lon": -55.255,
+        "lat": -31.214
+      },
+      {
+        "lon": -55.133,
+        "lat": -31.267
+      },
+      {
+        "lon": -52.517,
+        "lat": -30.433
+      },
+      {
+        "lon": -51.65,
+        "lat": -29.183
+      },
+      {
+        "lon": -51.617,
+        "lat": -27.483
+      },
+      {
+        "lon": -53.714,
+        "lat": -26.917
+      }
+    ],
+    "dir": "E",
+    "spd": "8",
+    "chng": "NC",
+    "rawSigmet": "WSBZ23 SBGL 111125\nSBCW SIGMET 10 VALID 111130/111530 SBCW - SBCW CURITIBA FIR EMBD TS FCST WI S3000 W05727 - S3017 W05724 - S3116 W05508 - S3026 W05231 - S2911 W05139 - S2729 W05137 - S2655 W05343 - S2819 W05552 - S3000 W05727 TOP FL460 MOV E 08KT NC="
+  },
+  {
+    "icaoId": "SBGL",
+    "firId": "SBCW",
+    "firName": "SBCW CURITIBA",
+    "receiptTime": "2026-11-11T11:24:13.957Z",
+    "validTimeFrom": 1794396600,
+    "validTimeTo": 1794411000,
+    "seriesId": "11",
+    "hazard": "ICE",
+    "qualifier": "SEV",
+    "base": 12000,
+    "top": 20000,
+    "geom": "AREA",
+    "coords": [
+      {
+        "lon": -55.046,
+        "lat": -31.32
+      },
+      {
+        "lon": -55.01,
+        "lat": -31.27
+      },
+      {
+        "lon": -54.82,
+        "lat": -31.45
+      },
+      {
+        "lon": -54.58,
+        "lat": -31.46
+      },
+      {
+        "lon": -54.48,
+        "lat": -31.56
+      },
+      {
+        "lon": -54.46,
+        "lat": -31.66
+      },
+      {
+        "lon": -54.315,
+        "lat": -31.763
+      },
+      {
+        "lon": -54.117,
+        "lat": -31.883
+      },
+      {
+        "lon": -54.105,
+        "lat": -31.912
+      },
+      {
+        "lon": -54.08,
+        "lat": -31.93
+      },
+      {
+        "lon": -54.02,
+        "lat": -31.91
+      },
+      {
+        "lon": -53.75,
+        "lat": -32.07
+      },
+      {
+        "lon": -53.65,
+        "lat": -32.25
+      },
+      {
+        "lon": -53.65,
+        "lat": -32.35
+      },
+      {
+        "lon": -53.39,
+        "lat": -32.58
+      },
+      {
+        "lon": -53.18,
+        "lat": -32.64
+      },
+      {
+        "lon": -53.11,
+        "lat": -32.73
+      },
+      {
+        "lon": -53.29,
+        "lat": -32.91
+      },
+      {
+        "lon": -53.3,
+        "lat": -32.96
+      },
+      {
+        "lon": -53.49,
+        "lat": -33.1
+      },
+      {
+        "lon": -53.54,
+        "lat": -33.24
+      },
+      {
+        "lon": -53.5,
+        "lat": -33.4
+      },
+      {
+        "lon": -53.501,
+        "lat": -33.415
+      },
+      {
+        "lon": -53.37,
+        "lat": -33.741
+      },
+      {
+        "lon": -53.055,
+        "lat": -33.97
+      },
+      {
+        "lon": -52.8,
+        "lat": -34
+      },
+      {
+        "lon": -50.4,
+        "lat": -34
+      },
+      {
+        "lon": -47.217,
+        "lat": -30.733
+      },
+      {
+        "lon": -47.217,
+        "lat": -29.667
+      },
+      {
+        "lon": -47.983,
+        "lat": -28.05
+      },
+      {
+        "lon": -52.183,
+        "lat": -27.133
+      },
+      {
+        "lon": -52.267,
+        "lat": -27.317
+      },
+      {
+        "lon": -51.617,
+        "lat": -27.483
+      },
+      {
+        "lon": -51.65,
+        "lat": -29.183
+      },
+      {
+        "lon": -52.517,
+        "lat": -30.433
+      },
+      {
+        "lon": -53.867,
+        "lat": -30.867
+      },
+      {
+        "lon": -55.133,
+        "lat": -31.267
+      },
+      {
+        "lon": -55.046,
+        "lat": -31.32
+      }
+    ],
+    "dir": "E",
+    "spd": "5",
+    "chng": "NC",
+    "rawSigmet": "WSBZ23 SBGL 111125\nSBCW SIGMET 11 VALID 111130/111530 SBCW - SBCW CURITIBA FIR SEV ICE FCST WI S3116 W05508 - S3153 W05407 - S3345 W05322 - S3353 W05323 - S3358 W05305 - S3400 W05248 - S3400 W05024 - S3044 W04713 - S2940 W04713 - S2803 W04759 - S2708 W05211 - S2719 W05216 - S2729 W05137 - S2911 W05139 - S3026 W05231 - S3052 W05352 - S3116 W05508 FL120/200 MOV E 05KT NC="
+  },
+  {
+    "icaoId": "SBGL",
+    "firId": "SBCW",
+    "firName": "SBCW CURITIBA",
+    "receiptTime": "2026-11-11T11:24:22.813Z",
+    "validTimeFrom": 1794396600,
+    "validTimeTo": 1794411000,
+    "seriesId": "12",
+    "hazard": "TURB",
+    "qualifier": "SEV",
+    "base": 30000,
+    "top": 40000,
+    "geom": "AREAS",
+    "coords": [
+      [
+        {
+          "lon": -54.667,
+          "lat": -23.817
+        },
+        {
+          "lon": -54.666,
+          "lat": -23.817
+        },
+        {
+          "lon": -54.667,
+          "lat": -23.817
+        },
+        {
+          "lon": -54.667,
+          "lat": -23.817
+        }
+      ],
+      [
+        {
+          "lon": -54.603,
+          "lat": -23.816
+        },
+        {
+          "lon": -54.41,
+          "lat": -23.9
+        },
+        {
+          "lon": -54.37,
+          "lat": -23.99
+        },
+        {
+          "lon": -54.24,
+          "lat": -24.05
+        },
+        {
+          "lon": -54.35,
+          "lat": -24.13
+        },
+        {
+          "lon": -54.285,
+          "lat": -24.278
+        },
+        {
+          "lon": -54.267,
+          "lat": -24.3
+        },
+        {
+          "lon": -54.27,
+          "lat": -24.312
+        },
+        {
+          "lon": -54.24,
+          "lat": -24.38
+        },
+        {
+          "lon": -54.318,
+          "lat": -24.474
+        },
+        {
+          "lon": -54.334,
+          "lat": -24.526
+        },
+        {
+          "lon": -54.31,
+          "lat": -24.63
+        },
+        {
+          "lon": -54.42,
+          "lat": -24.84
+        },
+        {
+          "lon": -54.45,
+          "lat": -25.02
+        },
+        {
+          "lon": -54.43,
+          "lat": -25.13
+        },
+        {
+          "lon": -54.587,
+          "lat": -25.378
+        },
+        {
+          "lon": -54.614,
+          "lat": -25.47
+        },
+        {
+          "lon": -54.601,
+          "lat": -25.56
+        },
+        {
+          "lon": -54.552,
+          "lat": -25.601
+        },
+        {
+          "lon": -54.43,
+          "lat": -25.68
+        },
+        {
+          "lon": -54.31,
+          "lat": -25.55
+        },
+        {
+          "lon": -54.24,
+          "lat": -25.6
+        },
+        {
+          "lon": -54.11,
+          "lat": -25.51
+        },
+        {
+          "lon": -54.02,
+          "lat": -25.56
+        },
+        {
+          "lon": -53.94,
+          "lat": -25.66
+        },
+        {
+          "lon": -53.89,
+          "lat": -25.63
+        },
+        {
+          "lon": -53.83,
+          "lat": -25.8
+        },
+        {
+          "lon": -53.83,
+          "lat": -25.97
+        },
+        {
+          "lon": -53.74,
+          "lat": -26.05
+        },
+        {
+          "lon": -53.65,
+          "lat": -26.24
+        },
+        {
+          "lon": -53.72,
+          "lat": -26.37
+        },
+        {
+          "lon": -53.71,
+          "lat": -26.5
+        },
+        {
+          "lon": -53.74,
+          "lat": -26.74
+        },
+        {
+          "lon": -53.7,
+          "lat": -26.88
+        },
+        {
+          "lon": -53.714,
+          "lat": -26.917
+        },
+        {
+          "lon": -51.617,
+          "lat": -27.483
+        },
+        {
+          "lon": -51.65,
+          "lat": -29.183
+        },
+        {
+          "lon": -52.2,
+          "lat": -29.983
+        },
+        {
+          "lon": -48.717,
+          "lat": -32.267
+        },
+        {
+          "lon": -47.217,
+          "lat": -30.733
+        },
+        {
+          "lon": -47.217,
+          "lat": -30.776
+        },
+        {
+          "lon": -44.009,
+          "lat": -27.061
+        },
+        {
+          "lon": -49.683,
+          "lat": -23.783
+        },
+        {
+          "lon": -54.603,
+          "lat": -23.816
+        }
+      ]
+    ],
+    "dir": "-",
+    "spd": "0",
+    "chng": "NC",
+    "rawSigmet": "WSBZ23 SBGL 111125\nSBCW SIGMET 12 VALID 111130/111530 SBCW - SBCW CURITIBA FIR SEV TURB FCST WI S2349 W05440 - S2418 W05416 - S2532 W05438 - S2542 W05426 - S2537 W05405 - S2655 W05343 - S2729 W05137 - S2911 W05139 - S2959 W05212 - S3216 W04843 - S3044 W04713 - S3048 W04713 - S2947 W04616 - S2704 W04400 - S2347 W04941 - S2349 W05440 FL300/400 STNR NC="
+  },
+  {
+    "icaoId": "SBGL",
+    "firId": "SBAO",
+    "firName": "SBAO ATLANTICO",
+    "receiptTime": "2026-11-11T11:27:14.237Z",
+    "validTimeFrom": 1794396600,
+    "validTimeTo": 1794411000,
+    "seriesId": "14",
+    "hazard": "ICE",
+    "qualifier": "SEV",
+    "base": 12000,
+    "top": 20000,
+    "geom": "AREA",
+    "coords": [
+      {
+        "lon": -47.217,
+        "lat": -30.776
+      },
+      {
+        "lon": -50,
+        "lat": -34
+      },
+      {
+        "lon": -48.216,
+        "lat": -34
+      },
+      {
+        "lon": -47.217,
+        "lat": -31.3
+      },
+      {
+        "lon": -47.217,
+        "lat": -30.776
+      }
+    ],
+    "dir": "E",
+    "spd": "5",
+    "chng": "NC",
+    "rawSigmet": "WSBZ23 SBGL 111125\nSBAO SIGMET 14 VALID 111130/111530 SBAO - SBAO ATLANTICO FIR SEV ICE FCST WI S3400 W05024 - S3419 W04820 - S3118 W04713 - S3044 W04713 - S3400 W05024 FL120/200 MOV E 05KT NC="
+  },
+  {
+    "icaoId": "SBGL",
+    "firId": "SBAO",
+    "firName": "SBAO ATLANTICO",
+    "receiptTime": "2026-11-11T11:27:23.756Z",
+    "validTimeFrom": 1794396600,
+    "validTimeTo": 1794411000,
+    "seriesId": "15",
+    "hazard": "ICE",
+    "qualifier": "SEV",
+    "base": 14000,
+    "top": 22000,
+    "geom": "AREA",
+    "coords": [
+      {
+        "lon": -38.217,
+        "lat": -18.618
+      },
+      {
+        "lon": -37.669,
+        "lat": -18.866
+      },
+      {
+        "lon": -37.667,
+        "lat": -18.867
+      },
+      {
+        "lon": -37.667,
+        "lat": -18.867
+      },
+      {
+        "lon": -37.66,
+        "lat": -18.87
+      },
+      {
+        "lon": -38.098,
+        "lat": -19.445
+      },
+      {
+        "lon": -38.35,
+        "lat": -19.783
+      },
+      {
+        "lon": -38.617,
+        "lat": -19.933
+      },
+      {
+        "lon": -37.867,
+        "lat": -20.433
+      },
+      {
+        "lon": -34.367,
+        "lat": -22.6
+      },
+      {
+        "lon": -29.667,
+        "lat": -24.533
+      },
+      {
+        "lon": -27.2,
+        "lat": -25.283
+      },
+      {
+        "lon": -22.683,
+        "lat": -28
+      },
+      {
+        "lon": -20.617,
+        "lat": -23.65
+      },
+      {
+        "lon": -25.533,
+        "lat": -19.517
+      },
+      {
+        "lon": -31.2,
+        "lat": -16.467
+      },
+      {
+        "lon": -35.7,
+        "lat": -14.467
+      },
+      {
+        "lon": -37.033,
+        "lat": -16.3
+      },
+      {
+        "lon": -38.217,
+        "lat": -18.618
+      }
+    ],
+    "dir": "-",
+    "spd": "0",
+    "chng": "NC",
+    "rawSigmet": "WSBZ23 SBGL 111125\nSBAO SIGMET 15 VALID 111130/111530 SBAO - SBAO ATLANTICO FIR SEV ICE FCST WI S1956 W03837 - S2026 W03752 - S2236 W03422 - S2432 W02940 - S2517 W02712 - S2800 W02241 - S2339 W02037 - S1931 W02532 - S1628 W03112 - S1428 W03542 - S1618 W03702 - S1841 W03815 - S1852 W03740 - S1947 W03821 - S1956 W03837 FL140/220 STNR NC="
+  },
+  {
+    "icaoId": "SBGL",
+    "firId": "SBAO",
+    "firName": "SBAO ATLANTICO",
+    "receiptTime": "2026-11-11T11:27:35.559Z",
+    "validTimeFrom": 1794396600,
+    "validTimeTo": 1794411000,
+    "seriesId": "17",
+    "hazard": "TS",
+    "qualifier": "EMBD",
+    "base": null,
+    "top": 48000,
+    "geom": "AREA",
+    "coords": [
+      {
+        "lon": -30.1,
+        "lat": 4.001
+      },
+      {
+        "lon": -34.995,
+        "lat": 7.647
+      },
+      {
+        "lon": -35.019,
+        "lat": 7.64
+      },
+      {
+        "lon": -38.112,
+        "lat": 6.001
+      },
+      {
+        "lon": -35.433,
+        "lat": 3.983
+      },
+      {
+        "lon": -31.717,
+        "lat": 2.417
+      },
+      {
+        "lon": -30.1,
+        "lat": 4.001
+      }
+    ],
+    "dir": "-",
+    "spd": "0",
+    "chng": "NC",
+    "rawSigmet": "WSBZ23 SBGL 111125\nSBAO SIGMET 17 VALID 111130/111530 SBAO - SBAO ATLANTICO FIR EMBD TS FCST WI N0601 W03808 - N0359 W03526 - N0225 W03143 - N0403 W03003 - N0739 W03459 - N0737 W03506 - N0637 W03701 - N0601 W03808 TOP FL480 STNR NC="
+  },
+  {
+    "icaoId": "SBGL",
+    "firId": "SBAO",
+    "firName": "SBAO ATLANTICO",
+    "receiptTime": "2026-11-11T11:27:36.301Z",
+    "validTimeFrom": 1794396600,
+    "validTimeTo": 1794411000,
+    "seriesId": "16",
+    "hazard": "TURB",
+    "qualifier": "SEV",
+    "base": 14000,
+    "top": 30000,
+    "geom": "AREA",
+    "coords": [
+      {
+        "lon": -10,
+        "lat": -33.993
+      },
+      {
+        "lon": -10,
+        "lat": -27.994
+      },
+      {
+        "lon": -19.817,
+        "lat": -22.233
+      },
+      {
+        "lon": -26.8,
+        "lat": -18.767
+      },
+      {
+        "lon": -29.133,
+        "lat": -20.383
+      },
+      {
+        "lon": -30.933,
+        "lat": -25.8
+      },
+      {
+        "lon": -22.833,
+        "lat": -30.533
+      },
+      {
+        "lon": -17.452,
+        "lat": -34
+      },
+      {
+        "lon": -10.043,
+        "lat": -34
+      },
+      {
+        "lon": -10,
+        "lat": -33.993
+      }
+    ],
+    "dir": "-",
+    "spd": "0",
+    "chng": "NC",
+    "rawSigmet": "WSBZ23 SBGL 111125\nSBAO SIGMET 16 VALID 111130/111530 SBAO - SBAO ATLANTICO FIR SEV TURB FCST WI S3357 W00945 - S3500 W01554 - S3032 W02250 - S2548 W03056 - S2023 W02908 - S1846 W02648 - S2214 W01949 - S2802 W00956 - S3357 W00945 FL140/300 STNR NC="
+  },
+  {
+    "icaoId": "SBGL",
+    "firId": "SBRE",
+    "firName": "SBRE RECIFE",
+    "receiptTime": "2026-11-11T11:28:46.011Z",
+    "validTimeFrom": 1794396600,
+    "validTimeTo": 1794411000,
+    "seriesId": "10",
+    "hazard": "ICE",
+    "qualifier": "SEV",
+    "base": 14000,
+    "top": 22000,
+    "geom": "AREA",
+    "coords": [
+      {
+        "lon": -38.628,
+        "lat": -19.925
+      },
+      {
+        "lon": -38.33,
+        "lat": -19.75
+      },
+      {
+        "lon": -38.098,
+        "lat": -19.445
+      },
+      {
+        "lon": -37.667,
+        "lat": -18.867
+      },
+      {
+        "lon": -37.669,
+        "lat": -18.866
+      },
+      {
+        "lon": -38.25,
+        "lat": -18.683
+      },
+      {
+        "lon": -38.217,
+        "lat": -18.618
+      },
+      {
+        "lon": -39.05,
+        "lat": -18.24
+      },
+      {
+        "lon": -37.78,
+        "lat": -15.63
+      },
+      {
+        "lon": -36.955,
+        "lat": -13.928
+      },
+      {
+        "lon": -41.617,
+        "lat": -12.3
+      },
+      {
+        "lon": -45.7,
+        "lat": -9.8
+      },
+      {
+        "lon": -47.183,
+        "lat": -10.883
+      },
+      {
+        "lon": -46.907,
+        "lat": -11.974
+      },
+      {
+        "lon": -46.856,
+        "lat": -12.045
+      },
+      {
+        "lon": -45.567,
+        "lat": -13.35
+      },
+      {
+        "lon": -44.352,
+        "lat": -15.24
+      },
+      {
+        "lon": -43.93,
+        "lat": -15.72
+      },
+      {
+        "lon": -41.48,
+        "lat": -17.14
+      },
+      {
+        "lon": -41.958,
+        "lat": -17.752
+      },
+      {
+        "lon": -41.6,
+        "lat": -17.9
+      },
+      {
+        "lon": -38.628,
+        "lat": -19.925
+      }
+    ],
+    "dir": "-",
+    "spd": "0",
+    "chng": "NC",
+    "rawSigmet": "WSBZ23 SBGL 111125\nSBRE SIGMET 10 VALID 111130/111530 SBRE - SBRE RECIFE FIR SEV ICE FCST WI S1053 W04711 - S1200 W04654 - S1321 W04534 - S1538 W04406 - S1657 W04149 - S1742 W04205 - S1754 W04136 - S1956 W03837 - S1947 W03821 - S1852 W03740 - S1841 W03815 - S1618 W03702 - S1428 W03542 - S1401 W03642 - S1218 W04137 - S0948 W04542 - S1053 W04711 FL140/220 STNR NC="
+  },
+  {
+    "icaoId": "SBGL",
+    "firId": "SBRE",
+    "firName": "SBRE RECIFE",
+    "receiptTime": "2026-11-11T11:28:55.462Z",
+    "validTimeFrom": 1794396600,
+    "validTimeTo": 1794411000,
+    "seriesId": "11",
+    "hazard": "TS",
+    "qualifier": "EMBD",
+    "base": null,
+    "top": 46000,
+    "geom": "AREA",
+    "coords": [
+      {
+        "lon": -43.533,
+        "lat": -6.267
+      },
+      {
+        "lon": -43.533,
+        "lat": -5.083
+      },
+      {
+        "lon": -41.5,
+        "lat": -5.083
+      },
+      {
+        "lon": -41.5,
+        "lat": -6.267
+      },
+      {
+        "lon": -43.533,
+        "lat": -6.267
+      }
+    ],
+    "dir": "-",
+    "spd": "0",
+    "chng": "NC",
+    "rawSigmet": "WSBZ23 SBGL 111125\nSBRE SIGMET 11 VALID 111130/111530 SBRE - SBRE RECIFE FIR EMBD TS FCST WI S0616 W04332 - S0505 W04332 - S0505 W04130 - S0616 W04130 - S0616 W04332 TOP FL460 STNR NC="
+  },
+  {
+    "icaoId": "SBGL",
+    "firId": "SBBS",
+    "firName": "SBBS BRASILIA",
+    "receiptTime": "2026-11-11T11:30:35.735Z",
+    "validTimeFrom": 1794396600,
+    "validTimeTo": 1794411000,
+    "seriesId": "5",
+    "hazard": "TS",
+    "qualifier": "EMBD",
+    "base": null,
+    "top": 46000,
+    "geom": "AREA",
+    "coords": [
+      {
+        "lon": -53.866,
+        "lat": -17.651
+      },
+      {
+        "lon": -54.102,
+        "lat": -17.39
+      },
+      {
+        "lon": -53.1,
+        "lat": -16.717
+      },
+      {
+        "lon": -53.517,
+        "lat": -15.067
+      },
+      {
+        "lon": -50.667,
+        "lat": -15.1
+      },
+      {
+        "lon": -48.25,
+        "lat": -15.017
+      },
+      {
+        "lon": -47,
+        "lat": -15.367
+      },
+      {
+        "lon": -47.7,
+        "lat": -17.083
+      },
+      {
+        "lon": -50.533,
+        "lat": -17.767
+      },
+      {
+        "lon": -53.866,
+        "lat": -17.651
+      }
+    ],
+    "dir": "-",
+    "spd": "0",
+    "chng": "NC",
+    "rawSigmet": "WSBZ23 SBGL 111125\nSBBS SIGMET 5 VALID 111130/111530 SBBS - SBBS BRASILIA FIR EMBD TS FCST WI S1724 W05407 - S1739 W05353 - S1746 W05032 - S1705 W04742 - S1522 W04700 - S1501 W04815 - S1506 W05040 - S1504 W05331 - S1643 W05306 - S1724 W05407 TOP FL460 STNR NC="
+  },
+  {
+    "icaoId": "SBGL",
+    "firId": "SBBS",
+    "firName": "SBBS BRASILIA",
+    "receiptTime": "2026-11-11T11:30:35.956Z",
+    "validTimeFrom": 1794396600,
+    "validTimeTo": 1794411000,
+    "seriesId": "6",
+    "hazard": "ICE",
+    "qualifier": "SEV",
+    "base": 14000,
+    "top": 22000,
+    "geom": "AREA",
+    "coords": [
+      {
+        "lon": -44.346,
+        "lat": -15.248
+      },
+      {
+        "lon": -45.48,
+        "lat": -13.96
+      },
+      {
+        "lon": -46.857,
+        "lat": -12.043
+      },
+      {
+        "lon": -46.9,
+        "lat": -12
+      },
+      {
+        "lon": -46.907,
+        "lat": -11.974
+      },
+      {
+        "lon": -47.01,
+        "lat": -11.83
+      },
+      {
+        "lon": -47.38,
+        "lat": -11.22
+      },
+      {
+        "lon": -47.444,
+        "lat": -11.077
+      },
+      {
+        "lon": -49.133,
+        "lat": -12.333
+      },
+      {
+        "lon": -51.017,
+        "lat": -13.233
+      },
+      {
+        "lon": -49.3,
+        "lat": -14.65
+      },
+      {
+        "lon": -48.267,
+        "lat": -15.017
+      },
+      {
+        "lon": -47,
+        "lat": -15.367
+      },
+      {
+        "lon": -47.5,
+        "lat": -16.567
+      },
+      {
+        "lon": -46.45,
+        "lat": -16.517
+      },
+      {
+        "lon": -43.983,
+        "lat": -16.95
+      },
+      {
+        "lon": -42.083,
+        "lat": -17.7
+      },
+      {
+        "lon": -41.817,
+        "lat": -16.95
+      },
+      {
+        "lon": -44.1,
+        "lat": -15.633
+      },
+      {
+        "lon": -44.346,
+        "lat": -15.248
+      }
+    ],
+    "dir": "-",
+    "spd": "0",
+    "chng": "NC",
+    "rawSigmet": "WSBZ23 SBGL 111125\nSBBS SIGMET 6 VALID 111130/111530 SBBS - SBBS BRASILIA FIR SEV ICE FCST WI S1314 W05101 - S1439 W04918 - S1501 W04816 - S1522 W04700 - S1634 W04730 - S1631 W04627 - S1657 W04359 - S1742 W04205 - S1657 W04149 - S1538 W04406 - S1320 W04534 - S1200 W04654 - S1053 W04711 - S1220 W04908 - S1314 W05101 FL140/220 STNR NC="
+  },
+  {
+    "icaoId": "CWAO",
+    "firId": "CZQX/O",
+    "firName": "CZQX GANDER OCEANIC",
+    "receiptTime": "2026-11-11T11:33:52.803Z",
+    "validTimeFrom": 1794396600,
+    "validTimeTo": 1794411000,
+    "seriesId": "K6",
+    "hazard": "TS",
+    "qualifier": "FRQ",
+    "base": null,
+    "top": 34000,
+    "geom": "AREA",
+    "coords": [
+      {
+        "lon": -41.411,
+        "lat": 45
+      },
+      {
+        "lon": -42.589,
+        "lat": 45
+      },
+      {
+        "lon": -42.589,
+        "lat": 45.32
+      },
+      {
+        "lon": -43.904,
+        "lat": 46.197
+      },
+      {
+        "lon": -43.096,
+        "lat": 46.803
+      },
+      {
+        "lon": -41.411,
+        "lat": 45.68
+      },
+      {
+        "lon": -41.411,
+        "lat": 45
+      }
+    ],
+    "dir": "E",
+    "spd": "20",
+    "chng": "WKN",
+    "rawSigmet": "WSNT01 CWAO 111133\nCZQX SIGMET K6 VALID 111130/111530 CWUL-\nCZQX GANDER OCEANIC FIR/CTA FRQ TS OBS WI 50NM WID LINE BTN N4500 W04200 - N4530\nW04200 - N4630 W04330 TOP FL340 MOV E 20KT WKN="
+  },
+  {
+    "icaoId": "WAAA",
+    "firId": "WAAF",
+    "firName": "WAAF UJUNG PANDANG",
+    "receiptTime": "2026-11-11T11:35:38.427Z",
+    "validTimeFrom": 1794396900,
+    "validTimeTo": 1794411300,
+    "seriesId": "13",
+    "hazard": "TS",
+    "qualifier": "EMBD",
+    "base": null,
+    "top": 53000,
+    "geom": "AREA",
+    "coords": [
+      {
+        "lon": 110.744,
+        "lat": -2.543
+      },
+      {
+        "lon": 112.323,
+        "lat": -0.472
+      },
+      {
+        "lon": 115.45,
+        "lat": -1.2
+      },
+      {
+        "lon": 115.517,
+        "lat": -4.317
+      },
+      {
+        "lon": 111.867,
+        "lat": -3.617
+      },
+      {
+        "lon": 110.744,
+        "lat": -2.543
+      }
+    ],
+    "dir": "S",
+    "spd": "5",
+    "chng": "INTSF",
+    "rawSigmet": "WSID21 WAAA 111135\nWAAF SIGMET 13 VALID 111135/111535 WAAA- WAAF UJUNG PANDANG FIR EMBD\nTS OBS WI S0112 E11527 - S0419 E11531 - S0337 E11152 - S0232 E11044 -\nS0028 E11218 - S0112 E11527 TOP FL530 MOV S 05KT INTSF="
+  },
+  {
+    "icaoId": "WAAA",
+    "firId": "WAAF",
+    "firName": "WAAF UJUNG PANDANG",
+    "receiptTime": "2026-11-11T11:35:39.753Z",
+    "validTimeFrom": 1794396900,
+    "validTimeTo": 1794411300,
+    "seriesId": "12",
+    "hazard": "TS",
+    "qualifier": "EMBD",
+    "base": null,
+    "top": 53000,
+    "geom": "AREA",
+    "coords": [
+      {
+        "lon": 116.867,
+        "lat": 4.367
+      },
+      {
+        "lon": 116.21,
+        "lat": 4.38
+      },
+      {
+        "lon": 116.09,
+        "lat": 4.28
+      },
+      {
+        "lon": 115.87,
+        "lat": 4.32
+      },
+      {
+        "lon": 115.63,
+        "lat": 4.08
+      },
+      {
+        "lon": 115.52,
+        "lat": 3.03
+      },
+      {
+        "lon": 115.22,
+        "lat": 3
+      },
+      {
+        "lon": 115.08,
+        "lat": 2.74
+      },
+      {
+        "lon": 115.2,
+        "lat": 2.51
+      },
+      {
+        "lon": 114.8,
+        "lat": 2.25
+      },
+      {
+        "lon": 114.84,
+        "lat": 1.96
+      },
+      {
+        "lon": 114.71,
+        "lat": 1.84
+      },
+      {
+        "lon": 114.59,
+        "lat": 1.46
+      },
+      {
+        "lon": 114.18,
+        "lat": 1.48
+      },
+      {
+        "lon": 113.62,
+        "lat": 1.23
+      },
+      {
+        "lon": 112.695,
+        "lat": 0.017
+      },
+      {
+        "lon": 116.867,
+        "lat": 0.017
+      },
+      {
+        "lon": 116.867,
+        "lat": 4.367
+      }
+    ],
+    "dir": "SSW",
+    "spd": "5",
+    "chng": "NC",
+    "rawSigmet": "WSID21 WAAA 111135\nWAAF SIGMET 12 VALID 111135/111535 WAAA- WAAF UJUNG PANDANG FIR EMBD\nTS OBS N OF N0001 AND W OF E11652 TOP FL530 MOV SSW 05KT NC="
+  },
+  {
+    "icaoId": "NTAA",
+    "firId": "NTTT",
+    "firName": "NTTT TAHITI",
+    "receiptTime": "2026-11-11T11:28:24.660Z",
+    "validTimeFrom": 1794397200,
+    "validTimeTo": 1794411600,
+    "seriesId": "B2",
+    "hazard": "TS",
+    "qualifier": "EMBD",
+    "base": null,
+    "top": 54000,
+    "geom": "AREA",
+    "coords": [
+      {
+        "lon": -139,
+        "lat": -3.25
+      },
+      {
+        "lon": -140,
+        "lat": 3.5
+      },
+      {
+        "lon": -130.25,
+        "lat": 3.5
+      },
+      {
+        "lon": -128.5,
+        "lat": -0.25
+      },
+      {
+        "lon": -139,
+        "lat": -3.25
+      }
+    ],
+    "dir": "-",
+    "spd": "0",
+    "chng": "NC",
+    "rawSigmet": "WSPF22 NTAA 111128\nNTTT SIGMET B2 VALID 111140/111540 NTAA-\nNTTT TAHITI FIR/UIR EMBD TS FCST WI S0315 W13900 - N0330 W14000 -\nN0330 W13015 - S0015 W12830 - S0315 W13900 TOP FL540 STNR NC="
+  },
+  {
+    "icaoId": "WAAA",
+    "firId": "WAAF",
+    "firName": "WAAF UJUNG PANDANG",
+    "receiptTime": "2026-11-11T11:41:26.948Z",
+    "validTimeFrom": 1794397200,
+    "validTimeTo": 1794418800,
+    "seriesId": "15",
+    "hazard": "VA",
+    "qualifier": "ERUPTION MT IBU",
+    "base": 0,
+    "top": 7000,
+    "geom": "AREA",
+    "coords": [
+      {
+        "lon": 127.717,
+        "lat": 1.45
+      },
+      {
+        "lon": 127.017,
+        "lat": 1.15
+      },
+      {
+        "lon": 126.933,
+        "lat": 1.583
+      },
+      {
+        "lon": 127.683,
+        "lat": 1.567
+      },
+      {
+        "lon": 127.717,
+        "lat": 1.45
+      }
+    ],
+    "dir": "SW",
+    "spd": "10",
+    "chng": "NC",
+    "rawSigmet": "WVID21 WAAA 111140\nWAAF SIGMET 15 VALID 111140/111740 WAAA-\nWAAF UJUNG PANDANG  FIR VA\nERUPTION MT IBU PSN N0129 E12738 VA CLD OBS AT 1120Z WI N0127 E12743\n- N0109 E12701 - N0135 E12656 - N0134 E12741 - N0127 E12743 SFC/FL070\nMOV SW 10KT NC="
+  },
+  {
+    "icaoId": "GMMC",
+    "firId": "GMMM",
+    "firName": "GMMM CASABLANCA",
+    "receiptTime": "2026-11-11T11:13:51.937Z",
+    "validTimeFrom": 1794397260,
+    "validTimeTo": 1794411660,
+    "seriesId": "U03",
+    "hazard": "TURB",
+    "qualifier": "SEV",
+    "base": 0,
+    "top": 12000,
+    "geom": "AREA",
+    "coords": [
+      {
+        "lon": -12.892,
+        "lat": 28.583
+      },
+      {
+        "lon": -12.51,
+        "lat": 30.02
+      },
+      {
+        "lon": -15.74,
+        "lat": 31.48
+      },
+      {
+        "lon": -15.18,
+        "lat": 31.77
+      },
+      {
+        "lon": -14.7,
+        "lat": 32.14
+      },
+      {
+        "lon": -12.111,
+        "lat": 35.75
+      },
+      {
+        "lon": -2.583,
+        "lat": 35.75
+      },
+      {
+        "lon": -5.417,
+        "lat": 34.333
+      },
+      {
+        "lon": -9.667,
+        "lat": 28.583
+      },
+      {
+        "lon": -8.75,
+        "lat": 28.583
+      },
+      {
+        "lon": -12.892,
+        "lat": 28.583
+      }
+    ],
+    "dir": "-",
+    "spd": "0",
+    "chng": "INTSF",
+    "rawSigmet": "WSMC31 GMMC 111101\nGMMM SIGMET U03 VALID 111141/111541 GMMC-\nGMMM CASABLANCA FIR\nSEV TURB FCST W OF LINE N3545 W00235 - N3420 W00525 - N2835 W00940 -\nN2835 W00845 SFC/FL120 STNR INTSF="
+  },
+  {
+    "icaoId": "CWAO",
+    "firId": "CZVR",
+    "firName": "CZVR VANCOUVER",
+    "receiptTime": "2026-11-11T11:52:02.887Z",
+    "validTimeFrom": 1794397800,
+    "validTimeTo": 1794412200,
+    "seriesId": "A3",
+    "hazard": "MTW",
+    "qualifier": "SEV",
+    "base": 0,
+    "top": 12000,
+    "geom": "AREA",
+    "coords": [
+      {
+        "lon": -120.78,
+        "lat": 49
+      },
+      {
+        "lon": -122.009,
+        "lat": 49
+      },
+      {
+        "lon": -127.366,
+        "lat": 53.718
+      },
+      {
+        "lon": -125.234,
+        "lat": 54.549
+      },
+      {
+        "lon": -119.501,
+        "lat": 49.499
+      },
+      {
+        "lon": -120.78,
+        "lat": 49
+      }
+    ],
+    "dir": "-",
+    "spd": "0",
+    "chng": "NC",
+    "rawSigmet": "WSCN01 CWAO 111151\nCZVR SIGMET A3 VALID 111150/111550 CWEG-\nCZVR VANCOUVER FIR SEV MTW FCST WI 90NM WID LINE BTN N5408 W12618 - N4905 W12034\nSFC/FL120 STNR NC="
+  },
+  {
+    "icaoId": "YBRF",
+    "firId": "YBBB",
+    "firName": "YBBB BRISBANE",
+    "receiptTime": "2026-11-11T11:55:18.967Z",
+    "validTimeFrom": 1794398040,
+    "validTimeTo": 1794407400,
+    "seriesId": "F01",
+    "hazard": "TS",
+    "qualifier": "FRQ",
+    "base": null,
+    "top": 48000,
+    "geom": "AREA",
+    "coords": [
+      {
+        "lon": 126,
+        "lat": -17
+      },
+      {
+        "lon": 132.333,
+        "lat": -17.5
+      },
+      {
+        "lon": 127.833,
+        "lat": -21.667
+      }
+    ],
+    "dir": "SSE",
+    "spd": "20",
+    "chng": "NC",
+    "rawSigmet": "WSAU21 YBRF 111154\nYBBB SIGMET F01 VALID 111154/111430 YBRF-\nYBBB BRISBANE FIR FRQ TS OBS WI S1700 E12600 - S1730 E13220 - S2140\nE12750 TOP FL480 MOV SSE 20KT NC="
+  },
+  {
+    "icaoId": "YMRF",
+    "firId": "YMMM",
+    "firName": "YMMM MELBOURNE",
+    "receiptTime": "2026-11-11T11:49:58.850Z",
+    "validTimeFrom": 1794398400,
+    "validTimeTo": 1794402000,
+    "seriesId": "F04",
+    "hazard": "TS",
+    "qualifier": "FRQ",
+    "base": null,
+    "top": 40000,
+    "geom": "AREA",
+    "coords": [
+      {
+        "lon": 121.5,
+        "lat": -28.167
+      },
+      {
+        "lon": 120.167,
+        "lat": -25.5
+      },
+      {
+        "lon": 121,
+        "lat": -25.333
+      },
+      {
+        "lon": 123,
+        "lat": -27
+      },
+      {
+        "lon": 121.833,
+        "lat": -31.167
+      },
+      {
+        "lon": 118.833,
+        "lat": -30.333
+      },
+      {
+        "lon": 119,
+        "lat": -27
+      },
+      {
+        "lon": 119.5,
+        "lat": -26.667
+      },
+      {
+        "lon": 121,
+        "lat": -29
+      }
+    ],
+    "dir": "SE",
+    "spd": "25",
+    "chng": "NC",
+    "rawSigmet": "WSAU21 YMRF 111149\nYMMM SIGMET F04 VALID 111200/111300 YMRF-\nYMMM MELBOURNE FIR FRQ TSGR FCST WI S2810 E12130 - S2530 E12010 -\nS2520 E12100 - S2700 E12300 - S3110 E12150 - S3020 E11850 - S2700\nE11900 - S2640 E11930 - S2900 E12100 TOP FL400 MOV SE 25KT NC="
+  },
+  {
+    "icaoId": "TFFF",
+    "firId": "SOOO",
+    "firName": "SOOO CAYENNE",
+    "receiptTime": "2026-11-11T11:59:40.453Z",
+    "validTimeFrom": 1794398400,
+    "validTimeTo": 1794402000,
+    "seriesId": "05",
+    "hazard": "TS",
+    "qualifier": "EMBD",
+    "base": null,
+    "top": 50000,
+    "geom": "AREA",
+    "coords": [
+      {
+        "lon": -38.539,
+        "lat": 5.774
+      },
+      {
+        "lon": -36.588,
+        "lat": 6.808
+      },
+      {
+        "lon": -38.75,
+        "lat": 8.25
+      },
+      {
+        "lon": -40.5,
+        "lat": 7
+      },
+      {
+        "lon": -38.539,
+        "lat": 5.774
+      }
+    ],
+    "dir": "-",
+    "spd": "0",
+    "chng": "WKN",
+    "rawSigmet": "WSFG20 TFFF 111159\nSOOO SIGMET 05 VALID 111200/111300 TFFF-\nSOOO CAYENNE FIR/UIR EMBD TS OBS WI N0545 W03830 - N0700 W04030 -\nN0815 W03845 - N0645 W03630 - N0545 W03830 TOP FL500 STNR WKN="
+  },
+  {
+    "icaoId": "YBRF",
+    "firId": "YBBB",
+    "firName": "YBBB BRISBANE",
+    "receiptTime": "2026-11-11T11:49:30.941Z",
+    "validTimeFrom": 1794398400,
+    "validTimeTo": 1794405600,
+    "seriesId": "Z03",
+    "hazard": "TS",
+    "qualifier": "SQL",
+    "base": null,
+    "top": 46000,
+    "geom": "AREA",
+    "coords": [
+      {
+        "lon": 153.167,
+        "lat": -25.167
+      },
+      {
+        "lon": 152.983,
+        "lat": -25.983
+      },
+      {
+        "lon": 149.5,
+        "lat": -25.167
+      },
+      {
+        "lon": 149.667,
+        "lat": -24.5
+      }
+    ],
+    "dir": "NNE",
+    "spd": "20",
+    "chng": "NC",
+    "rawSigmet": "WSAU21 YBRF 111149\nYBBB SIGMET Z03 VALID 111200/111400 YBRF-\nYBBB BRISBANE FIR SQL TS OBS WI S2510 E15310 - S2559 E15259 - S2510\nE14930 - S2430 E14940 TOP FL460 MOV NNE 20KT NC="
+  },
+  {
+    "icaoId": "RUKR",
+    "firId": "UNKL",
+    "firName": "UNKL KRASNOYARSK",
+    "receiptTime": "2026-11-11T10:22:54.288Z",
+    "validTimeFrom": 1794398400,
+    "validTimeTo": 1794409200,
+    "seriesId": "6",
+    "hazard": "ICE",
+    "qualifier": "SEV",
+    "base": 0,
+    "top": 15000,
+    "geom": "AREA",
+    "coords": [
+      {
+        "lon": 96,
+        "lat": 54
+      },
+      {
+        "lon": 96,
+        "lat": 54
+      },
+      {
+        "lon": 96,
+        "lat": 54
+      },
+      {
+        "lon": 92.283,
+        "lat": 52.133
+      },
+      {
+        "lon": 88.368,
+        "lat": 51.546
+      },
+      {
+        "lon": 89.4,
+        "lat": 51.02
+      },
+      {
+        "lon": 89.69,
+        "lat": 49.92
+      },
+      {
+        "lon": 91.43,
+        "lat": 50.5
+      },
+      {
+        "lon": 92.34,
+        "lat": 50.92
+      },
+      {
+        "lon": 92.98,
+        "lat": 50.65
+      },
+      {
+        "lon": 94.2,
+        "lat": 50.59
+      },
+      {
+        "lon": 94.64,
+        "lat": 49.95
+      },
+      {
+        "lon": 96,
+        "lat": 49.934
+      },
+      {
+        "lon": 96,
+        "lat": 54
+      }
+    ],
+    "dir": "E",
+    "spd": "10",
+    "chng": "NC",
+    "rawSigmet": "WSRA31 RUKR 111022\nUNKL SIGMET 6 VALID 111200/111500 UNKL-\nUNKL KRASNOYARSK FIR SEV ICE FCST SE OF LINE N5132 E08817 - N5208\nE09217 - N5400 E09600 SFC/FL150 MOV E 20KMH NC="
+  },
+  {
+    "icaoId": "RUSP",
+    "firId": "ULLL",
+    "firName": "ULLL SANKT-PETERBURG",
+    "receiptTime": "2026-11-11T10:41:36.123Z",
+    "validTimeFrom": 1794398400,
+    "validTimeTo": 1794409200,
+    "seriesId": "5",
+    "hazard": "ICE",
+    "qualifier": "SEV",
+    "base": 0,
+    "top": 15000,
+    "geom": "AREA",
+    "coords": [
+      {
+        "lon": 60.951,
+        "lat": 65.053
+      },
+      {
+        "lon": 61.38,
+        "lat": 65.34
+      },
+      {
+        "lon": 62.54,
+        "lat": 65.98
+      },
+      {
+        "lon": 62.778,
+        "lat": 66.119
+      },
+      {
+        "lon": 59.517,
+        "lat": 67.6
+      },
+      {
+        "lon": 58.683,
+        "lat": 67.65
+      },
+      {
+        "lon": 58.033,
+        "lat": 67.067
+      },
+      {
+        "lon": 53.95,
+        "lat": 66.95
+      },
+      {
+        "lon": 53.917,
+        "lat": 66.533
+      },
+      {
+        "lon": 54.6,
+        "lat": 65.7
+      },
+      {
+        "lon": 58.95,
+        "lat": 65.633
+      },
+      {
+        "lon": 60.2,
+        "lat": 64.617
+      },
+      {
+        "lon": 60.951,
+        "lat": 65.053
+      }
+    ],
+    "dir": "-",
+    "spd": "0",
+    "chng": "NC",
+    "rawSigmet": "WSRS31 RUSP 111041\nULLL SIGMET 5 VALID 111200/111500 ULLI-\nULLL SANKT-PETERBURG FIR SEV ICE (FZRA) FCST WI N6739 E05841 - N6736\nE05931 - N6607 E06247 - N6437 E06012 - N6538 E05857 - N6542 E05436 -\nN6632 E05355 - N6657 E05357 - N6704 E05802 - N6739 E05841 SFC/FL150\nSTNR NC="
+  },
+  {
+    "icaoId": "RUMG",
+    "firId": "UHMM",
+    "firName": "UHMM MAGADAN",
+    "receiptTime": "2026-11-11T09:49:19.272Z",
+    "validTimeFrom": 1794398400,
+    "validTimeTo": 1794412800,
+    "seriesId": "M05",
+    "hazard": "ICE",
+    "qualifier": "SEV",
+    "base": 0,
+    "top": 10000,
+    "geom": "AREA",
+    "coords": [
+      {
+        "lon": -177.585,
+        "lat": 61.414
+      },
+      {
+        "lon": -176.26,
+        "lat": 62.19
+      },
+      {
+        "lon": -172.5,
+        "lat": 64
+      },
+      {
+        "lon": -169.5,
+        "lat": 65
+      },
+      {
+        "lon": -169.5,
+        "lat": 68
+      },
+      {
+        "lon": -169.5,
+        "lat": 71.931
+      },
+      {
+        "lon": -179.967,
+        "lat": 70.583
+      },
+      {
+        "lon": -180,
+        "lat": 61.517
+      },
+      {
+        "lon": -177.75,
+        "lat": 61.333
+      },
+      {
+        "lon": -177.585,
+        "lat": 61.414
+      }
+    ],
+    "dir": "-",
+    "spd": "0",
+    "chng": "NC",
+    "rawSigmet": "WSRA31 RUMG 110948\nUHMM SIGMET M05 VALID 111200/111600 UHMM-\nUHMM MAGADAN FIR SEV ICE FCST WI N7200 W16858 -\nN6500 W16858 - N6403 W17212 - N6120 W17745 -\nN6131 E18000 - N7035 W17958 - N7200 W16858\nSFC/FL100 STNR NC="
+  },
+  {
+    "icaoId": "RUMG",
+    "firId": "UHMM",
+    "firName": "UHMM MAGADAN",
+    "receiptTime": "2026-11-11T09:50:38.694Z",
+    "validTimeFrom": 1794398400,
+    "validTimeTo": 1794412800,
+    "seriesId": "M06",
+    "hazard": "TURB",
+    "qualifier": "SEV",
+    "base": 0,
+    "top": 10000,
+    "geom": "AREAS",
+    "coords": [
+      [
+        {
+          "lon": 180,
+          "lat": 65.001
+        },
+        {
+          "lon": 180,
+          "lat": 67.504
+        },
+        {
+          "lon": 179.967,
+          "lat": 67.017
+        },
+        {
+          "lon": 180,
+          "lat": 65.001
+        }
+      ],
+      [
+        {
+          "lon": 180,
+          "lat": 69.111
+        },
+        {
+          "lon": 180,
+          "lat": 75.684
+        },
+        {
+          "lon": 175.783,
+          "lat": 75.2
+        },
+        {
+          "lon": 180,
+          "lat": 69.111
+        }
+      ],
+      [
+        {
+          "lon": 180,
+          "lat": 65.001
+        },
+        {
+          "lon": 180,
+          "lat": 67.504
+        },
+        {
+          "lon": 180.1,
+          "lat": 68.967
+        },
+        {
+          "lon": 180,
+          "lat": 69.111
+        },
+        {
+          "lon": 180,
+          "lat": 75.684
+        },
+        {
+          "lon": 190.5,
+          "lat": 76.889
+        },
+        {
+          "lon": 190.5,
+          "lat": 68
+        },
+        {
+          "lon": 190.5,
+          "lat": 65
+        },
+        {
+          "lon": 187.5,
+          "lat": 64
+        },
+        {
+          "lon": 183.74,
+          "lat": 62.19
+        },
+        {
+          "lon": 182.415,
+          "lat": 61.414
+        },
+        {
+          "lon": 182.25,
+          "lat": 61.333
+        },
+        {
+          "lon": 180,
+          "lat": 61.517
+        },
+        {
+          "lon": 180,
+          "lat": 64
+        },
+        {
+          "lon": 180,
+          "lat": 65
+        },
+        {
+          "lon": 180,
+          "lat": 65.001
+        }
+      ]
+    ],
+    "dir": "-",
+    "spd": "0",
+    "chng": "NC",
+    "rawSigmet": "WSRA31 RUMG 110950\nUHMM SIGMET M06 VALID 111200/111600 UHMM-\nUHMM MAGADAN FIR SEV TURB FCST WI N7657 W16858 - N6700 W16858\n- N6500 W16858 - N6403 W17212 - N6120 W17745 - N6131 E18000\n- N6400 E18000 - N6500 E18000 - N6701 E17958 - N6858 W17954\n- N7512 E17547 - N7657 W16858 SFC/FL100 STNR NC="
+  },
+  {
+    "icaoId": "SCTE",
+    "firId": "SCTZ",
+    "firName": "SCTZ PUERTO MONTT",
+    "receiptTime": "2026-11-11T11:07:01.183Z",
+    "validTimeFrom": 1794398400,
+    "validTimeTo": 1794412800,
+    "seriesId": "04",
+    "hazard": "MTW",
+    "qualifier": "SEV",
+    "base": null,
+    "top": 12000,
+    "geom": "AREA",
+    "coords": [
+      {
+        "lon": -71.91,
+        "lat": -47
+      },
+      {
+        "lon": -71.97,
+        "lat": -46.95
+      },
+      {
+        "lon": -71.94,
+        "lat": -46.8
+      },
+      {
+        "lon": -71.82,
+        "lat": -46.78
+      },
+      {
+        "lon": -71.68,
+        "lat": -46.66
+      },
+      {
+        "lon": -71.68,
+        "lat": -46.54
+      },
+      {
+        "lon": -71.77,
+        "lat": -46.34
+      },
+      {
+        "lon": -71.76,
+        "lat": -46.24
+      },
+      {
+        "lon": -71.92,
+        "lat": -46.14
+      },
+      {
+        "lon": -71.75,
+        "lat": -46.09
+      },
+      {
+        "lon": -71.65,
+        "lat": -46
+      },
+      {
+        "lon": -71.64,
+        "lat": -45.91
+      },
+      {
+        "lon": -71.75,
+        "lat": -45.85
+      },
+      {
+        "lon": -71.79,
+        "lat": -45.69
+      },
+      {
+        "lon": -71.76,
+        "lat": -45.56
+      },
+      {
+        "lon": -71.67,
+        "lat": -45.52
+      },
+      {
+        "lon": -71.49,
+        "lat": -45.5
+      },
+      {
+        "lon": -71.51,
+        "lat": -45.41
+      },
+      {
+        "lon": -71.31,
+        "lat": -45.3
+      },
+      {
+        "lon": -71.36,
+        "lat": -45.21
+      },
+      {
+        "lon": -71.49,
+        "lat": -45.12
+      },
+      {
+        "lon": -71.59,
+        "lat": -44.98
+      },
+      {
+        "lon": -71.78,
+        "lat": -44.93
+      },
+      {
+        "lon": -71.89,
+        "lat": -44.95
+      },
+      {
+        "lon": -72.07,
+        "lat": -44.9
+      },
+      {
+        "lon": -72.08,
+        "lat": -44.76
+      },
+      {
+        "lon": -71.83,
+        "lat": -44.79
+      },
+      {
+        "lon": -71.76,
+        "lat": -44.75
+      },
+      {
+        "lon": -71.63,
+        "lat": -44.78
+      },
+      {
+        "lon": -71.5,
+        "lat": -44.74
+      },
+      {
+        "lon": -71.34,
+        "lat": -44.8
+      },
+      {
+        "lon": -71.24,
+        "lat": -44.75
+      },
+      {
+        "lon": -71.2,
+        "lat": -44.59
+      },
+      {
+        "lon": -71.12,
+        "lat": -44.53
+      },
+      {
+        "lon": -71.21,
+        "lat": -44.43
+      },
+      {
+        "lon": -71.48,
+        "lat": -44.4
+      },
+      {
+        "lon": -71.82,
+        "lat": -44.4
+      },
+      {
+        "lon": -71.81,
+        "lat": -44.21
+      },
+      {
+        "lon": -71.86,
+        "lat": -44.11
+      },
+      {
+        "lon": -71.76,
+        "lat": -44.06
+      },
+      {
+        "lon": -71.63,
+        "lat": -43.93
+      },
+      {
+        "lon": -71.75,
+        "lat": -43.84
+      },
+      {
+        "lon": -71.69,
+        "lat": -43.62
+      },
+      {
+        "lon": -71.78,
+        "lat": -43.52
+      },
+      {
+        "lon": -71.94,
+        "lat": -43.44
+      },
+      {
+        "lon": -71.9,
+        "lat": -43.32
+      },
+      {
+        "lon": -71.74,
+        "lat": -43.31
+      },
+      {
+        "lon": -71.75,
+        "lat": -43.17
+      },
+      {
+        "lon": -71.9,
+        "lat": -43.1
+      },
+      {
+        "lon": -72.1,
+        "lat": -43.08
+      },
+      {
+        "lon": -72.118,
+        "lat": -43
+      },
+      {
+        "lon": -73,
+        "lat": -43
+      },
+      {
+        "lon": -75,
+        "lat": -47
+      },
+      {
+        "lon": -71.91,
+        "lat": -47
+      }
+    ],
+    "dir": "-",
+    "spd": "0",
+    "chng": "NC",
+    "rawSigmet": "WSCH31 SCTE 111104\nSCTZ SIGMET 04 VALID 111200/111600 SCTE-\nSCTZ PUERTO MONTT FIR SEV MTW FCST E OF LINE S4300 W07300 - S4700 \nW07500 BLW FL120 STNR NC="
+  },
+  {
+    "icaoId": "UACC",
+    "firId": "UACN",
+    "firName": "UACN ASTANA",
+    "receiptTime": "2026-11-11T11:31:16.273Z",
+    "validTimeFrom": 1794398400,
+    "validTimeTo": 1794412800,
+    "seriesId": "4",
+    "hazard": "ICE",
+    "qualifier": "SEV",
+    "base": 0,
+    "top": 10000,
+    "geom": "AREA",
+    "coords": [
+      {
+        "lon": 77.033,
+        "lat": 50.333
+      },
+      {
+        "lon": 76.19,
+        "lat": 49.76
+      },
+      {
+        "lon": 76.18,
+        "lat": 48.82
+      },
+      {
+        "lon": 75.18,
+        "lat": 48.46
+      },
+      {
+        "lon": 74.28,
+        "lat": 48.12
+      },
+      {
+        "lon": 73.01,
+        "lat": 48.07
+      },
+      {
+        "lon": 71.82,
+        "lat": 48.01
+      },
+      {
+        "lon": 71.88,
+        "lat": 46.54
+      },
+      {
+        "lon": 71.93,
+        "lat": 45.07
+      },
+      {
+        "lon": 70.59,
+        "lat": 45.25
+      },
+      {
+        "lon": 69.42,
+        "lat": 45.41
+      },
+      {
+        "lon": 67.89,
+        "lat": 45.98
+      },
+      {
+        "lon": 66.21,
+        "lat": 46.62
+      },
+      {
+        "lon": 65,
+        "lat": 47.014
+      },
+      {
+        "lon": 65,
+        "lat": 50.333
+      },
+      {
+        "lon": 77.033,
+        "lat": 50.333
+      }
+    ],
+    "dir": "ENE",
+    "spd": "10",
+    "chng": "NC",
+    "rawSigmet": "WSKZ31 UACC 111130\nUACN SIGMET 4 VALID 111200/111600 UACC-\nUACN ASTANA FIR SEV ICE (FZRA) FCST S OF N5020 AND E OF E06500\nSFC/10000FT MOV ENE 20KMH NC="
+  },
+  {
+    "icaoId": "LPMG",
+    "firId": "LPPO",
+    "firName": "LPPO SANTA MARIA OCEANIC",
+    "receiptTime": "2026-11-11T12:00:41.457Z",
+    "validTimeFrom": 1794398400,
+    "validTimeTo": 1794412800,
+    "seriesId": "T03",
+    "hazard": "TS",
+    "qualifier": "EMBD",
+    "base": null,
+    "top": 41000,
+    "geom": "AREA",
+    "coords": [
+      {
+        "lon": -40,
+        "lat": 32
+      },
+      {
+        "lon": -40,
+        "lat": 45
+      },
+      {
+        "lon": -37.5,
+        "lat": 45
+      },
+      {
+        "lon": -37.5,
+        "lat": 32
+      },
+      {
+        "lon": -40,
+        "lat": 32
+      }
+    ],
+    "dir": "E",
+    "spd": "35",
+    "chng": "NC",
+    "rawSigmet": "WSAZ31 LPMG 111200\nLPPO SIGMET T03 VALID 111200/111600 LPPT-\nLPPO SANTA MARIA OCEANIC FIR EMBD TS FCST WI N32 W040 - N45 W040 -\nN45 W03730 - N32 W03730 - N32 W040 TOP FL410 MOV E 35KT NC="
+  },
+  {
+    "icaoId": "FCBB",
+    "firId": "FCCC",
+    "firName": "FCCC BRAZZAVILLE",
+    "receiptTime": "2026-11-11T12:10:36.349Z",
+    "validTimeFrom": 1794399000,
+    "validTimeTo": 1794413400,
+    "seriesId": "K1",
+    "hazard": "TS",
+    "qualifier": "EMBD",
+    "base": null,
+    "top": 43000,
+    "geom": "AREA",
+    "coords": [
+      {
+        "lon": 15.867,
+        "lat": -4.016
+      },
+      {
+        "lon": 15.19,
+        "lat": -4.34
+      },
+      {
+        "lon": 14.82,
+        "lat": -4.83
+      },
+      {
+        "lon": 14.42,
+        "lat": -4.87
+      },
+      {
+        "lon": 14.39,
+        "lat": -4.28
+      },
+      {
+        "lon": 13.79,
+        "lat": -4.42
+      },
+      {
+        "lon": 13.37,
+        "lat": -4.88
+      },
+      {
+        "lon": 13.07,
+        "lat": -4.64
+      },
+      {
+        "lon": 13.05,
+        "lat": -4.61
+      },
+      {
+        "lon": 12.81,
+        "lat": -4.39
+      },
+      {
+        "lon": 11.99,
+        "lat": -5.01
+      },
+      {
+        "lon": 10.36,
+        "lat": -5.31
+      },
+      {
+        "lon": 8.85,
+        "lat": -5.46
+      },
+      {
+        "lon": 7.77,
+        "lat": -4.81
+      },
+      {
+        "lon": 7.35,
+        "lat": -4.589
+      },
+      {
+        "lon": 7.35,
+        "lat": -2.683
+      },
+      {
+        "lon": 15.867,
+        "lat": 2.517
+      },
+      {
+        "lon": 15.867,
+        "lat": -4.016
+      }
+    ],
+    "dir": "W",
+    "spd": "8",
+    "chng": "INTSF",
+    "rawSigmet": "WSCG31 FCBB 111210\nFCCC SIGMET K1 VALID 111210/111610 FCBB-\nFCCC BRAZZAVILLE FIR/UIR EMBD TS OBS AT 1200Z\nSE OF LINE N0231 E01552 - S0241 E00721\nTOP FL430 MOV W 08KT INTSF="
+  },
+  {
+    "icaoId": "FNLU",
+    "firId": "FNAN",
+    "firName": "FNAN LUANDA",
+    "receiptTime": "2026-11-11T12:24:14.900Z",
+    "validTimeFrom": 1794399000,
+    "validTimeTo": 1794413400,
+    "seriesId": "A02",
+    "hazard": "TS",
+    "qualifier": "EMBD",
+    "base": null,
+    "top": 47000,
+    "geom": "AREA",
+    "coords": [
+      {
+        "lon": 14.983,
+        "lat": -13.917
+      },
+      {
+        "lon": 14.267,
+        "lat": -7.717
+      },
+      {
+        "lon": 15.117,
+        "lat": -6.683
+      },
+      {
+        "lon": 16,
+        "lat": -7.267
+      },
+      {
+        "lon": 17.483,
+        "lat": -8.167
+      },
+      {
+        "lon": 20.25,
+        "lat": -8.933
+      },
+      {
+        "lon": 17.967,
+        "lat": -11.8
+      },
+      {
+        "lon": 14.983,
+        "lat": -13.917
+      }
+    ],
+    "dir": "NE",
+    "spd": "5",
+    "chng": "INTSF",
+    "rawSigmet": "WSAN31 FNLU 111221\nFNAN SIGMET A02 VALID 111210/111610 FNLU-\nFNAN LUANDA FIR/UIR EMBD TS OBS WI S1355 E01459 - S0743 E01416 - S0641 E01507 - S0716 E016 - S0810 E01729 - S0856 E02015 - S1148 E01758 - S1355 E01459 TOP FL470 MOV NE 05KT INTSF="
+  },
+  {
+    "icaoId": "SCCI",
+    "firId": "SCCZ",
+    "firName": "SCCZ PUNTA ARENAS",
+    "receiptTime": "2026-11-11T12:14:35.232Z",
+    "validTimeFrom": 1794399120,
+    "validTimeTo": 1794413520,
+    "seriesId": "C1",
+    "hazard": "TS",
+    "qualifier": "EMBD",
+    "base": null,
+    "top": 30000,
+    "geom": "AREA",
+    "coords": [
+      {
+        "lon": -66,
+        "lat": -56
+      },
+      {
+        "lon": -66,
+        "lat": -55.36
+      },
+      {
+        "lon": -66.14,
+        "lat": -55.17
+      },
+      {
+        "lon": -66.59,
+        "lat": -55.15
+      },
+      {
+        "lon": -66.84,
+        "lat": -55
+      },
+      {
+        "lon": -67.17,
+        "lat": -54.92
+      },
+      {
+        "lon": -68.64,
+        "lat": -54.94
+      },
+      {
+        "lon": -68.64,
+        "lat": -53.98
+      },
+      {
+        "lon": -68.63,
+        "lat": -53.44
+      },
+      {
+        "lon": -68.63,
+        "lat": -52.64
+      },
+      {
+        "lon": -68.45,
+        "lat": -52.35
+      },
+      {
+        "lon": -68.45,
+        "lat": -52.3
+      },
+      {
+        "lon": -68.82,
+        "lat": -52.24
+      },
+      {
+        "lon": -69.21,
+        "lat": -52.14
+      },
+      {
+        "lon": -69.49,
+        "lat": -52.13
+      },
+      {
+        "lon": -69.95,
+        "lat": -52.01
+      },
+      {
+        "lon": -70.63,
+        "lat": -52
+      },
+      {
+        "lon": -71.92,
+        "lat": -51.99
+      },
+      {
+        "lon": -71.96,
+        "lat": -51.87
+      },
+      {
+        "lon": -72.05,
+        "lat": -51.79
+      },
+      {
+        "lon": -72.28,
+        "lat": -51.7
+      },
+      {
+        "lon": -72.35,
+        "lat": -51.58
+      },
+      {
+        "lon": -72.35,
+        "lat": -51.47
+      },
+      {
+        "lon": -72.27,
+        "lat": -51.22
+      },
+      {
+        "lon": -72.41,
+        "lat": -51.1
+      },
+      {
+        "lon": -72.28,
+        "lat": -51.01
+      },
+      {
+        "lon": -72.279,
+        "lat": -51
+      },
+      {
+        "lon": -76,
+        "lat": -51
+      },
+      {
+        "lon": -76,
+        "lat": -56
+      },
+      {
+        "lon": -66,
+        "lat": -56
+      }
+    ],
+    "dir": "E",
+    "spd": "25",
+    "chng": "INTSF",
+    "rawSigmet": "WSCH31 SCCI 111212\nSCCZ SIGMET C1 VALID 111212/111612 SCCI-\nSCCZ PUNTA ARENAS FIR EMBD TS FCST E OF LINE S5100 W07600 - S5600 \nW07600 TOP FL300 MOV E 25KT INTSF="
+  },
+  {
+    "icaoId": "MHTG",
+    "firId": "MHTG",
+    "firName": "MHCC CENTRAL AMERICAN",
+    "receiptTime": "2026-11-11T12:14:53.957Z",
+    "validTimeFrom": 1794399180,
+    "validTimeTo": 1794413580,
+    "seriesId": "B4",
+    "hazard": "TS",
+    "qualifier": "FRQ",
+    "base": null,
+    "top": 48000,
+    "geom": "AREA",
+    "coords": [
+      {
+        "lon": -88.467,
+        "lat": 17.1
+      },
+      {
+        "lon": -86.983,
+        "lat": 17
+      },
+      {
+        "lon": -87.067,
+        "lat": 15.733
+      },
+      {
+        "lon": -88.433,
+        "lat": 15.817
+      }
+    ],
+    "dir": "SW",
+    "spd": "5",
+    "chng": "NC",
+    "rawSigmet": "WSHO31 MHTG 111213\nMHTG SIGMET B4 VALID 111213/111613 MHTG-\nMHCC CENTRAL AMERICAN FIR FRQ TS OBS AT 1200Z \nWI N1706 W08828 - N1700 W08659 - N1544 W08704 - \nN1549 W08826 TOP FL480 MOV SW 05KT NC="
+  },
+  {
+    "icaoId": "CWAO",
+    "firId": "CZEG",
+    "firName": "CZEG EDMONTON",
+    "receiptTime": "2026-11-11T12:15:52.162Z",
+    "validTimeFrom": 1794399300,
+    "validTimeTo": 1794413700,
+    "seriesId": "I4",
+    "hazard": "TURB",
+    "qualifier": "SEV",
+    "base": 0,
+    "top": 4000,
+    "geom": "AREA",
+    "coords": [
+      {
+        "lon": -61.755,
+        "lat": 65
+      },
+      {
+        "lon": -67.122,
+        "lat": 65
+      },
+      {
+        "lon": -65.357,
+        "lat": 66.841
+      },
+      {
+        "lon": -60.676,
+        "lat": 66.126
+      },
+      {
+        "lon": -61.755,
+        "lat": 65
+      }
+    ],
+    "dir": "-",
+    "spd": "0",
+    "chng": "NC",
+    "rawSigmet": "WSCN02 CWAO 111215\nCZEG SIGMET I4 VALID 111215/111615 CWEG-\nCZEG EDMONTON FIR SEV TURB FCST WI 120NM WID LINE BTN N6629 W06301 - N6203\nW06716 SFC/FL040 STNR NC="
+  },
+  {
+    "icaoId": "KKCI",
+    "firId": "KZWY",
+    "firName": "NEW YORK OCEANIC",
+    "receiptTime": "2026-11-11T12:12:04.577Z",
+    "validTimeFrom": 1794399300,
+    "validTimeTo": 1794413700,
+    "seriesId": "KILO 4",
+    "hazard": "TS",
+    "qualifier": "FRQ",
+    "base": null,
+    "top": 50000,
+    "geom": "AREA",
+    "coords": [
+      {
+        "lon": -69.233,
+        "lat": 25.417
+      },
+      {
+        "lon": -61.767,
+        "lat": 20.083
+      },
+      {
+        "lon": -65.067,
+        "lat": 18.017
+      },
+      {
+        "lon": -75.633,
+        "lat": 22.85
+      },
+      {
+        "lon": -69.233,
+        "lat": 25.417
+      }
+    ],
+    "dir": "ENE",
+    "spd": "15",
+    "chng": "NC",
+    "rawSigmet": "WSNT11 KKCI 111215\nKZWY KZMA TJZS SIGMET KILO 4 VALID 111215/111615 KKCI-\nNEW YORK OCEANIC FIR MIAMI OCEANIC FIR SAN JUAN OCEANIC FIR FRQ\nTS OBS AT 1215Z WI N2525 W06914 - N2005 W06146 - N1801 W06504 -\nN2251 W07538 - N2525 W06914. TOP FL500. MOV ENE 15KT. NC."
+  },
+  {
+    "icaoId": "KKCI",
+    "firId": "KZWY",
+    "firName": "NEW YORK OCEANIC",
+    "receiptTime": "2026-11-11T12:13:04.802Z",
+    "validTimeFrom": 1794399300,
+    "validTimeTo": 1794413700,
+    "seriesId": "HOTEL 13",
+    "hazard": "TS",
+    "qualifier": "FRQ",
+    "base": null,
+    "top": 41000,
+    "geom": "AREA",
+    "coords": [
+      {
+        "lon": -40.033,
+        "lat": 44.883
+      },
+      {
+        "lon": -39.917,
+        "lat": 29.617
+      },
+      {
+        "lon": -41.267,
+        "lat": 29.567
+      },
+      {
+        "lon": -42.717,
+        "lat": 44.85
+      },
+      {
+        "lon": -40.033,
+        "lat": 44.883
+      }
+    ],
+    "dir": "E",
+    "spd": "35",
+    "chng": "NC",
+    "rawSigmet": "WSNT08 KKCI 111215\nKZWY SIGMET HOTEL 13 VALID 111215/111615 KKCI-\nNEW YORK OCEANIC FIR FRQ TS OBS AT 1215Z WI N4453 W04002 - N2937\nW03955 - N2934 W04116 - N4451 W04243 - N4453 W04002. TOP FL410.\nMOV E 35KT. NC."
+  },
+  {
+    "icaoId": "CWAO",
+    "firId": "CZUL",
+    "firName": "CZUL MONTREAL",
+    "receiptTime": "2026-11-11T12:15:51.999Z",
+    "validTimeFrom": 1794399300,
+    "validTimeTo": 1794413700,
+    "seriesId": "H4",
+    "hazard": "TURB",
+    "qualifier": "SEV",
+    "base": 0,
+    "top": 4000,
+    "geom": "AREA",
+    "coords": [
+      {
+        "lon": -63,
+        "lat": 63.702
+      },
+      {
+        "lon": -63,
+        "lat": 64
+      },
+      {
+        "lon": -62.58,
+        "lat": 64.14
+      },
+      {
+        "lon": -61.755,
+        "lat": 65
+      },
+      {
+        "lon": -67.122,
+        "lat": 65
+      },
+      {
+        "lon": -69.607,
+        "lat": 62.407
+      },
+      {
+        "lon": -64.926,
+        "lat": 61.693
+      },
+      {
+        "lon": -63,
+        "lat": 63.702
+      }
+    ],
+    "dir": "-",
+    "spd": "0",
+    "chng": "NC",
+    "rawSigmet": "WSCN05 CWAO 111215\nCZUL SIGMET H4 VALID 111215/111615 CWEG-\nCZUL MONTREAL FIR SEV TURB FCST WI 120NM WID LINE BTN N6629 W06301 - N6203\nW06716 SFC/FL040 STNR NC="
+  },
+  {
+    "icaoId": "MHTG",
+    "firId": "MHTG",
+    "firName": "MHCC CENTRAL AMERICAN",
+    "receiptTime": "2026-11-11T12:18:27.621Z",
+    "validTimeFrom": 1794399480,
+    "validTimeTo": 1794413880,
+    "seriesId": "C4",
+    "hazard": "TS",
+    "qualifier": "EMBD",
+    "base": null,
+    "top": 50000,
+    "geom": "AREA",
+    "coords": [
+      {
+        "lon": -85.068,
+        "lat": 20.665
+      },
+      {
+        "lon": -83.72,
+        "lat": 20.373
+      },
+      {
+        "lon": -84.133,
+        "lat": 19.083
+      },
+      {
+        "lon": -85.167,
+        "lat": 19.233
+      },
+      {
+        "lon": -85.6,
+        "lat": 19.933
+      },
+      {
+        "lon": -85.462,
+        "lat": 20.123
+      },
+      {
+        "lon": -85.3,
+        "lat": 20.16
+      },
+      {
+        "lon": -85.32,
+        "lat": 20.319
+      },
+      {
+        "lon": -85.068,
+        "lat": 20.665
+      }
+    ],
+    "dir": "NE",
+    "spd": "5",
+    "chng": "INTSF",
+    "rawSigmet": "WSCA31 MHTG 111218\nMHTG SIGMET C4 VALID 111218/111618 MHTG-\nMHCC CENTRAL AMERICAN FIR EMBD TS OBS AT 1210Z \nWI N1956 W08536 - N2040 W08504 - N2023 W08343 - \nN1905 W08408 - N1914 W08510 TOP FL500 MOV NE 05KT INTSF="
+  },
+  {
+    "icaoId": "SEGU",
+    "firId": "SEFG",
+    "firName": "SEFG GUAYAQUIL",
+    "receiptTime": "2026-11-11T12:22:46.303Z",
+    "validTimeFrom": 1794399600,
+    "validTimeTo": 1794410400,
+    "seriesId": "01",
+    "hazard": "TS",
+    "qualifier": "EMBD",
+    "base": null,
+    "top": 43000,
+    "geom": "AREA",
+    "coords": [
+      {
+        "lon": -78.65,
+        "lat": 1.299
+      },
+      {
+        "lon": -78.81,
+        "lat": 1.4
+      },
+      {
+        "lon": -83,
+        "lat": 1.4
+      },
+      {
+        "lon": -83.25,
+        "lat": 1.4
+      },
+      {
+        "lon": -83.25,
+        "lat": -0.283
+      },
+      {
+        "lon": -78.65,
+        "lat": -0.3
+      },
+      {
+        "lon": -78.65,
+        "lat": 1.299
+      }
+    ],
+    "dir": "-",
+    "spd": "0",
+    "chng": "INTSF",
+    "rawSigmet": "WSEQ31 SEGU 111220\nSEFG SIGMET 01 VALID 111220/111520 SEGU-\nSEFG GUAYAQUIL FIR EMBD TS OBS AT 1200Z N OF LINE S0017 W08315 -\nS0018 W07839\nTOP FL430 STNR INTSF="
+  },
+  {
+    "icaoId": "CWAO",
+    "firId": "CZVR",
+    "firName": "CZVR VANCOUVER",
+    "receiptTime": "2026-11-11T12:20:53.884Z",
+    "validTimeFrom": 1794399600,
+    "validTimeTo": 1794414000,
+    "seriesId": "R2",
+    "hazard": "MTW",
+    "qualifier": "SEV",
+    "base": 34000,
+    "top": 42000,
+    "geom": "AREAS",
+    "coords": [
+      [
+        {
+          "lon": -115.152,
+          "lat": 49.87
+        },
+        {
+          "lon": -115.15,
+          "lat": 49.94
+        },
+        {
+          "lon": -115.64,
+          "lat": 50.36
+        },
+        {
+          "lon": -115.761,
+          "lat": 50.357
+        },
+        {
+          "lon": -115.152,
+          "lat": 49.87
+        }
+      ],
+      [
+        {
+          "lon": -117.216,
+          "lat": 51.521
+        },
+        {
+          "lon": -117.46,
+          "lat": 51.78
+        },
+        {
+          "lon": -119.01,
+          "lat": 53.4
+        },
+        {
+          "lon": -120.224,
+          "lat": 54.146
+        },
+        {
+          "lon": -120.387,
+          "lat": 54.059
+        },
+        {
+          "lon": -117.216,
+          "lat": 51.521
+        }
+      ]
+    ],
+    "dir": "-",
+    "spd": "0",
+    "chng": "NC",
+    "rawSigmet": "WSCN01 CWAO 111220\nCZVR SIGMET R2 VALID 111220/111620 CWEG-\nCZVR VANCOUVER FIR SEV MTW FCST WI 90NM WID LINE BTN N4908 W11245 - N5432 W11930\nFL340/420 STNR NC="
+  },
+  {
+    "icaoId": "CWAO",
+    "firId": "CZEG",
+    "firName": "CZEG EDMONTON",
+    "receiptTime": "2026-11-11T12:20:53.926Z",
+    "validTimeFrom": 1794399600,
+    "validTimeTo": 1794414000,
+    "seriesId": "Q2",
+    "hazard": "MTW",
+    "qualifier": "SEV",
+    "base": 34000,
+    "top": 42000,
+    "geom": "AREA",
+    "coords": [
+      {
+        "lon": -120.224,
+        "lat": 54.146
+      },
+      {
+        "lon": -119.01,
+        "lat": 53.4
+      },
+      {
+        "lon": -117.46,
+        "lat": 51.78
+      },
+      {
+        "lon": -117.216,
+        "lat": 51.521
+      },
+      {
+        "lon": -115.761,
+        "lat": 50.357
+      },
+      {
+        "lon": -115.64,
+        "lat": 50.36
+      },
+      {
+        "lon": -115.15,
+        "lat": 49.94
+      },
+      {
+        "lon": -115.152,
+        "lat": 49.87
+      },
+      {
+        "lon": -114.064,
+        "lat": 49
+      },
+      {
+        "lon": -112.999,
+        "lat": 49
+      },
+      {
+        "lon": -111.863,
+        "lat": 49.608
+      },
+      {
+        "lon": -118.613,
+        "lat": 55.008
+      },
+      {
+        "lon": -120.224,
+        "lat": 54.146
+      }
+    ],
+    "dir": "-",
+    "spd": "0",
+    "chng": "NC",
+    "rawSigmet": "WSCN02 CWAO 111220\nCZEG SIGMET Q2 VALID 111220/111620 CWEG-\nCZEG EDMONTON FIR SEV MTW FCST WI 90NM WID LINE BTN N4908 W11245 - N5432 W11930\nFL340/420 STNR NC="
+  },
+  {
+    "icaoId": "SCCI",
+    "firId": "SCCZ",
+    "firName": "SCCZ PUNTA ARENAS",
+    "receiptTime": "2026-11-11T12:22:46.399Z",
+    "validTimeFrom": 1794399720,
+    "validTimeTo": 1794414120,
+    "seriesId": "D1",
+    "hazard": "TURB",
+    "qualifier": "SEV",
+    "base": 6000,
+    "top": 18000,
+    "geom": "AREA",
+    "coords": [
+      {
+        "lon": -68.63,
+        "lat": -52.833
+      },
+      {
+        "lon": -68.63,
+        "lat": -52.64
+      },
+      {
+        "lon": -68.45,
+        "lat": -52.35
+      },
+      {
+        "lon": -68.45,
+        "lat": -52.3
+      },
+      {
+        "lon": -68.82,
+        "lat": -52.24
+      },
+      {
+        "lon": -69.21,
+        "lat": -52.14
+      },
+      {
+        "lon": -69.49,
+        "lat": -52.13
+      },
+      {
+        "lon": -69.95,
+        "lat": -52.01
+      },
+      {
+        "lon": -70.63,
+        "lat": -52
+      },
+      {
+        "lon": -71.92,
+        "lat": -51.99
+      },
+      {
+        "lon": -71.96,
+        "lat": -51.87
+      },
+      {
+        "lon": -72.05,
+        "lat": -51.79
+      },
+      {
+        "lon": -72.28,
+        "lat": -51.7
+      },
+      {
+        "lon": -72.35,
+        "lat": -51.58
+      },
+      {
+        "lon": -72.35,
+        "lat": -51.47
+      },
+      {
+        "lon": -72.27,
+        "lat": -51.22
+      },
+      {
+        "lon": -72.41,
+        "lat": -51.1
+      },
+      {
+        "lon": -72.28,
+        "lat": -51.01
+      },
+      {
+        "lon": -72.26,
+        "lat": -50.84
+      },
+      {
+        "lon": -72.35,
+        "lat": -50.73
+      },
+      {
+        "lon": -72.3,
+        "lat": -50.65
+      },
+      {
+        "lon": -72.51,
+        "lat": -50.6
+      },
+      {
+        "lon": -72.62,
+        "lat": -50.67
+      },
+      {
+        "lon": -72.76,
+        "lat": -50.62
+      },
+      {
+        "lon": -73.09,
+        "lat": -50.77
+      },
+      {
+        "lon": -73.18,
+        "lat": -50.75
+      },
+      {
+        "lon": -73.19,
+        "lat": -50.64
+      },
+      {
+        "lon": -73.26,
+        "lat": -50.57
+      },
+      {
+        "lon": -73.27,
+        "lat": -50.36
+      },
+      {
+        "lon": -73.37,
+        "lat": -50.23
+      },
+      {
+        "lon": -73.53,
+        "lat": -50.14
+      },
+      {
+        "lon": -73.48,
+        "lat": -50.01
+      },
+      {
+        "lon": -73.57,
+        "lat": -49.92
+      },
+      {
+        "lon": -73.47,
+        "lat": -49.76
+      },
+      {
+        "lon": -73.55,
+        "lat": -49.68
+      },
+      {
+        "lon": -73.52,
+        "lat": -49.61
+      },
+      {
+        "lon": -73.59,
+        "lat": -49.53
+      },
+      {
+        "lon": -73.46,
+        "lat": -49.31
+      },
+      {
+        "lon": -73.15,
+        "lat": -49.3
+      },
+      {
+        "lon": -73.18,
+        "lat": -49.21
+      },
+      {
+        "lon": -73.08,
+        "lat": -49.06
+      },
+      {
+        "lon": -72.95,
+        "lat": -48.96
+      },
+      {
+        "lon": -72.81,
+        "lat": -48.95
+      },
+      {
+        "lon": -72.59,
+        "lat": -48.79
+      },
+      {
+        "lon": -72.6,
+        "lat": -48.49
+      },
+      {
+        "lon": -72.52,
+        "lat": -48.42
+      },
+      {
+        "lon": -72.3,
+        "lat": -48.33
+      },
+      {
+        "lon": -72.32,
+        "lat": -48.14
+      },
+      {
+        "lon": -72.4,
+        "lat": -48.02
+      },
+      {
+        "lon": -72.54,
+        "lat": -47.92
+      },
+      {
+        "lon": -72.46,
+        "lat": -47.75
+      },
+      {
+        "lon": -72.35,
+        "lat": -47.62
+      },
+      {
+        "lon": -72.29,
+        "lat": -47.41
+      },
+      {
+        "lon": -72.19,
+        "lat": -47.42
+      },
+      {
+        "lon": -72.03,
+        "lat": -47.27
+      },
+      {
+        "lon": -72.03,
+        "lat": -47.2
+      },
+      {
+        "lon": -71.88,
+        "lat": -47.22
+      },
+      {
+        "lon": -71.87,
+        "lat": -47.14
+      },
+      {
+        "lon": -72,
+        "lat": -47.04
+      },
+      {
+        "lon": -71.91,
+        "lat": -47
+      },
+      {
+        "lon": -76,
+        "lat": -47.002
+      },
+      {
+        "lon": -76,
+        "lat": -52.833
+      },
+      {
+        "lon": -68.63,
+        "lat": -52.833
+      }
+    ],
+    "dir": "-",
+    "spd": "0",
+    "chng": "NC",
+    "rawSigmet": "WSCH31 SCCI 111222\nSCCZ SIGMET D1 VALID 111222/111622 SCCI-\nSCCZ PUNTA ARENAS FIR SEV TURB FCST E OF LINE S4700 W07600 - S5250 \nW07600 FL060/180 STNR NC="
+  },
+  {
+    "icaoId": "WMKK",
+    "firId": "WBFC",
+    "firName": "WBFC KOTA KINABALU",
+    "receiptTime": "2026-11-11T12:11:42.609Z",
+    "validTimeFrom": 1794399900,
+    "validTimeTo": 1794413700,
+    "seriesId": "9",
+    "hazard": "TS",
+    "qualifier": "EMBD",
+    "base": null,
+    "top": 53000,
+    "geom": "AREA",
+    "coords": [
+      {
+        "lon": 115.082,
+        "lat": 2.737
+      },
+      {
+        "lon": 115.08,
+        "lat": 2.74
+      },
+      {
+        "lon": 115.22,
+        "lat": 3
+      },
+      {
+        "lon": 115.52,
+        "lat": 3.03
+      },
+      {
+        "lon": 115.63,
+        "lat": 4.08
+      },
+      {
+        "lon": 115.87,
+        "lat": 4.32
+      },
+      {
+        "lon": 116.09,
+        "lat": 4.28
+      },
+      {
+        "lon": 116.21,
+        "lat": 4.38
+      },
+      {
+        "lon": 117.23,
+        "lat": 4.36
+      },
+      {
+        "lon": 117.89,
+        "lat": 4
+      },
+      {
+        "lon": 119.05,
+        "lat": 4
+      },
+      {
+        "lon": 119.05,
+        "lat": 4
+      },
+      {
+        "lon": 119.58,
+        "lat": 4.596
+      },
+      {
+        "lon": 119.568,
+        "lat": 4.613
+      },
+      {
+        "lon": 115.65,
+        "lat": 7.75
+      },
+      {
+        "lon": 110.2,
+        "lat": 1.183
+      },
+      {
+        "lon": 115.082,
+        "lat": 2.737
+      }
+    ],
+    "dir": "SSW",
+    "spd": "5",
+    "chng": "NC",
+    "rawSigmet": "WSMS31 WMKK 111212\nWBFC SIGMET 9 VALID 111225/111615 WBKK-\nWBFC KOTA KINABALU FIR EMBD TS\nOBS NW OF LINE N0400 E11903 - N0436 E11935 AND SE OF LINE N0111\nE11012 - N0745 E11539 TOP FL530 MOV SSW 05KT NC="
+  },
+  {
+    "icaoId": "SKBO",
+    "firId": "SKED",
+    "firName": "SKED BOGOTA",
+    "receiptTime": "2026-11-11T12:29:11.352Z",
+    "validTimeFrom": 1794400200,
+    "validTimeTo": 1794420000,
+    "seriesId": "C1",
+    "hazard": "VA",
+    "qualifier": "ERUPTION MT VOLCAN PURACE",
+    "base": null,
+    "top": null,
+    "geom": "AREA",
+    "coords": [
+      {
+        "lon": -76.533,
+        "lat": 2.383
+      },
+      {
+        "lon": -76.383,
+        "lat": 2.317
+      },
+      {
+        "lon": -76.383,
+        "lat": 2.317
+      },
+      {
+        "lon": -76.55,
+        "lat": 2.333
+      },
+      {
+        "lon": -76.533,
+        "lat": 2.383
+      }
+    ],
+    "dir": null,
+    "spd": null,
+    "chng": null,
+    "rawSigmet": "WVCO31 SKBO 111230\nSKED SIGMET C1 VALID 111230/111800 SKBO-\nSKED BOGOTA FIR VA ERUPTION MT VOLCAN PURACE PSN N0219 W07624 VA CLD\nOBS AT 1152Z WI N0223 W07632 - N0219 W07623 - N0219 W07623 - N0220\nW07633 - N0223 W07632 SFC/AL160 MOV W 15KT="
+  },
+  {
+    "icaoId": "FYWW",
+    "firId": "FYWH",
+    "firName": "FYWF WINDHOEK",
+    "receiptTime": "2026-11-11T12:44:15.392Z",
+    "validTimeFrom": 1794400500,
+    "validTimeTo": 1794414900,
+    "seriesId": "1",
+    "hazard": "TS",
+    "qualifier": "",
+    "base": null,
+    "top": null,
+    "geom": "AREA",
+    "coords": [
+      {
+        "lon": 20,
+        "lat": -17.875
+      },
+      {
+        "lon": 18.89,
+        "lat": -17.8
+      },
+      {
+        "lon": 18.863,
+        "lat": -17.774
+      },
+      {
+        "lon": 11.75,
+        "lat": -17.3
+      },
+      {
+        "lon": 15.033,
+        "lat": -21.85
+      },
+      {
+        "lon": 19.98,
+        "lat": -22.031
+      },
+      {
+        "lon": 19.98,
+        "lat": -22
+      },
+      {
+        "lon": 20.033,
+        "lat": -22
+      },
+      {
+        "lon": 20,
+        "lat": -17.875
+      }
+    ],
+    "dir": null,
+    "spd": null,
+    "chng": "INTSF",
+    "rawSigmet": "WSNM31 FYWW 111234\nFYWH SIGMET 1 VALID 111235/111635 FYWH-\nFYWF WINDHOEK FIR OBSC TS OBS AT 1235Z WI S1718 E01145 - S2151\nE01502 - S2202 E02002 - S1751 E02000 - S1718 E01145 INTSF="
+  },
+  {
+    "icaoId": "SGAS",
+    "firId": "SGFA",
+    "firName": "SGFA ASUNCION",
+    "receiptTime": "2026-11-11T12:40:28.862Z",
+    "validTimeFrom": 1794400800,
+    "validTimeTo": 1794411600,
+    "seriesId": "02",
+    "hazard": "TS",
+    "qualifier": "EMBD",
+    "base": null,
+    "top": 39000,
+    "geom": "AREA",
+    "coords": [
+      {
+        "lon": -60.022,
+        "lat": -24.01
+      },
+      {
+        "lon": -60.02,
+        "lat": -24.01
+      },
+      {
+        "lon": -60.003,
+        "lat": -24.02
+      },
+      {
+        "lon": -58.431,
+        "lat": -24.848
+      },
+      {
+        "lon": -58.42,
+        "lat": -24.85
+      },
+      {
+        "lon": -58.417,
+        "lat": -24.856
+      },
+      {
+        "lon": -58.254,
+        "lat": -24.941
+      },
+      {
+        "lon": -58.24,
+        "lat": -24.93
+      },
+      {
+        "lon": -57.85,
+        "lat": -25.12
+      },
+      {
+        "lon": -57.797,
+        "lat": -25.182
+      },
+      {
+        "lon": -57.7,
+        "lat": -25.233
+      },
+      {
+        "lon": -55.483,
+        "lat": -24.967
+      },
+      {
+        "lon": -54.441,
+        "lat": -24.967
+      },
+      {
+        "lon": -54.42,
+        "lat": -24.84
+      },
+      {
+        "lon": -54.31,
+        "lat": -24.63
+      },
+      {
+        "lon": -54.34,
+        "lat": -24.5
+      },
+      {
+        "lon": -54.24,
+        "lat": -24.38
+      },
+      {
+        "lon": -54.35,
+        "lat": -24.13
+      },
+      {
+        "lon": -54.24,
+        "lat": -24.05
+      },
+      {
+        "lon": -54.37,
+        "lat": -23.99
+      },
+      {
+        "lon": -54.41,
+        "lat": -23.9
+      },
+      {
+        "lon": -54.64,
+        "lat": -23.8
+      },
+      {
+        "lon": -54.91,
+        "lat": -23.97
+      },
+      {
+        "lon": -55.17,
+        "lat": -24.02
+      },
+      {
+        "lon": -55.4,
+        "lat": -23.96
+      },
+      {
+        "lon": -55.45,
+        "lat": -23.68
+      },
+      {
+        "lon": -55.52,
+        "lat": -23.6
+      },
+      {
+        "lon": -55.54,
+        "lat": -23.47
+      },
+      {
+        "lon": -55.51,
+        "lat": -23.38
+      },
+      {
+        "lon": -55.55,
+        "lat": -23.32
+      },
+      {
+        "lon": -55.52,
+        "lat": -23.23
+      },
+      {
+        "lon": -55.62,
+        "lat": -23.02
+      },
+      {
+        "lon": -55.654,
+        "lat": -22.85
+      },
+      {
+        "lon": -56.267,
+        "lat": -22.85
+      },
+      {
+        "lon": -60.2,
+        "lat": -23.917
+      },
+      {
+        "lon": -60.022,
+        "lat": -24.01
+      }
+    ],
+    "dir": "E",
+    "spd": "0",
+    "chng": "INTSF",
+    "rawSigmet": "WSPY31 SGAS 111240\nSGFA SIGMET 02 VALID 111240/111540 SGAS-\nSGFA ASUNCION FIR EMBD TS OBS AT 1230Z E OF LINE S2458 W05529 - S2514\n W05742 - S2355 W06012  - S2251 W05616 TOP FL390 MOV E INTSF="
+  },
+  {
+    "icaoId": "MMMX",
+    "firId": "MMFR",
+    "firName": "MMFO MAZATLAN OCEANICA",
+    "receiptTime": "2026-11-11T12:49:00.766Z",
+    "validTimeFrom": 1794401160,
+    "validTimeTo": 1794415560,
+    "seriesId": "H2",
+    "hazard": "TS",
+    "qualifier": "OCNL",
+    "base": null,
+    "top": 46000,
+    "geom": "AREA",
+    "coords": [
+      {
+        "lon": -106.9,
+        "lat": 9.383
+      },
+      {
+        "lon": -109.9,
+        "lat": 8.367
+      },
+      {
+        "lon": -109.35,
+        "lat": 13.233
+      },
+      {
+        "lon": -106.567,
+        "lat": 12.75
+      }
+    ],
+    "dir": "-",
+    "spd": "0",
+    "chng": "WKN",
+    "rawSigmet": "WSMX31 MMMX 111248\nMMID SIGMET H2 VALID 111246/111646 MMMX-\nMMFO MAZATLAN OCEANICA FIR OCNL TS OBS\n AT 1246Z\nWI N0923 W10654 - N0822 W10954 - N1314 W10921 - N1245 W10634 CB TOP ABV\n         FL460\nMOV STNRY WKN.\n="
+  },
+  {
+    "icaoId": "RJTD",
+    "firId": "RJJJ",
+    "firName": "RJJJ FUKUOKA",
+    "receiptTime": "2026-11-11T12:48:29.618Z",
+    "validTimeFrom": 1794401220,
+    "validTimeTo": 1794415620,
+    "seriesId": "S01",
+    "hazard": "TS",
+    "qualifier": "FRQ",
+    "base": null,
+    "top": 50000,
+    "geom": "AREA",
+    "coords": [
+      {
+        "lon": 154.767,
+        "lat": 28.533
+      },
+      {
+        "lon": 152.883,
+        "lat": 30
+      },
+      {
+        "lon": 158.517,
+        "lat": 35.117
+      },
+      {
+        "lon": 160.967,
+        "lat": 32.983
+      },
+      {
+        "lon": 154.767,
+        "lat": 28.533
+      }
+    ],
+    "dir": "ENE",
+    "spd": "30",
+    "chng": "INTSF",
+    "rawSigmet": "WSJP31 RJTD 111247\nRJJJ SIGMET S01 VALID 111247/111647 RJTD-\nRJJJ FUKUOKA FIR FRQ TS FCST WI N2832 E15446 - N3000 E15253 - N3507\nE15831 - N3259 E16058 - N2832 E15446 TOP FL500 MOV ENE 30KT INTSF="
+  },
+  {
+    "icaoId": "MMMX",
+    "firId": "MMFR",
+    "firName": "MMFO MAZATLAN OCEANICA",
+    "receiptTime": "2026-11-11T12:52:01.081Z",
+    "validTimeFrom": 1794401340,
+    "validTimeTo": 1794415740,
+    "seriesId": "A1",
+    "hazard": "TS",
+    "qualifier": "OCNL",
+    "base": null,
+    "top": 50000,
+    "geom": "AREA",
+    "coords": [
+      {
+        "lon": -116.467,
+        "lat": 12.533
+      },
+      {
+        "lon": -119.9,
+        "lat": 11.933
+      },
+      {
+        "lon": -119.967,
+        "lat": 14.3
+      }
+    ],
+    "dir": "-",
+    "spd": "0",
+    "chng": "NC",
+    "rawSigmet": "WSMX31 MMMX 111251\nMMID SIGMET A1 VALID 111249/111649 MMMX-\nMMFO MAZATLAN OCEANICA FIR OCNL TS OBS\n AT 1249Z\nWI N1232 W11628 - N1156 W11954 - N1418 W11958 CB TOP ABV FL500\nMOV STNRY NC.\n="
+  },
+  {
+    "icaoId": "VTBS",
+    "firId": "VTBB",
+    "firName": "VTBB BANGKOK",
+    "receiptTime": "2026-11-11T12:50:19.443Z",
+    "validTimeFrom": 1794401400,
+    "validTimeTo": 1794415800,
+    "seriesId": "03",
+    "hazard": "TS",
+    "qualifier": "EMBD",
+    "base": null,
+    "top": 52000,
+    "geom": "AREA",
+    "coords": [
+      {
+        "lon": 99.85,
+        "lat": 10.683
+      },
+      {
+        "lon": 102.467,
+        "lat": 9.217
+      },
+      {
+        "lon": 102.817,
+        "lat": 7.65
+      },
+      {
+        "lon": 100.65,
+        "lat": 7.933
+      },
+      {
+        "lon": 101.133,
+        "lat": 8.9
+      },
+      {
+        "lon": 99.233,
+        "lat": 9.983
+      },
+      {
+        "lon": 99.85,
+        "lat": 10.683
+      }
+    ],
+    "dir": "WNW",
+    "spd": "5",
+    "chng": "NC",
+    "rawSigmet": "WSTH31 VTBS 111249\nVTBB SIGMET 03 VALID 111250/111650 VTBS-\nVTBB BANGKOK FIR EMBD TS OBS WI N1041 E09951 - N0913 E10228 - N0739\nE10249 - N0756 E10039 - N0854 E10108 - N0959 E09914 - N1041 E09951\nTOP FL520 MOV WNW 05KT NC="
+  },
+  {
+    "icaoId": "NZKL",
+    "firId": "NZZC",
+    "firName": "NZZC NEW ZEALAND",
+    "receiptTime": "2026-11-11T12:54:22.711Z",
+    "validTimeFrom": 1794401640,
+    "validTimeTo": 1794409200,
+    "seriesId": "35",
+    "hazard": "TURB",
+    "qualifier": "SEV",
+    "base": 0,
+    "top": 13000,
+    "geom": "AREA",
+    "coords": [
+      {
+        "lon": 171.167,
+        "lat": -43.167
+      },
+      {
+        "lon": 173.167,
+        "lat": -41.5
+      },
+      {
+        "lon": 174.167,
+        "lat": -41.833
+      },
+      {
+        "lon": 173.333,
+        "lat": -42.833
+      },
+      {
+        "lon": 172.167,
+        "lat": -43.333
+      },
+      {
+        "lon": 171.167,
+        "lat": -43.167
+      }
+    ],
+    "dir": "-",
+    "spd": "0",
+    "chng": "WKN",
+    "rawSigmet": "WSNZ21 NZKL 111252\nNZZC SIGMET 35 VALID 111254/111500 NZKL-\nNZZC NEW ZEALAND FIR SEV TURB FCST WI S4310 E17110 - S4130 E17310 -\nS4150 E17410 - S4250 E17320 - S4320 E17210 - S4310 E17110 SFC/FL130\nSTNR WKN="
+  },
+  {
+    "icaoId": "NZKL",
+    "firId": "NZZC",
+    "firName": "NZZC NEW ZEALAND",
+    "receiptTime": "2026-11-11T12:55:02.909Z",
+    "validTimeFrom": 1794401640,
+    "validTimeTo": 1794416040,
+    "seriesId": "37",
+    "hazard": "TURB",
+    "qualifier": "SEV",
+    "base": 0,
+    "top": 6000,
+    "geom": "AREA",
+    "coords": [
+      {
+        "lon": 175.5,
+        "lat": -40.5
+      },
+      {
+        "lon": 176,
+        "lat": -41.167
+      },
+      {
+        "lon": 175.333,
+        "lat": -41.667
+      },
+      {
+        "lon": 174.5,
+        "lat": -41.333
+      },
+      {
+        "lon": 175.5,
+        "lat": -40.5
+      }
+    ],
+    "dir": "-",
+    "spd": "0",
+    "chng": "NC",
+    "rawSigmet": "WSNZ21 NZKL 111254\nNZZC SIGMET 37 VALID 111254/111654 NZKL-\nNZZC NEW ZEALAND FIR SEV TURB FCST WI S4030 E17530 - S4110 E17600 -\nS4140 E17520 - S4120 E17430 - S4030 E17530 SFC/6000FT STNR NC="
+  },
+  {
+    "icaoId": "SBGL",
+    "firId": "SBAZ",
+    "firName": "SBAZ AMAZONICA",
+    "receiptTime": "2026-11-11T12:56:33.259Z",
+    "validTimeFrom": 1794401820,
+    "validTimeTo": 1794411000,
+    "seriesId": "29",
+    "hazard": "TS",
+    "qualifier": "EMBD",
+    "base": null,
+    "top": 48000,
+    "geom": "AREA",
+    "coords": [
+      {
+        "lon": -61.046,
+        "lat": -13.5
+      },
+      {
+        "lon": -61.02,
+        "lat": -13.54
+      },
+      {
+        "lon": -60.8,
+        "lat": -13.6
+      },
+      {
+        "lon": -60.65,
+        "lat": -13.72
+      },
+      {
+        "lon": -60.46,
+        "lat": -13.81
+      },
+      {
+        "lon": -60.402,
+        "lat": -13.995
+      },
+      {
+        "lon": -60.383,
+        "lat": -14
+      },
+      {
+        "lon": -60.433,
+        "lat": -14.267
+      },
+      {
+        "lon": -59.283,
+        "lat": -15.517
+      },
+      {
+        "lon": -58.683,
+        "lat": -13.717
+      },
+      {
+        "lon": -58.6,
+        "lat": -13.75
+      },
+      {
+        "lon": -59.917,
+        "lat": -12.45
+      },
+      {
+        "lon": -61.046,
+        "lat": -13.5
+      }
+    ],
+    "dir": "-",
+    "spd": "0",
+    "chng": "NC",
+    "rawSigmet": "WSBZ23 SBGL 111252\nSBAZ SIGMET 29 VALID 111257/111530 SBAZ - SBAZ AMAZONICA FIR EMBD TS FCST WI S1333 W06106 - S1353 W06048 - S1400 W06023 - S1416 W06026 - S1531 W05917 - S1343 W05841 - S1345 W05836 - S1227 W05955 - S1333 W06106 TOP FL480 STNR NC="
+  }
+]

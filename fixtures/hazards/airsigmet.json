@@ -1,0 +1,170 @@
+[
+  {
+    "icaoId": "KKCI",
+    "alphaChar": "C",
+    "seriesId": "16C",
+    "receiptTime": "2026-11-11T12:56:07.235Z",
+    "creationTime": "2026-11-11T12:55:00.000Z",
+    "validTimeFrom": 1794401700,
+    "validTimeTo": 1794408900,
+    "airSigmetType": "SIGMET",
+    "hazard": "CONVECTIVE",
+    "altitudeHi1": 42000,
+    "altitudeHi2": 42000,
+    "altitudeLow1": null,
+    "altitudeLow2": null,
+    "movementDir": 250,
+    "movementSpd": 30,
+    "rawAirSigmet": "WSUS32 KKCI 111255\nMKCC WST 111255\nCONVECTIVE SIGMET 16C\nVALID UNTIL 1455Z\nLA TX CSTL WTRS\nFROM 110SSE LCH-190SE PSX-120ENE BRO-80ESE PSX-110SSE LCH\nAREA EMBD TS MOV FROM 25030KT. TOPS TO FL420.",
+    "postProcessFlag": 0,
+    "severity": 5,
+    "coords": [
+      {
+        "lon": -92.297,
+        "lat": 28.453
+      },
+      {
+        "lon": -93.813,
+        "lat": 26.502
+      },
+      {
+        "lon": -95.323,
+        "lat": 26.686
+      },
+      {
+        "lon": -94.919,
+        "lat": 28.233
+      },
+      {
+        "lon": -92.297,
+        "lat": 28.453
+      }
+    ]
+  },
+  {
+    "icaoId": "KKCI",
+    "alphaChar": "C",
+    "seriesId": "17C",
+    "receiptTime": "2026-11-11T12:56:07.256Z",
+    "creationTime": "2026-11-11T12:55:00.000Z",
+    "validTimeFrom": 1794401700,
+    "validTimeTo": 1794408900,
+    "airSigmetType": "SIGMET",
+    "hazard": "CONVECTIVE",
+    "altitudeHi1": 38000,
+    "altitudeHi2": 38000,
+    "altitudeLow1": null,
+    "altitudeLow2": null,
+    "movementDir": 250,
+    "movementSpd": 20,
+    "rawAirSigmet": "WSUS32 KKCI 111255\nMKCC WST 111255\nCONVECTIVE SIGMET 17C\nVALID UNTIL 1455Z\nWI IL IA\nFROM 40N DBQ-40ESE DBQ-20ESE IOW-60NW IOW-40N DBQ\nAREA EMBD TS MOV FROM 25020KT. TOPS TO FL380.",
+    "postProcessFlag": 0,
+    "severity": 5,
+    "coords": [
+      {
+        "lon": -90.71,
+        "lat": 43.065
+      },
+      {
+        "lon": -89.884,
+        "lat": 42.137
+      },
+      {
+        "lon": -91.202,
+        "lat": 41.389
+      },
+      {
+        "lon": -92.563,
+        "lat": 42.222
+      },
+      {
+        "lon": -90.71,
+        "lat": 43.065
+      }
+    ]
+  },
+  {
+    "icaoId": "KKCI",
+    "alphaChar": "",
+    "seriesId": "6E",
+    "receiptTime": "2026-11-11T12:56:07.294Z",
+    "creationTime": "2026-11-11T12:55:00.000Z",
+    "validTimeFrom": 1794401700,
+    "validTimeTo": 1794408900,
+    "airSigmetType": "SIGMET",
+    "hazard": "CONVECTIVE",
+    "altitudeHi1": 42000,
+    "altitudeHi2": 42000,
+    "altitudeLow1": null,
+    "altitudeLow2": null,
+    "movementDir": 240,
+    "movementSpd": 25,
+    "rawAirSigmet": "WSUS31 KKCI 111255\nMKCE WST 111255\nCONVECTIVE SIGMET 6E\nVALID UNTIL 1455Z\nFL CSTL WTRS\nFROM 180ENE OMN-160ENE PBI-50ESE TRV-40ENE OMN-180ENE OMN\nAREA EMBD TS MOV FROM 24025KT. TOPS TO FL420.",
+    "postProcessFlag": 0,
+    "severity": 5,
+    "coords": [
+      {
+        "lon": -77.913,
+        "lat": 30.432
+      },
+      {
+        "lon": -77.323,
+        "lat": 27.693
+      },
+      {
+        "lon": -79.628,
+        "lat": 27.352
+      },
+      {
+        "lon": -80.406,
+        "lat": 29.558
+      },
+      {
+        "lon": -77.913,
+        "lat": 30.432
+      }
+    ]
+  },
+  {
+    "icaoId": "KKCI",
+    "alphaChar": "",
+    "seriesId": "7E",
+    "receiptTime": "2026-11-11T12:56:07.314Z",
+    "creationTime": "2026-11-11T12:55:00.000Z",
+    "validTimeFrom": 1794401700,
+    "validTimeTo": 1794408900,
+    "airSigmetType": "SIGMET",
+    "hazard": "CONVECTIVE",
+    "altitudeHi1": 34000,
+    "altitudeHi2": 34000,
+    "altitudeLow1": null,
+    "altitudeLow2": null,
+    "movementDir": 240,
+    "movementSpd": 25,
+    "rawAirSigmet": "WSUS31 KKCI 111255\nMKCE WST 111255\nCONVECTIVE SIGMET 7E\nVALID UNTIL 1455Z\nFL CSTL WTRS\nFROM 50WSW SRQ-60WSW RSW-140WNW EYW-120WSW SRQ-50WSW SRQ\nAREA EMBD TS MOV FROM 24025KT. TOPS TO FL340.",
+    "postProcessFlag": 0,
+    "severity": 5,
+    "coords": [
+      {
+        "lon": -83.41,
+        "lat": 27.072
+      },
+      {
+        "lon": -82.804,
+        "lat": 26.136
+      },
+      {
+        "lon": -84.192,
+        "lat": 25.444
+      },
+      {
+        "lon": -84.605,
+        "lat": 26.605
+      },
+      {
+        "lon": -83.41,
+        "lat": 27.072
+      }
+    ]
+  }
+]

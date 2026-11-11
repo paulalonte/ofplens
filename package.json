@@ -24,6 +24,7 @@
     "format:check": "prettier --check .",
     "fixture:capture": "tsx --env-file-if-exists=.env scripts/capture-ofp.ts",
     "fixture:weather": "tsx scripts/capture-weather.ts",
+    "fixture:hazards": "tsx scripts/capture-hazards.ts",
     "briefing:try": "tsx --env-file-if-exists=.env packages/agent/scripts/try-briefing.ts"
   },
   "devDependencies": {

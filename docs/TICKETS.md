@@ -3,9 +3,9 @@
 Derived from [PLAN.md](PLAN.md). Work them in order, one ticket per branch/PR.
 Each ticket ends with tests green and its "Done when" shown working.
 
-> **Status (10 Nov 2026):** OFP-01 to OFP-28 are done: the MVP and Phase 4 (live weather) are
+> **Status (11 Nov 2026):** OFP-01 to OFP-29 are done: the MVP and Phase 4 (live weather) are
 > complete, and so is **Phase 5 — AI briefing** (OFP-24 to OFP-28). In progress: **Phase 6 —
-> hazards along the route** (OFP-29 to OFP-33). Deployment (3b) follows.
+> hazards along the route** (OFP-30 to OFP-33 left). Deployment (3b) follows.
 
 **MVP = Phases 0–3**: load my latest SimBrief OFP, see a clean briefing, and keep a
 history in Postgres, running locally. Deploy (3b), live weather (4) and everything AI
@@ -312,6 +312,10 @@ mapped to the affected waypoints, shown on the plan page, and named by the AI br
 - `pnpm fixture:hazards` captures the three feeds to `fixtures/hazards/`.
 - **Done when:** tests parse the captured feeds, map every hazard code seen in them (unknown
   codes become `other`), and keep advisories without a polygon (listed, never matched).
+- *As built:* `polygons` is a list of rings (an advisory can cover several areas, "AREAS");
+  empty means no shape. Areas across the antimeridian keep longitudes past ±180 so they stay
+  continuous (OFP-30 must handle that). G-AIRMET freezing-level contours (`FZLVL`, lines) are
+  left out; a G-AIRMET snapshot counts as valid 90 min either side of its time.
 
 ### OFP-30 · Match hazards to the route
 - A pure function: the plan's legs (consecutive waypoints, with altitude and ETA from takeoff

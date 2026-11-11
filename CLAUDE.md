@@ -29,6 +29,7 @@ history in Postgres. **For flight simulation (X-Plane 12) only.** The plan is in
 | `pnpm format` / `pnpm format:check`    | Prettier                                                                                                                    |
 | `pnpm fixture:capture <name>`          | Save your latest SimBrief OFP (pilot ID redacted) to `fixtures/ofp/`                                                        |
 | `pnpm fixture:weather`                 | Save current METARs/TAFs for 24 airports to `fixtures/weather/`                                                             |
+| `pnpm fixture:hazards`                 | Save current SIGMETs and G-AIRMETs (three feeds) to `fixtures/hazards/`                                                     |
 | `pnpm briefing:try <planId\|fixture>`  | One real, paid AI briefing (key from `.env`), or `--fixtures` for all; prints briefing, tokens, cost, guardrail failures    |
 
 Before saying a change is done, run `pnpm format:check && pnpm lint && pnpm typecheck && pnpm test`
@@ -41,10 +42,11 @@ apps/web       React + Vite + TanStack Router (file-based, src/routes) + Query +
 apps/api       Fastify; buildApp() in app.ts (testable), server.ts (listens)
 packages/ofp   OFP Zod schema, parseOfp(), shared domain types and formatters
 packages/db    Drizzle client, schema, migrations
-packages/weather  aviationweather.gov client (METAR/TAF), METAR decoder, flight category, plan weather (read/refresh)
+packages/weather  aviationweather.gov client (METAR/TAF, SIGMET/G-AIRMET hazards), METAR decoder, flight category, plan weather
 packages/agent    Briefing agent: tools as plain functions (reused by the API and, later, MCP), Briefing schema
 fixtures/ofp   Real SimBrief OFP JSON samples (OFP-05)
 fixtures/weather  Real aviationweather.gov METAR/TAF responses (`pnpm fixture:weather`)
+fixtures/hazards  Real SIGMET/G-AIRMET feeds (`pnpm fixture:hazards`)
 ```
 
 Web app (`apps/web/src`):

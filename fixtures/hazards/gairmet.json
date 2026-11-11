@@ -1,0 +1,3954 @@
+[
+  {
+    "tag": "1W",
+    "forecastHour": 3,
+    "validTime": "2026-11-11T12:00:00.000Z",
+    "hazard": "TURB-HI",
+    "geometryType": "AREA",
+    "latlonpairs": 19,
+    "frequency": null,
+    "severity": "MOD",
+    "due_to": null,
+    "status": "NRML",
+    "top": "420",
+    "base": "300",
+    "fzltop": null,
+    "fzlbase": null,
+    "level": null,
+    "receiptTime": 1794386843,
+    "issueTime": 1794386700,
+    "expireTime": 1794409200,
+    "product": "TANGO",
+    "geom": "AREA",
+    "coords": [
+      {
+        "lat": "31.81",
+        "lon": "-98.58"
+      },
+      {
+        "lat": "30.21",
+        "lon": "-91.57"
+      },
+      {
+        "lat": "28.80",
+        "lon": "-85.71"
+      },
+      {
+        "lat": "26.19",
+        "lon": "-81.86"
+      },
+      {
+        "lat": "24.07",
+        "lon": "-81.53"
+      },
+      {
+        "lat": "24.00",
+        "lon": "-83.01"
+      },
+      {
+        "lat": "25.24",
+        "lon": "-83.35"
+      },
+      {
+        "lat": "27.33",
+        "lon": "-84.16"
+      },
+      {
+        "lat": "27.06",
+        "lon": "-87.69"
+      },
+      {
+        "lat": "28.31",
+        "lon": "-87.96"
+      },
+      {
+        "lat": "28.23",
+        "lon": "-94.12"
+      },
+      {
+        "lat": "27.44",
+        "lon": "-95.22"
+      },
+      {
+        "lat": "27.30",
+        "lon": "-99.69"
+      },
+      {
+        "lat": "29.29",
+        "lon": "-100.82"
+      },
+      {
+        "lat": "28.99",
+        "lon": "-104.06"
+      },
+      {
+        "lat": "30.15",
+        "lon": "-104.93"
+      },
+      {
+        "lat": "30.66",
+        "lon": "-105.37"
+      },
+      {
+        "lat": "31.18",
+        "lon": "-104.03"
+      },
+      {
+        "lat": "31.81",
+        "lon": "-98.58"
+      }
+    ]
+  },
+  {
+    "tag": "1C",
+    "forecastHour": 3,
+    "validTime": "2026-11-11T12:00:00.000Z",
+    "hazard": "FZLVL",
+    "geometryType": "LINE",
+    "latlonpairs": 17,
+    "frequency": null,
+    "severity": null,
+    "due_to": null,
+    "status": "NRML",
+    "top": null,
+    "base": null,
+    "fzltop": null,
+    "fzlbase": null,
+    "level": "160",
+    "receiptTime": 1794385885,
+    "issueTime": 1794386700,
+    "expireTime": 1794409200,
+    "product": "ZULU",
+    "geom": "LINE",
+    "coords": [
+      {
+        "lat": "19.71",
+        "lon": "-94.26"
+      },
+      {
+        "lat": "20.53",
+        "lon": "-93.44"
+      },
+      {
+        "lat": "21.15",
+        "lon": "-93.04"
+      },
+      {
+        "lat": "21.51",
+        "lon": "-92.43"
+      },
+      {
+        "lat": "22.01",
+        "lon": "-91.06"
+      },
+      {
+        "lat": "22.53",
+        "lon": "-89.66"
+      },
+      {
+        "lat": "23.10",
+        "lon": "-88.25"
+      },
+      {
+        "lat": "23.51",
+        "lon": "-86.98"
+      },
+      {
+        "lat": "24.17",
+        "lon": "-85.77"
+      },
+      {
+        "lat": "24.44",
+        "lon": "-84.74"
+      },
+      {
+        "lat": "23.71",
+        "lon": "-84.42"
+      },
+      {
+        "lat": "22.91",
+        "lon": "-84.32"
+      },
+      {
+        "lat": "22.55",
+        "lon": "-83.61"
+      },
+      {
+        "lat": "21.74",
+        "lon": "-82.70"
+      },
+      {
+        "lat": "21.30",
+        "lon": "-80.88"
+      },
+      {
+        "lat": "20.38",
+        "lon": "-79.89"
+      },
+      {
+        "lat": "18.98",
+        "lon": "-80.50"
+      }
+    ]
+  },
+  {
+    "tag": "5E",
+    "forecastHour": 3,
+    "validTime": "2026-11-11T12:00:00.000Z",
+    "hazard": "MT_OBSC",
+    "geometryType": "AREA",
+    "latlonpairs": 12,
+    "frequency": null,
+    "severity": null,
+    "due_to": "MTNS OBSC BY CLDS PCPN BR",
+    "status": "NRML",
+    "top": null,
+    "base": null,
+    "fzltop": null,
+    "fzlbase": null,
+    "level": null,
+    "receiptTime": 1794386423,
+    "issueTime": 1794386700,
+    "expireTime": 1794409200,
+    "product": "SIERRA",
+    "geom": "AREA",
+    "coords": [
+      {
+        "lat": "49.02",
+        "lon": "-120.91"
+      },
+      {
+        "lat": "47.98",
+        "lon": "-121.65"
+      },
+      {
+        "lat": "47.69",
+        "lon": "-122.09"
+      },
+      {
+        "lat": "47.16",
+        "lon": "-122.39"
+      },
+      {
+        "lat": "45.76",
+        "lon": "-122.29"
+      },
+      {
+        "lat": "44.25",
+        "lon": "-123.45"
+      },
+      {
+        "lat": "43.17",
+        "lon": "-124.00"
+      },
+      {
+        "lat": "42.51",
+        "lon": "-124.66"
+      },
+      {
+        "lat": "46.89",
+        "lon": "-124.13"
+      },
+      {
+        "lat": "48.30",
+        "lon": "-124.61"
+      },
+      {
+        "lat": "48.97",
+        "lon": "-122.96"
+      },
+      {
+        "lat": "49.02",
+        "lon": "-120.91"
+      }
+    ]
+  },
+  {
+    "tag": "1W",
+    "forecastHour": 3,
+    "validTime": "2026-11-11T12:00:00.000Z",
+    "hazard": "SFC_WND",
+    "geometryType": "AREA",
+    "latlonpairs": 14,
+    "frequency": null,
+    "severity": null,
+    "due_to": "USTAINED SFC WINDS GREATER THAN 30 KTS",
+    "status": "NRML",
+    "top": null,
+    "base": null,
+    "fzltop": null,
+    "fzlbase": null,
+    "level": null,
+    "receiptTime": 1794386843,
+    "issueTime": 1794386700,
+    "expireTime": 1794409200,
+    "product": "TANGO",
+    "geom": "AREA",
+    "coords": [
+      {
+        "lat": "48.41",
+        "lon": "-125.43"
+      },
+      {
+        "lat": "48.21",
+        "lon": "-124.76"
+      },
+      {
+        "lat": "47.50",
+        "lon": "-124.48"
+      },
+      {
+        "lat": "47.35",
+        "lon": "-124.37"
+      },
+      {
+        "lat": "46.49",
+        "lon": "-123.94"
+      },
+      {
+        "lat": "45.82",
+        "lon": "-124.08"
+      },
+      {
+        "lat": "45.33",
+        "lon": "-124.60"
+      },
+      {
+        "lat": "44.64",
+        "lon": "-125.29"
+      },
+      {
+        "lat": "44.22",
+        "lon": "-126.16"
+      },
+      {
+        "lat": "44.38",
+        "lon": "-126.55"
+      },
+      {
+        "lat": "45.06",
+        "lon": "-126.50"
+      },
+      {
+        "lat": "46.47",
+        "lon": "-127.03"
+      },
+      {
+        "lat": "48.40",
+        "lon": "-126.59"
+      },
+      {
+        "lat": "48.41",
+        "lon": "-125.43"
+      }
+    ]
+  },
+  {
+    "tag": "4W",
+    "forecastHour": 3,
+    "validTime": "2026-11-11T12:00:00.000Z",
+    "hazard": "TURB-HI",
+    "geometryType": "AREA",
+    "latlonpairs": 24,
+    "frequency": null,
+    "severity": "MOD",
+    "due_to": null,
+    "status": "NRML",
+    "top": "420",
+    "base": "220",
+    "fzltop": null,
+    "fzlbase": null,
+    "level": null,
+    "receiptTime": 1794386843,
+    "issueTime": 1794386700,
+    "expireTime": 1794409200,
+    "product": "TANGO",
+    "geom": "AREA",
+    "coords": [
+      {
+        "lat": "48.98",
+        "lon": "-107.09"
+      },
+      {
+        "lat": "48.93",
+        "lon": "-105.73"
+      },
+      {
+        "lat": "48.92",
+        "lon": "-104.30"
+      },
+      {
+        "lat": "48.96",
+        "lon": "-102.02"
+      },
+      {
+        "lat": "46.75",
+        "lon": "-100.98"
+      },
+      {
+        "lat": "44.47",
+        "lon": "-99.57"
+      },
+      {
+        "lat": "43.25",
+        "lon": "-98.01"
+      },
+      {
+        "lat": "42.52",
+        "lon": "-96.49"
+      },
+      {
+        "lat": "42.50",
+        "lon": "-94.09"
+      },
+      {
+        "lat": "43.21",
+        "lon": "-92.74"
+      },
+      {
+        "lat": "44.12",
+        "lon": "-92.13"
+      },
+      {
+        "lat": "44.94",
+        "lon": "-91.50"
+      },
+      {
+        "lat": "44.95",
+        "lon": "-89.12"
+      },
+      {
+        "lat": "43.36",
+        "lon": "-88.06"
+      },
+      {
+        "lat": "40.95",
+        "lon": "-87.71"
+      },
+      {
+        "lat": "40.48",
+        "lon": "-87.99"
+      },
+      {
+        "lat": "39.79",
+        "lon": "-88.91"
+      },
+      {
+        "lat": "38.89",
+        "lon": "-91.60"
+      },
+      {
+        "lat": "39.18",
+        "lon": "-94.77"
+      },
+      {
+        "lat": "39.58",
+        "lon": "-98.95"
+      },
+      {
+        "lat": "41.19",
+        "lon": "-104.06"
+      },
+      {
+        "lat": "43.34",
+        "lon": "-105.83"
+      },
+      {
+        "lat": "45.87",
+        "lon": "-106.85"
+      },
+      {
+        "lat": "48.98",
+        "lon": "-107.09"
+      }
+    ]
+  },
+  {
+    "tag": "1C",
+    "forecastHour": 3,
+    "validTime": "2026-11-11T12:00:00.000Z",
+    "hazard": "FZLVL",
+    "geometryType": "LINE",
+    "latlonpairs": 14,
+    "frequency": null,
+    "severity": null,
+    "due_to": null,
+    "status": "NRML",
+    "top": null,
+    "base": null,
+    "fzltop": null,
+    "fzlbase": null,
+    "level": "160",
+    "receiptTime": 1794385885,
+    "issueTime": 1794386700,
+    "expireTime": 1794409200,
+    "product": "ZULU",
+    "geom": "LINE",
+    "coords": [
+      {
+        "lat": "18.71",
+        "lon": "-78.08"
+      },
+      {
+        "lat": "19.05",
+        "lon": "-77.88"
+      },
+      {
+        "lat": "19.24",
+        "lon": "-77.62"
+      },
+      {
+        "lat": "19.36",
+        "lon": "-77.41"
+      },
+      {
+        "lat": "19.46",
+        "lon": "-77.20"
+      },
+      {
+        "lat": "19.61",
+        "lon": "-76.79"
+      },
+      {
+        "lat": "19.63",
+        "lon": "-76.65"
+      },
+      {
+        "lat": "19.69",
+        "lon": "-76.39"
+      },
+      {
+        "lat": "19.57",
+        "lon": "-76.02"
+      },
+      {
+        "lat": "19.55",
+        "lon": "-76.01"
+      },
+      {
+        "lat": "19.15",
+        "lon": "-75.73"
+      },
+      {
+        "lat": "19.04",
+        "lon": "-75.71"
+      },
+      {
+        "lat": "18.77",
+        "lon": "-75.68"
+      },
+      {
+        "lat": "18.41",
+        "lon": "-75.70"
+      }
+    ]
+  },
+  {
+    "tag": "3W",
+    "forecastHour": 3,
+    "validTime": "2026-11-11T12:00:00.000Z",
+    "hazard": "TURB-HI",
+    "geometryType": "AREA",
+    "latlonpairs": 13,
+    "frequency": null,
+    "severity": "MOD",
+    "due_to": null,
+    "status": "NRML",
+    "top": "360",
+    "base": "280",
+    "fzltop": null,
+    "fzlbase": null,
+    "level": null,
+    "receiptTime": 1794386843,
+    "issueTime": 1794386700,
+    "expireTime": 1794409200,
+    "product": "TANGO",
+    "geom": "AREA",
+    "coords": [
+      {
+        "lat": "49.20",
+        "lon": "-117.75"
+      },
+      {
+        "lat": "47.78",
+        "lon": "-116.57"
+      },
+      {
+        "lat": "46.45",
+        "lon": "-116.15"
+      },
+      {
+        "lat": "44.99",
+        "lon": "-116.46"
+      },
+      {
+        "lat": "43.36",
+        "lon": "-118.64"
+      },
+      {
+        "lat": "42.76",
+        "lon": "-120.94"
+      },
+      {
+        "lat": "44.15",
+        "lon": "-122.54"
+      },
+      {
+        "lat": "45.91",
+        "lon": "-123.71"
+      },
+      {
+        "lat": "47.26",
+        "lon": "-124.95"
+      },
+      {
+        "lat": "48.65",
+        "lon": "-124.93"
+      },
+      {
+        "lat": "47.94",
+        "lon": "-123.56"
+      },
+      {
+        "lat": "49.02",
+        "lon": "-123.01"
+      },
+      {
+        "lat": "49.20",
+        "lon": "-117.75"
+      }
+    ]
+  },
+  {
+    "tag": "5E",
+    "forecastHour": 3,
+    "validTime": "2026-11-11T12:00:00.000Z",
+    "hazard": "IFR",
+    "geometryType": "AREA",
+    "latlonpairs": 10,
+    "frequency": null,
+    "severity": null,
+    "due_to": "CIG BLW 010 VIS BLW 3SM PCPN BR FG",
+    "status": "NRML",
+    "top": null,
+    "base": null,
+    "fzltop": null,
+    "fzlbase": null,
+    "level": null,
+    "receiptTime": 1794386423,
+    "issueTime": 1794386700,
+    "expireTime": 1794409200,
+    "product": "SIERRA",
+    "geom": "AREA",
+    "coords": [
+      {
+        "lat": "29.98",
+        "lon": "-95.93"
+      },
+      {
+        "lat": "29.05",
+        "lon": "-95.54"
+      },
+      {
+        "lat": "28.83",
+        "lon": "-95.43"
+      },
+      {
+        "lat": "28.10",
+        "lon": "-96.29"
+      },
+      {
+        "lat": "27.10",
+        "lon": "-96.42"
+      },
+      {
+        "lat": "25.97",
+        "lon": "-96.07"
+      },
+      {
+        "lat": "25.94",
+        "lon": "-98.90"
+      },
+      {
+        "lat": "28.16",
+        "lon": "-100.14"
+      },
+      {
+        "lat": "29.55",
+        "lon": "-97.69"
+      },
+      {
+        "lat": "29.98",
+        "lon": "-95.93"
+      }
+    ]
+  },
+  {
+    "tag": "8E",
+    "forecastHour": 3,
+    "validTime": "2026-11-11T12:00:00.000Z",
+    "hazard": "IFR",
+    "geometryType": "AREA",
+    "latlonpairs": 12,
+    "frequency": null,
+    "severity": null,
+    "due_to": "CIG BLW 010 VIS BLW 3SM BR FG",
+    "status": "NRML",
+    "top": null,
+    "base": null,
+    "fzltop": null,
+    "fzlbase": null,
+    "level": null,
+    "receiptTime": 1794386423,
+    "issueTime": 1794386700,
+    "expireTime": 1794409200,
+    "product": "SIERRA",
+    "geom": "AREA",
+    "coords": [
+      {
+        "lat": "49.02",
+        "lon": "-116.44"
+      },
+      {
+        "lat": "47.90",
+        "lon": "-114.85"
+      },
+      {
+        "lat": "47.12",
+        "lon": "-114.88"
+      },
+      {
+        "lat": "46.67",
+        "lon": "-115.51"
+      },
+      {
+        "lat": "47.74",
+        "lon": "-116.91"
+      },
+      {
+        "lat": "47.07",
+        "lon": "-118.53"
+      },
+      {
+        "lat": "46.07",
+        "lon": "-118.16"
+      },
+      {
+        "lat": "45.51",
+        "lon": "-119.00"
+      },
+      {
+        "lat": "45.31",
+        "lon": "-120.22"
+      },
+      {
+        "lat": "45.35",
+        "lon": "-121.88"
+      },
+      {
+        "lat": "48.99",
+        "lon": "-121.21"
+      },
+      {
+        "lat": "49.02",
+        "lon": "-116.44"
+      }
+    ]
+  },
+  {
+    "tag": "6W",
+    "forecastHour": 3,
+    "validTime": "2026-11-11T12:00:00.000Z",
+    "hazard": "TURB-HI",
+    "geometryType": "AREA",
+    "latlonpairs": 24,
+    "frequency": null,
+    "severity": "MOD",
+    "due_to": null,
+    "status": "NRML",
+    "top": "360",
+    "base": "240",
+    "fzltop": null,
+    "fzlbase": null,
+    "level": null,
+    "receiptTime": 1794386843,
+    "issueTime": 1794386700,
+    "expireTime": 1794409200,
+    "product": "TANGO",
+    "geom": "AREA",
+    "coords": [
+      {
+        "lat": "45.21",
+        "lon": "-106.59"
+      },
+      {
+        "lat": "45.21",
+        "lon": "-106.59"
+      },
+      {
+        "lat": "43.29",
+        "lon": "-105.92"
+      },
+      {
+        "lat": "41.16",
+        "lon": "-104.10"
+      },
+      {
+        "lat": "39.55",
+        "lon": "-98.73"
+      },
+      {
+        "lat": "39.03",
+        "lon": "-94.06"
+      },
+      {
+        "lat": "38.81",
+        "lon": "-91.40"
+      },
+      {
+        "lat": "38.41",
+        "lon": "-91.28"
+      },
+      {
+        "lat": "37.35",
+        "lon": "-92.83"
+      },
+      {
+        "lat": "36.98",
+        "lon": "-94.55"
+      },
+      {
+        "lat": "36.73",
+        "lon": "-96.48"
+      },
+      {
+        "lat": "36.56",
+        "lon": "-98.03"
+      },
+      {
+        "lat": "36.62",
+        "lon": "-99.62"
+      },
+      {
+        "lat": "36.77",
+        "lon": "-101.07"
+      },
+      {
+        "lat": "36.83",
+        "lon": "-101.71"
+      },
+      {
+        "lat": "36.98",
+        "lon": "-103.46"
+      },
+      {
+        "lat": "37.20",
+        "lon": "-104.87"
+      },
+      {
+        "lat": "37.44",
+        "lon": "-107.33"
+      },
+      {
+        "lat": "38.08",
+        "lon": "-109.07"
+      },
+      {
+        "lat": "38.65",
+        "lon": "-109.82"
+      },
+      {
+        "lat": "40.78",
+        "lon": "-110.15"
+      },
+      {
+        "lat": "42.68",
+        "lon": "-109.78"
+      },
+      {
+        "lat": "44.07",
+        "lon": "-108.87"
+      },
+      {
+        "lat": "45.21",
+        "lon": "-106.59"
+      }
+    ]
+  },
+  {
+    "tag": "1C",
+    "forecastHour": 3,
+    "validTime": "2026-11-11T12:00:00.000Z",
+    "hazard": "FZLVL",
+    "geometryType": "AREA",
+    "latlonpairs": 13,
+    "frequency": null,
+    "severity": null,
+    "due_to": null,
+    "status": "NRML",
+    "top": null,
+    "base": null,
+    "fzltop": null,
+    "fzlbase": null,
+    "level": "160",
+    "receiptTime": 1794385885,
+    "issueTime": 1794386700,
+    "expireTime": 1794409200,
+    "product": "ZULU",
+    "geom": "LINE",
+    "coords": [
+      {
+        "lat": "23.49",
+        "lon": "-79.03"
+      },
+      {
+        "lat": "23.50",
+        "lon": "-78.63"
+      },
+      {
+        "lat": "23.27",
+        "lon": "-78.26"
+      },
+      {
+        "lat": "23.12",
+        "lon": "-78.12"
+      },
+      {
+        "lat": "22.74",
+        "lon": "-77.94"
+      },
+      {
+        "lat": "22.41",
+        "lon": "-78.33"
+      },
+      {
+        "lat": "22.41",
+        "lon": "-78.37"
+      },
+      {
+        "lat": "22.43",
+        "lon": "-78.50"
+      },
+      {
+        "lat": "22.49",
+        "lon": "-78.76"
+      },
+      {
+        "lat": "22.69",
+        "lon": "-79.13"
+      },
+      {
+        "lat": "22.90",
+        "lon": "-79.39"
+      },
+      {
+        "lat": "23.26",
+        "lon": "-79.38"
+      },
+      {
+        "lat": "23.49",
+        "lon": "-79.03"
+      }
+    ]
+  },
+  {
+    "tag": "1W",
+    "forecastHour": 3,
+    "validTime": "2026-11-11T12:00:00.000Z",
+    "hazard": "LLWS",
+    "geometryType": "AREA",
+    "latlonpairs": 12,
+    "frequency": null,
+    "severity": null,
+    "due_to": "AIR SPEED LOSS OR GAIN OF 20KTS OR MORE BELOW 2000 FT AGL",
+    "status": "NRML",
+    "top": null,
+    "base": null,
+    "fzltop": null,
+    "fzlbase": null,
+    "level": null,
+    "receiptTime": 1794386843,
+    "issueTime": 1794386700,
+    "expireTime": 1794409200,
+    "product": "TANGO",
+    "geom": "AREA",
+    "coords": [
+      {
+        "lat": "48.94",
+        "lon": "-122.29"
+      },
+      {
+        "lat": "48.93",
+        "lon": "-121.80"
+      },
+      {
+        "lat": "48.46",
+        "lon": "-121.83"
+      },
+      {
+        "lat": "47.86",
+        "lon": "-122.23"
+      },
+      {
+        "lat": "47.42",
+        "lon": "-122.62"
+      },
+      {
+        "lat": "47.24",
+        "lon": "-123.18"
+      },
+      {
+        "lat": "47.22",
+        "lon": "-124.04"
+      },
+      {
+        "lat": "48.56",
+        "lon": "-124.89"
+      },
+      {
+        "lat": "48.12",
+        "lon": "-123.83"
+      },
+      {
+        "lat": "48.30",
+        "lon": "-123.31"
+      },
+      {
+        "lat": "48.84",
+        "lon": "-122.99"
+      },
+      {
+        "lat": "48.94",
+        "lon": "-122.29"
+      }
+    ]
+  },
+  {
+    "tag": "8E",
+    "forecastHour": 3,
+    "validTime": "2026-11-11T12:00:00.000Z",
+    "hazard": "IFR",
+    "geometryType": "AREA",
+    "latlonpairs": 9,
+    "frequency": null,
+    "severity": null,
+    "due_to": "CIG BLW 010 VIS BLW 3SM PCPN BR",
+    "status": "NRML",
+    "top": null,
+    "base": null,
+    "fzltop": null,
+    "fzlbase": null,
+    "level": null,
+    "receiptTime": 1794386423,
+    "issueTime": 1794386700,
+    "expireTime": 1794409200,
+    "product": "SIERRA",
+    "geom": "AREA",
+    "coords": [
+      {
+        "lat": "48.62",
+        "lon": "-124.92"
+      },
+      {
+        "lat": "48.23",
+        "lon": "-123.30"
+      },
+      {
+        "lat": "47.90",
+        "lon": "-123.08"
+      },
+      {
+        "lat": "47.32",
+        "lon": "-123.59"
+      },
+      {
+        "lat": "47.07",
+        "lon": "-124.37"
+      },
+      {
+        "lat": "45.95",
+        "lon": "-124.19"
+      },
+      {
+        "lat": "45.03",
+        "lon": "-126.53"
+      },
+      {
+        "lat": "48.26",
+        "lon": "-127.84"
+      },
+      {
+        "lat": "48.62",
+        "lon": "-124.92"
+      }
+    ]
+  },
+  {
+    "tag": "1C",
+    "forecastHour": 3,
+    "validTime": "2026-11-11T12:00:00.000Z",
+    "hazard": "FZLVL",
+    "geometryType": "LINE",
+    "latlonpairs": 25,
+    "frequency": null,
+    "severity": null,
+    "due_to": null,
+    "status": "NRML",
+    "top": null,
+    "base": null,
+    "fzltop": null,
+    "fzlbase": null,
+    "level": "040",
+    "receiptTime": 1794385885,
+    "issueTime": 1794386700,
+    "expireTime": 1794409200,
+    "product": "ZULU",
+    "geom": "LINE",
+    "coords": [
+      {
+        "lat": "48.55",
+        "lon": "-136.87"
+      },
+      {
+        "lat": "48.69",
+        "lon": "-136.70"
+      },
+      {
+        "lat": "48.84",
+        "lon": "-136.48"
+      },
+      {
+        "lat": "49.12",
+        "lon": "-136.27"
+      },
+      {
+        "lat": "49.27",
+        "lon": "-136.16"
+      },
+      {
+        "lat": "49.53",
+        "lon": "-136.00"
+      },
+      {
+        "lat": "49.75",
+        "lon": "-135.85"
+      },
+      {
+        "lat": "49.93",
+        "lon": "-135.72"
+      },
+      {
+        "lat": "50.17",
+        "lon": "-135.53"
+      },
+      {
+        "lat": "50.34",
+        "lon": "-135.38"
+      },
+      {
+        "lat": "50.56",
+        "lon": "-135.18"
+      },
+      {
+        "lat": "50.75",
+        "lon": "-135.03"
+      },
+      {
+        "lat": "50.97",
+        "lon": "-134.84"
+      },
+      {
+        "lat": "51.14",
+        "lon": "-134.73"
+      },
+      {
+        "lat": "51.45",
+        "lon": "-134.53"
+      },
+      {
+        "lat": "51.53",
+        "lon": "-134.49"
+      },
+      {
+        "lat": "51.89",
+        "lon": "-134.34"
+      },
+      {
+        "lat": "52.05",
+        "lon": "-134.27"
+      },
+      {
+        "lat": "52.25",
+        "lon": "-134.23"
+      },
+      {
+        "lat": "52.59",
+        "lon": "-134.20"
+      },
+      {
+        "lat": "52.91",
+        "lon": "-134.26"
+      },
+      {
+        "lat": "53.22",
+        "lon": "-134.41"
+      },
+      {
+        "lat": "53.51",
+        "lon": "-134.61"
+      },
+      {
+        "lat": "53.81",
+        "lon": "-134.81"
+      },
+      {
+        "lat": "54.10",
+        "lon": "-135.00"
+      }
+    ]
+  },
+  {
+    "tag": "1C",
+    "forecastHour": 3,
+    "validTime": "2026-11-11T12:00:00.000Z",
+    "hazard": "FZLVL",
+    "geometryType": "LINE",
+    "latlonpairs": 54,
+    "frequency": null,
+    "severity": null,
+    "due_to": null,
+    "status": "NRML",
+    "top": null,
+    "base": null,
+    "fzltop": null,
+    "fzlbase": null,
+    "level": "120",
+    "receiptTime": 1794385885,
+    "issueTime": 1794386700,
+    "expireTime": 1794409200,
+    "product": "ZULU",
+    "geom": "LINE",
+    "coords": [
+      {
+        "lat": "37.45",
+        "lon": "-132.29"
+      },
+      {
+        "lat": "39.69",
+        "lon": "-130.09"
+      },
+      {
+        "lat": "41.00",
+        "lon": "-128.79"
+      },
+      {
+        "lat": "42.05",
+        "lon": "-127.21"
+      },
+      {
+        "lat": "43.39",
+        "lon": "-125.73"
+      },
+      {
+        "lat": "43.87",
+        "lon": "-124.89"
+      },
+      {
+        "lat": "44.18",
+        "lon": "-123.51"
+      },
+      {
+        "lat": "44.97",
+        "lon": "-121.34"
+      },
+      {
+        "lat": "45.32",
+        "lon": "-118.02"
+      },
+      {
+        "lat": "44.99",
+        "lon": "-116.85"
+      },
+      {
+        "lat": "44.43",
+        "lon": "-116.21"
+      },
+      {
+        "lat": "43.67",
+        "lon": "-115.62"
+      },
+      {
+        "lat": "43.13",
+        "lon": "-114.74"
+      },
+      {
+        "lat": "38.78",
+        "lon": "-108.23"
+      },
+      {
+        "lat": "37.34",
+        "lon": "-107.59"
+      },
+      {
+        "lat": "36.16",
+        "lon": "-105.75"
+      },
+      {
+        "lat": "36.81",
+        "lon": "-104.81"
+      },
+      {
+        "lat": "37.78",
+        "lon": "-104.59"
+      },
+      {
+        "lat": "38.17",
+        "lon": "-103.75"
+      },
+      {
+        "lat": "38.42",
+        "lon": "-102.37"
+      },
+      {
+        "lat": "38.56",
+        "lon": "-101.45"
+      },
+      {
+        "lat": "38.13",
+        "lon": "-100.46"
+      },
+      {
+        "lat": "36.90",
+        "lon": "-99.10"
+      },
+      {
+        "lat": "36.53",
+        "lon": "-98.16"
+      },
+      {
+        "lat": "36.38",
+        "lon": "-96.99"
+      },
+      {
+        "lat": "36.61",
+        "lon": "-94.56"
+      },
+      {
+        "lat": "36.86",
+        "lon": "-93.72"
+      },
+      {
+        "lat": "36.88",
+        "lon": "-92.31"
+      },
+      {
+        "lat": "36.31",
+        "lon": "-92.49"
+      },
+      {
+        "lat": "35.75",
+        "lon": "-93.57"
+      },
+      {
+        "lat": "34.99",
+        "lon": "-95.42"
+      },
+      {
+        "lat": "34.35",
+        "lon": "-95.94"
+      },
+      {
+        "lat": "33.53",
+        "lon": "-95.87"
+      },
+      {
+        "lat": "32.81",
+        "lon": "-95.18"
+      },
+      {
+        "lat": "32.42",
+        "lon": "-94.18"
+      },
+      {
+        "lat": "32.09",
+        "lon": "-93.00"
+      },
+      {
+        "lat": "31.73",
+        "lon": "-92.41"
+      },
+      {
+        "lat": "30.92",
+        "lon": "-90.54"
+      },
+      {
+        "lat": "30.99",
+        "lon": "-88.22"
+      },
+      {
+        "lat": "31.17",
+        "lon": "-86.04"
+      },
+      {
+        "lat": "32.09",
+        "lon": "-84.18"
+      },
+      {
+        "lat": "32.91",
+        "lon": "-82.26"
+      },
+      {
+        "lat": "33.36",
+        "lon": "-81.55"
+      },
+      {
+        "lat": "34.05",
+        "lon": "-81.92"
+      },
+      {
+        "lat": "34.49",
+        "lon": "-82.38"
+      },
+      {
+        "lat": "34.87",
+        "lon": "-81.78"
+      },
+      {
+        "lat": "34.64",
+        "lon": "-79.61"
+      },
+      {
+        "lat": "35.48",
+        "lon": "-77.65"
+      },
+      {
+        "lat": "35.61",
+        "lon": "-76.55"
+      },
+      {
+        "lat": "35.46",
+        "lon": "-75.09"
+      },
+      {
+        "lat": "35.11",
+        "lon": "-72.09"
+      },
+      {
+        "lat": "34.49",
+        "lon": "-69.58"
+      },
+      {
+        "lat": "33.76",
+        "lon": "-67.47"
+      },
+      {
+        "lat": "33.49",
+        "lon": "-65.30"
+      }
+    ]
+  },
+  {
+    "tag": "1C",
+    "forecastHour": 3,
+    "validTime": "2026-11-11T12:00:00.000Z",
+    "hazard": "FZLVL",
+    "geometryType": "AREA",
+    "latlonpairs": 21,
+    "frequency": null,
+    "severity": null,
+    "due_to": null,
+    "status": "NRML",
+    "top": null,
+    "base": null,
+    "fzltop": null,
+    "fzlbase": null,
+    "level": "SFC",
+    "receiptTime": 1794385885,
+    "issueTime": 1794386700,
+    "expireTime": 1794409200,
+    "product": "ZULU",
+    "geom": "LINE",
+    "coords": [
+      {
+        "lat": "44.13",
+        "lon": "-110.84"
+      },
+      {
+        "lat": "43.50",
+        "lon": "-110.82"
+      },
+      {
+        "lat": "41.77",
+        "lon": "-110.62"
+      },
+      {
+        "lat": "41.30",
+        "lon": "-110.16"
+      },
+      {
+        "lat": "41.19",
+        "lon": "-109.18"
+      },
+      {
+        "lat": "41.02",
+        "lon": "-108.25"
+      },
+      {
+        "lat": "40.60",
+        "lon": "-107.63"
+      },
+      {
+        "lat": "39.20",
+        "lon": "-107.29"
+      },
+      {
+        "lat": "37.87",
+        "lon": "-107.19"
+      },
+      {
+        "lat": "37.78",
+        "lon": "-106.65"
+      },
+      {
+        "lat": "38.21",
+        "lon": "-106.22"
+      },
+      {
+        "lat": "39.33",
+        "lon": "-105.40"
+      },
+      {
+        "lat": "40.72",
+        "lon": "-105.70"
+      },
+      {
+        "lat": "41.60",
+        "lon": "-105.85"
+      },
+      {
+        "lat": "42.19",
+        "lon": "-106.29"
+      },
+      {
+        "lat": "42.31",
+        "lon": "-108.21"
+      },
+      {
+        "lat": "42.77",
+        "lon": "-109.10"
+      },
+      {
+        "lat": "43.27",
+        "lon": "-109.43"
+      },
+      {
+        "lat": "44.10",
+        "lon": "-109.82"
+      },
+      {
+        "lat": "44.47",
+        "lon": "-110.43"
+      },
+      {
+        "lat": "44.13",
+        "lon": "-110.84"
+      }
+    ]
+  },
+  {
+    "tag": "2W",
+    "forecastHour": 3,
+    "validTime": "2026-11-11T12:00:00.000Z",
+    "hazard": "TURB-LO",
+    "geometryType": "AREA",
+    "latlonpairs": 16,
+    "frequency": null,
+    "severity": "MOD",
+    "due_to": null,
+    "status": "NRML",
+    "top": "130",
+    "base": "080",
+    "fzltop": null,
+    "fzlbase": null,
+    "level": null,
+    "receiptTime": 1794386843,
+    "issueTime": 1794386700,
+    "expireTime": 1794409200,
+    "product": "TANGO",
+    "geom": "AREA",
+    "coords": [
+      {
+        "lat": "44.53",
+        "lon": "-90.20"
+      },
+      {
+        "lat": "44.28",
+        "lon": "-88.74"
+      },
+      {
+        "lat": "44.24",
+        "lon": "-86.85"
+      },
+      {
+        "lat": "44.19",
+        "lon": "-85.69"
+      },
+      {
+        "lat": "43.59",
+        "lon": "-85.22"
+      },
+      {
+        "lat": "42.96",
+        "lon": "-86.68"
+      },
+      {
+        "lat": "42.81",
+        "lon": "-87.62"
+      },
+      {
+        "lat": "42.27",
+        "lon": "-88.67"
+      },
+      {
+        "lat": "41.84",
+        "lon": "-89.76"
+      },
+      {
+        "lat": "41.45",
+        "lon": "-90.82"
+      },
+      {
+        "lat": "41.40",
+        "lon": "-91.87"
+      },
+      {
+        "lat": "41.72",
+        "lon": "-92.19"
+      },
+      {
+        "lat": "42.79",
+        "lon": "-92.35"
+      },
+      {
+        "lat": "43.54",
+        "lon": "-92.36"
+      },
+      {
+        "lat": "44.25",
+        "lon": "-91.72"
+      },
+      {
+        "lat": "44.53",
+        "lon": "-90.20"
+      }
+    ]
+  },
+  {
+    "tag": "7C",
+    "forecastHour": 3,
+    "validTime": "2026-11-11T12:00:00.000Z",
+    "hazard": "ICE",
+    "geometryType": "AREA",
+    "latlonpairs": 8,
+    "frequency": null,
+    "severity": "MOD",
+    "due_to": "ICE",
+    "status": "NRML",
+    "top": "230",
+    "base": "150",
+    "fzltop": null,
+    "fzlbase": null,
+    "level": null,
+    "receiptTime": 1794385885,
+    "issueTime": 1794386700,
+    "expireTime": 1794409200,
+    "product": "ZULU",
+    "geom": "AREA",
+    "coords": [
+      {
+        "lat": "47.66",
+        "lon": "-121.73"
+      },
+      {
+        "lat": "46.58",
+        "lon": "-120.31"
+      },
+      {
+        "lat": "42.35",
+        "lon": "-122.10"
+      },
+      {
+        "lat": "42.18",
+        "lon": "-123.36"
+      },
+      {
+        "lat": "43.10",
+        "lon": "-124.21"
+      },
+      {
+        "lat": "46.70",
+        "lon": "-124.65"
+      },
+      {
+        "lat": "47.39",
+        "lon": "-123.76"
+      },
+      {
+        "lat": "47.66",
+        "lon": "-121.73"
+      }
+    ]
+  },
+  {
+    "tag": "2E",
+    "forecastHour": 3,
+    "validTime": "2026-11-11T12:00:00.000Z",
+    "hazard": "IFR",
+    "geometryType": "AREA",
+    "latlonpairs": 16,
+    "frequency": null,
+    "severity": null,
+    "due_to": "CIG BLW 010 VIS BLW 3SM BR FG",
+    "status": "NRML",
+    "top": null,
+    "base": null,
+    "fzltop": null,
+    "fzlbase": null,
+    "level": null,
+    "receiptTime": 1794386423,
+    "issueTime": 1794386700,
+    "expireTime": 1794409200,
+    "product": "SIERRA",
+    "geom": "AREA",
+    "coords": [
+      {
+        "lat": "32.77",
+        "lon": "-101.26"
+      },
+      {
+        "lat": "32.55",
+        "lon": "-100.37"
+      },
+      {
+        "lat": "32.03",
+        "lon": "-99.67"
+      },
+      {
+        "lat": "31.48",
+        "lon": "-99.61"
+      },
+      {
+        "lat": "30.00",
+        "lon": "-98.54"
+      },
+      {
+        "lat": "28.99",
+        "lon": "-98.68"
+      },
+      {
+        "lat": "28.15",
+        "lon": "-100.15"
+      },
+      {
+        "lat": "29.55",
+        "lon": "-101.29"
+      },
+      {
+        "lat": "29.34",
+        "lon": "-102.83"
+      },
+      {
+        "lat": "29.79",
+        "lon": "-102.99"
+      },
+      {
+        "lat": "30.24",
+        "lon": "-102.49"
+      },
+      {
+        "lat": "31.02",
+        "lon": "-102.39"
+      },
+      {
+        "lat": "31.14",
+        "lon": "-103.21"
+      },
+      {
+        "lat": "31.80",
+        "lon": "-103.87"
+      },
+      {
+        "lat": "32.62",
+        "lon": "-103.08"
+      },
+      {
+        "lat": "32.77",
+        "lon": "-101.26"
+      }
+    ]
+  },
+  {
+    "tag": "1E",
+    "forecastHour": 3,
+    "validTime": "2026-11-11T12:00:00.000Z",
+    "hazard": "IFR",
+    "geometryType": "AREA",
+    "latlonpairs": 27,
+    "frequency": null,
+    "severity": null,
+    "due_to": "CIG BLW 010 VIS BLW 3SM BR",
+    "status": "NRML",
+    "top": null,
+    "base": null,
+    "fzltop": null,
+    "fzlbase": null,
+    "level": null,
+    "receiptTime": 1794386423,
+    "issueTime": 1794386700,
+    "expireTime": 1794409200,
+    "product": "SIERRA",
+    "geom": "AREA",
+    "coords": [
+      {
+        "lat": "45.93",
+        "lon": "-124.25"
+      },
+      {
+        "lat": "45.84",
+        "lon": "-122.69"
+      },
+      {
+        "lat": "45.37",
+        "lon": "-122.44"
+      },
+      {
+        "lat": "43.55",
+        "lon": "-123.06"
+      },
+      {
+        "lat": "43.61",
+        "lon": "-124.58"
+      },
+      {
+        "lat": "42.97",
+        "lon": "-124.73"
+      },
+      {
+        "lat": "42.09",
+        "lon": "-123.76"
+      },
+      {
+        "lat": "40.99",
+        "lon": "-124.67"
+      },
+      {
+        "lat": "40.12",
+        "lon": "-124.23"
+      },
+      {
+        "lat": "38.75",
+        "lon": "-123.77"
+      },
+      {
+        "lat": "38.55",
+        "lon": "-122.76"
+      },
+      {
+        "lat": "38.22",
+        "lon": "-122.27"
+      },
+      {
+        "lat": "37.44",
+        "lon": "-121.89"
+      },
+      {
+        "lat": "37.04",
+        "lon": "-121.98"
+      },
+      {
+        "lat": "36.72",
+        "lon": "-122.45"
+      },
+      {
+        "lat": "35.92",
+        "lon": "-122.12"
+      },
+      {
+        "lat": "34.77",
+        "lon": "-121.24"
+      },
+      {
+        "lat": "33.41",
+        "lon": "-121.25"
+      },
+      {
+        "lat": "32.81",
+        "lon": "-120.93"
+      },
+      {
+        "lat": "33.15",
+        "lon": "-119.56"
+      },
+      {
+        "lat": "32.90",
+        "lon": "-118.95"
+      },
+      {
+        "lat": "31.97",
+        "lon": "-118.02"
+      },
+      {
+        "lat": "30.68",
+        "lon": "-120.87"
+      },
+      {
+        "lat": "35.97",
+        "lon": "-124.16"
+      },
+      {
+        "lat": "39.99",
+        "lon": "-127.05"
+      },
+      {
+        "lat": "44.99",
+        "lon": "-126.53"
+      },
+      {
+        "lat": "45.93",
+        "lon": "-124.25"
+      }
+    ]
+  },
+  {
+    "tag": "3C",
+    "forecastHour": 3,
+    "validTime": "2026-11-11T12:00:00.000Z",
+    "hazard": "ICE",
+    "geometryType": "AREA",
+    "latlonpairs": 12,
+    "frequency": null,
+    "severity": "MOD",
+    "due_to": "ICE",
+    "status": "NRML",
+    "top": "220",
+    "base": "150",
+    "fzltop": null,
+    "fzlbase": null,
+    "level": null,
+    "receiptTime": 1794385885,
+    "issueTime": 1794386700,
+    "expireTime": 1794409200,
+    "product": "ZULU",
+    "geom": "AREA",
+    "coords": [
+      {
+        "lat": "35.89",
+        "lon": "-77.84"
+      },
+      {
+        "lat": "35.43",
+        "lon": "-76.19"
+      },
+      {
+        "lat": "35.17",
+        "lon": "-75.19"
+      },
+      {
+        "lat": "34.56",
+        "lon": "-74.46"
+      },
+      {
+        "lat": "34.13",
+        "lon": "-74.02"
+      },
+      {
+        "lat": "33.05",
+        "lon": "-75.60"
+      },
+      {
+        "lat": "33.13",
+        "lon": "-76.48"
+      },
+      {
+        "lat": "33.52",
+        "lon": "-77.53"
+      },
+      {
+        "lat": "34.29",
+        "lon": "-79.12"
+      },
+      {
+        "lat": "35.01",
+        "lon": "-79.51"
+      },
+      {
+        "lat": "35.65",
+        "lon": "-78.99"
+      },
+      {
+        "lat": "35.89",
+        "lon": "-77.84"
+      }
+    ]
+  },
+  {
+    "tag": "5C",
+    "forecastHour": 3,
+    "validTime": "2026-11-11T12:00:00.000Z",
+    "hazard": "ICE",
+    "geometryType": "AREA",
+    "latlonpairs": 10,
+    "frequency": null,
+    "severity": "MOD",
+    "due_to": "ICE",
+    "status": "NRML",
+    "top": "150",
+    "base": "100",
+    "fzltop": null,
+    "fzlbase": null,
+    "level": null,
+    "receiptTime": 1794385885,
+    "issueTime": 1794386700,
+    "expireTime": 1794409200,
+    "product": "ZULU",
+    "geom": "AREA",
+    "coords": [
+      {
+        "lat": "45.95",
+        "lon": "-104.19"
+      },
+      {
+        "lat": "45.61",
+        "lon": "-102.78"
+      },
+      {
+        "lat": "44.28",
+        "lon": "-101.36"
+      },
+      {
+        "lat": "43.40",
+        "lon": "-100.60"
+      },
+      {
+        "lat": "42.80",
+        "lon": "-100.97"
+      },
+      {
+        "lat": "42.51",
+        "lon": "-101.86"
+      },
+      {
+        "lat": "42.88",
+        "lon": "-103.76"
+      },
+      {
+        "lat": "43.78",
+        "lon": "-105.09"
+      },
+      {
+        "lat": "45.21",
+        "lon": "-105.40"
+      },
+      {
+        "lat": "45.95",
+        "lon": "-104.19"
+      }
+    ]
+  },
+  {
+    "tag": "3E",
+    "forecastHour": 3,
+    "validTime": "2026-11-11T12:00:00.000Z",
+    "hazard": "IFR",
+    "geometryType": "AREA",
+    "latlonpairs": 8,
+    "frequency": null,
+    "severity": null,
+    "due_to": "CIG BLW 010 VIS BLW 3SM BR FG",
+    "status": "NRML",
+    "top": null,
+    "base": null,
+    "fzltop": null,
+    "fzlbase": null,
+    "level": null,
+    "receiptTime": 1794386423,
+    "issueTime": 1794386700,
+    "expireTime": 1794409200,
+    "product": "SIERRA",
+    "geom": "AREA",
+    "coords": [
+      {
+        "lat": "49.09",
+        "lon": "-101.09"
+      },
+      {
+        "lat": "47.49",
+        "lon": "-99.87"
+      },
+      {
+        "lat": "46.53",
+        "lon": "-99.53"
+      },
+      {
+        "lat": "46.04",
+        "lon": "-99.99"
+      },
+      {
+        "lat": "47.65",
+        "lon": "-102.66"
+      },
+      {
+        "lat": "48.03",
+        "lon": "-103.62"
+      },
+      {
+        "lat": "49.04",
+        "lon": "-104.56"
+      },
+      {
+        "lat": "49.09",
+        "lon": "-101.09"
+      }
+    ]
+  },
+  {
+    "tag": "1C",
+    "forecastHour": 3,
+    "validTime": "2026-11-11T12:00:00.000Z",
+    "hazard": "FZLVL",
+    "geometryType": "LINE",
+    "latlonpairs": 48,
+    "frequency": null,
+    "severity": null,
+    "due_to": null,
+    "status": "NRML",
+    "top": null,
+    "base": null,
+    "fzltop": null,
+    "fzlbase": null,
+    "level": "SFC",
+    "receiptTime": 1794385885,
+    "issueTime": 1794386700,
+    "expireTime": 1794409200,
+    "product": "ZULU",
+    "geom": "LINE",
+    "coords": [
+      {
+        "lat": "49.58",
+        "lon": "-103.26"
+      },
+      {
+        "lat": "49.84",
+        "lon": "-102.52"
+      },
+      {
+        "lat": "49.52",
+        "lon": "-101.21"
+      },
+      {
+        "lat": "48.89",
+        "lon": "-99.52"
+      },
+      {
+        "lat": "48.93",
+        "lon": "-96.84"
+      },
+      {
+        "lat": "49.17",
+        "lon": "-95.35"
+      },
+      {
+        "lat": "49.65",
+        "lon": "-94.93"
+      },
+      {
+        "lat": "50.28",
+        "lon": "-95.00"
+      },
+      {
+        "lat": "50.87",
+        "lon": "-95.73"
+      },
+      {
+        "lat": "50.92",
+        "lon": "-97.14"
+      },
+      {
+        "lat": "50.52",
+        "lon": "-97.95"
+      },
+      {
+        "lat": "50.51",
+        "lon": "-98.62"
+      },
+      {
+        "lat": "51.10",
+        "lon": "-99.17"
+      },
+      {
+        "lat": "52.08",
+        "lon": "-100.32"
+      },
+      {
+        "lat": "52.76",
+        "lon": "-100.02"
+      },
+      {
+        "lat": "53.09",
+        "lon": "-99.15"
+      },
+      {
+        "lat": "53.33",
+        "lon": "-98.34"
+      },
+      {
+        "lat": "53.17",
+        "lon": "-97.61"
+      },
+      {
+        "lat": "52.76",
+        "lon": "-97.10"
+      },
+      {
+        "lat": "51.76",
+        "lon": "-95.85"
+      },
+      {
+        "lat": "51.20",
+        "lon": "-93.89"
+      },
+      {
+        "lat": "50.83",
+        "lon": "-90.94"
+      },
+      {
+        "lat": "50.62",
+        "lon": "-88.29"
+      },
+      {
+        "lat": "50.02",
+        "lon": "-86.46"
+      },
+      {
+        "lat": "49.16",
+        "lon": "-84.76"
+      },
+      {
+        "lat": "48.90",
+        "lon": "-83.23"
+      },
+      {
+        "lat": "48.11",
+        "lon": "-81.32"
+      },
+      {
+        "lat": "47.65",
+        "lon": "-78.92"
+      },
+      {
+        "lat": "46.96",
+        "lon": "-77.04"
+      },
+      {
+        "lat": "46.51",
+        "lon": "-74.28"
+      },
+      {
+        "lat": "46.72",
+        "lon": "-73.02"
+      },
+      {
+        "lat": "46.63",
+        "lon": "-71.74"
+      },
+      {
+        "lat": "46.20",
+        "lon": "-69.80"
+      },
+      {
+        "lat": "46.78",
+        "lon": "-68.02"
+      },
+      {
+        "lat": "46.93",
+        "lon": "-66.87"
+      },
+      {
+        "lat": "47.52",
+        "lon": "-66.19"
+      },
+      {
+        "lat": "48.22",
+        "lon": "-65.58"
+      },
+      {
+        "lat": "49.02",
+        "lon": "-65.48"
+      },
+      {
+        "lat": "49.71",
+        "lon": "-66.20"
+      },
+      {
+        "lat": "50.18",
+        "lon": "-65.20"
+      },
+      {
+        "lat": "50.36",
+        "lon": "-64.33"
+      },
+      {
+        "lat": "50.69",
+        "lon": "-62.24"
+      },
+      {
+        "lat": "51.19",
+        "lon": "-60.90"
+      },
+      {
+        "lat": "51.99",
+        "lon": "-60.09"
+      },
+      {
+        "lat": "52.59",
+        "lon": "-59.47"
+      },
+      {
+        "lat": "53.02",
+        "lon": "-59.66"
+      },
+      {
+        "lat": "53.56",
+        "lon": "-59.81"
+      },
+      {
+        "lat": "54.19",
+        "lon": "-59.40"
+      }
+    ]
+  },
+  {
+    "tag": "7E",
+    "forecastHour": 3,
+    "validTime": "2026-11-11T12:00:00.000Z",
+    "hazard": "IFR",
+    "geometryType": "AREA",
+    "latlonpairs": 10,
+    "frequency": null,
+    "severity": null,
+    "due_to": "CIG BLW 010 VIS BLW 3SM BR",
+    "status": "NRML",
+    "top": null,
+    "base": null,
+    "fzltop": null,
+    "fzlbase": null,
+    "level": null,
+    "receiptTime": 1794386423,
+    "issueTime": 1794386700,
+    "expireTime": 1794409200,
+    "product": "SIERRA",
+    "geom": "AREA",
+    "coords": [
+      {
+        "lat": "38.00",
+        "lon": "-94.61"
+      },
+      {
+        "lat": "37.53",
+        "lon": "-94.13"
+      },
+      {
+        "lat": "36.45",
+        "lon": "-94.24"
+      },
+      {
+        "lat": "35.83",
+        "lon": "-95.58"
+      },
+      {
+        "lat": "35.55",
+        "lon": "-96.96"
+      },
+      {
+        "lat": "35.85",
+        "lon": "-98.41"
+      },
+      {
+        "lat": "36.59",
+        "lon": "-98.44"
+      },
+      {
+        "lat": "37.69",
+        "lon": "-97.02"
+      },
+      {
+        "lat": "37.95",
+        "lon": "-95.84"
+      },
+      {
+        "lat": "38.00",
+        "lon": "-94.61"
+      }
+    ]
+  },
+  {
+    "tag": "2C",
+    "forecastHour": 3,
+    "validTime": "2026-11-11T12:00:00.000Z",
+    "hazard": "ICE",
+    "geometryType": "AREA",
+    "latlonpairs": 19,
+    "frequency": null,
+    "severity": "MOD",
+    "due_to": "ICE",
+    "status": "NRML",
+    "top": "150",
+    "base": "FZL",
+    "fzltop": "090",
+    "fzlbase": "040",
+    "level": null,
+    "receiptTime": 1794385885,
+    "issueTime": 1794386700,
+    "expireTime": 1794409200,
+    "product": "ZULU",
+    "geom": "AREA",
+    "coords": [
+      {
+        "lat": "47.83",
+        "lon": "-89.37"
+      },
+      {
+        "lat": "47.21",
+        "lon": "-86.84"
+      },
+      {
+        "lat": "46.69",
+        "lon": "-85.59"
+      },
+      {
+        "lat": "45.55",
+        "lon": "-85.76"
+      },
+      {
+        "lat": "44.56",
+        "lon": "-85.21"
+      },
+      {
+        "lat": "44.09",
+        "lon": "-84.23"
+      },
+      {
+        "lat": "43.20",
+        "lon": "-84.31"
+      },
+      {
+        "lat": "42.73",
+        "lon": "-85.72"
+      },
+      {
+        "lat": "41.57",
+        "lon": "-86.44"
+      },
+      {
+        "lat": "41.36",
+        "lon": "-88.31"
+      },
+      {
+        "lat": "40.97",
+        "lon": "-90.44"
+      },
+      {
+        "lat": "41.43",
+        "lon": "-92.05"
+      },
+      {
+        "lat": "42.14",
+        "lon": "-93.38"
+      },
+      {
+        "lat": "43.15",
+        "lon": "-95.34"
+      },
+      {
+        "lat": "43.75",
+        "lon": "-96.54"
+      },
+      {
+        "lat": "45.77",
+        "lon": "-97.65"
+      },
+      {
+        "lat": "46.64",
+        "lon": "-96.60"
+      },
+      {
+        "lat": "47.77",
+        "lon": "-91.85"
+      },
+      {
+        "lat": "47.83",
+        "lon": "-89.37"
+      }
+    ]
+  },
+  {
+    "tag": "6C",
+    "forecastHour": 3,
+    "validTime": "2026-11-11T12:00:00.000Z",
+    "hazard": "ICE",
+    "geometryType": "AREA",
+    "latlonpairs": 14,
+    "frequency": null,
+    "severity": "MOD",
+    "due_to": "ICE",
+    "status": "NRML",
+    "top": "080",
+    "base": "FZL",
+    "fzltop": "030",
+    "fzlbase": "010",
+    "level": null,
+    "receiptTime": 1794385885,
+    "issueTime": 1794386700,
+    "expireTime": 1794409200,
+    "product": "ZULU",
+    "geom": "AREA",
+    "coords": [
+      {
+        "lat": "47.51",
+        "lon": "-69.19"
+      },
+      {
+        "lat": "47.18",
+        "lon": "-68.91"
+      },
+      {
+        "lat": "47.33",
+        "lon": "-68.23"
+      },
+      {
+        "lat": "47.06",
+        "lon": "-67.83"
+      },
+      {
+        "lat": "45.62",
+        "lon": "-67.79"
+      },
+      {
+        "lat": "45.18",
+        "lon": "-67.31"
+      },
+      {
+        "lat": "45.17",
+        "lon": "-67.69"
+      },
+      {
+        "lat": "45.04",
+        "lon": "-70.25"
+      },
+      {
+        "lat": "45.03",
+        "lon": "-71.24"
+      },
+      {
+        "lat": "45.28",
+        "lon": "-71.43"
+      },
+      {
+        "lat": "45.29",
+        "lon": "-70.98"
+      },
+      {
+        "lat": "45.97",
+        "lon": "-70.23"
+      },
+      {
+        "lat": "46.71",
+        "lon": "-69.99"
+      },
+      {
+        "lat": "47.51",
+        "lon": "-69.19"
+      }
+    ]
+  },
+  {
+    "tag": "4W",
+    "forecastHour": 3,
+    "validTime": "2026-11-11T12:00:00.000Z",
+    "hazard": "TURB-LO",
+    "geometryType": "AREA",
+    "latlonpairs": 18,
+    "frequency": null,
+    "severity": "MOD",
+    "due_to": null,
+    "status": "NRML",
+    "top": "180",
+    "base": "080",
+    "fzltop": null,
+    "fzlbase": null,
+    "level": null,
+    "receiptTime": 1794386843,
+    "issueTime": 1794386700,
+    "expireTime": 1794409200,
+    "product": "TANGO",
+    "geom": "AREA",
+    "coords": [
+      {
+        "lat": "32.91",
+        "lon": "-91.43"
+      },
+      {
+        "lat": "32.83",
+        "lon": "-90.54"
+      },
+      {
+        "lat": "32.68",
+        "lon": "-89.70"
+      },
+      {
+        "lat": "32.42",
+        "lon": "-88.59"
+      },
+      {
+        "lat": "31.85",
+        "lon": "-88.06"
+      },
+      {
+        "lat": "31.17",
+        "lon": "-87.89"
+      },
+      {
+        "lat": "30.50",
+        "lon": "-87.98"
+      },
+      {
+        "lat": "29.71",
+        "lon": "-89.01"
+      },
+      {
+        "lat": "29.68",
+        "lon": "-89.54"
+      },
+      {
+        "lat": "29.46",
+        "lon": "-92.37"
+      },
+      {
+        "lat": "29.34",
+        "lon": "-94.81"
+      },
+      {
+        "lat": "29.53",
+        "lon": "-95.12"
+      },
+      {
+        "lat": "29.81",
+        "lon": "-95.39"
+      },
+      {
+        "lat": "30.24",
+        "lon": "-95.41"
+      },
+      {
+        "lat": "30.90",
+        "lon": "-95.03"
+      },
+      {
+        "lat": "31.68",
+        "lon": "-94.30"
+      },
+      {
+        "lat": "32.70",
+        "lon": "-92.42"
+      },
+      {
+        "lat": "32.91",
+        "lon": "-91.43"
+      }
+    ]
+  },
+  {
+    "tag": "3W",
+    "forecastHour": 3,
+    "validTime": "2026-11-11T12:00:00.000Z",
+    "hazard": "TURB-LO",
+    "geometryType": "AREA",
+    "latlonpairs": 15,
+    "frequency": null,
+    "severity": "MOD",
+    "due_to": "MTN WAVE",
+    "status": "NRML",
+    "top": "070",
+    "base": "SFC",
+    "fzltop": null,
+    "fzlbase": null,
+    "level": null,
+    "receiptTime": 1794386843,
+    "issueTime": 1794386700,
+    "expireTime": 1794409200,
+    "product": "TANGO",
+    "geom": "AREA",
+    "coords": [
+      {
+        "lat": "49.04",
+        "lon": "-122.72"
+      },
+      {
+        "lat": "48.96",
+        "lon": "-121.17"
+      },
+      {
+        "lat": "48.33",
+        "lon": "-121.74"
+      },
+      {
+        "lat": "47.56",
+        "lon": "-121.45"
+      },
+      {
+        "lat": "46.89",
+        "lon": "-121.51"
+      },
+      {
+        "lat": "46.15",
+        "lon": "-122.47"
+      },
+      {
+        "lat": "46.03",
+        "lon": "-122.83"
+      },
+      {
+        "lat": "46.18",
+        "lon": "-123.55"
+      },
+      {
+        "lat": "46.28",
+        "lon": "-124.02"
+      },
+      {
+        "lat": "46.89",
+        "lon": "-124.08"
+      },
+      {
+        "lat": "47.50",
+        "lon": "-124.48"
+      },
+      {
+        "lat": "48.51",
+        "lon": "-124.91"
+      },
+      {
+        "lat": "48.62",
+        "lon": "-123.79"
+      },
+      {
+        "lat": "48.54",
+        "lon": "-123.07"
+      },
+      {
+        "lat": "49.04",
+        "lon": "-122.72"
+      }
+    ]
+  },
+  {
+    "tag": "1C",
+    "forecastHour": 3,
+    "validTime": "2026-11-11T12:00:00.000Z",
+    "hazard": "FZLVL",
+    "geometryType": "LINE",
+    "latlonpairs": 40,
+    "frequency": null,
+    "severity": null,
+    "due_to": null,
+    "status": "NRML",
+    "top": null,
+    "base": null,
+    "fzltop": null,
+    "fzlbase": null,
+    "level": "040",
+    "receiptTime": 1794385885,
+    "issueTime": 1794386700,
+    "expireTime": 1794409200,
+    "product": "ZULU",
+    "geom": "LINE",
+    "coords": [
+      {
+        "lat": "57.30",
+        "lon": "-118.28"
+      },
+      {
+        "lat": "57.03",
+        "lon": "-117.78"
+      },
+      {
+        "lat": "57.02",
+        "lon": "-116.83"
+      },
+      {
+        "lat": "56.66",
+        "lon": "-116.17"
+      },
+      {
+        "lat": "56.29",
+        "lon": "-115.74"
+      },
+      {
+        "lat": "56.02",
+        "lon": "-115.22"
+      },
+      {
+        "lat": "55.76",
+        "lon": "-114.69"
+      },
+      {
+        "lat": "55.15",
+        "lon": "-114.52"
+      },
+      {
+        "lat": "54.81",
+        "lon": "-114.71"
+      },
+      {
+        "lat": "54.17",
+        "lon": "-114.89"
+      },
+      {
+        "lat": "53.59",
+        "lon": "-114.26"
+      },
+      {
+        "lat": "53.30",
+        "lon": "-113.81"
+      },
+      {
+        "lat": "53.01",
+        "lon": "-113.46"
+      },
+      {
+        "lat": "52.46",
+        "lon": "-112.93"
+      },
+      {
+        "lat": "52.11",
+        "lon": "-112.58"
+      },
+      {
+        "lat": "51.83",
+        "lon": "-112.27"
+      },
+      {
+        "lat": "50.93",
+        "lon": "-110.94"
+      },
+      {
+        "lat": "50.79",
+        "lon": "-110.50"
+      },
+      {
+        "lat": "50.23",
+        "lon": "-108.39"
+      },
+      {
+        "lat": "49.39",
+        "lon": "-106.68"
+      },
+      {
+        "lat": "48.51",
+        "lon": "-105.08"
+      },
+      {
+        "lat": "48.71",
+        "lon": "-104.07"
+      },
+      {
+        "lat": "49.45",
+        "lon": "-103.64"
+      },
+      {
+        "lat": "48.43",
+        "lon": "-99.52"
+      },
+      {
+        "lat": "48.03",
+        "lon": "-97.05"
+      },
+      {
+        "lat": "47.82",
+        "lon": "-94.50"
+      },
+      {
+        "lat": "47.65",
+        "lon": "-91.56"
+      },
+      {
+        "lat": "47.72",
+        "lon": "-88.53"
+      },
+      {
+        "lat": "47.05",
+        "lon": "-86.55"
+      },
+      {
+        "lat": "45.97",
+        "lon": "-85.07"
+      },
+      {
+        "lat": "44.81",
+        "lon": "-80.49"
+      },
+      {
+        "lat": "44.19",
+        "lon": "-78.22"
+      },
+      {
+        "lat": "43.50",
+        "lon": "-76.37"
+      },
+      {
+        "lat": "43.01",
+        "lon": "-73.63"
+      },
+      {
+        "lat": "42.66",
+        "lon": "-70.79"
+      },
+      {
+        "lat": "42.59",
+        "lon": "-68.28"
+      },
+      {
+        "lat": "42.99",
+        "lon": "-66.23"
+      },
+      {
+        "lat": "43.74",
+        "lon": "-64.43"
+      },
+      {
+        "lat": "44.10",
+        "lon": "-63.57"
+      },
+      {
+        "lat": "43.98",
+        "lon": "-62.14"
+      }
+    ]
+  },
+  {
+    "tag": "6E",
+    "forecastHour": 3,
+    "validTime": "2026-11-11T12:00:00.000Z",
+    "hazard": "IFR",
+    "geometryType": "AREA",
+    "latlonpairs": 10,
+    "frequency": null,
+    "severity": null,
+    "due_to": "VIS BLW 3SM BR",
+    "status": "NRML",
+    "top": null,
+    "base": null,
+    "fzltop": null,
+    "fzlbase": null,
+    "level": null,
+    "receiptTime": 1794386423,
+    "issueTime": 1794386700,
+    "expireTime": 1794409200,
+    "product": "SIERRA",
+    "geom": "AREA",
+    "coords": [
+      {
+        "lat": "44.16",
+        "lon": "-85.58"
+      },
+      {
+        "lat": "44.01",
+        "lon": "-84.85"
+      },
+      {
+        "lat": "43.35",
+        "lon": "-84.46"
+      },
+      {
+        "lat": "41.62",
+        "lon": "-85.41"
+      },
+      {
+        "lat": "40.45",
+        "lon": "-85.90"
+      },
+      {
+        "lat": "40.57",
+        "lon": "-86.73"
+      },
+      {
+        "lat": "41.29",
+        "lon": "-86.85"
+      },
+      {
+        "lat": "42.64",
+        "lon": "-86.30"
+      },
+      {
+        "lat": "43.69",
+        "lon": "-86.46"
+      },
+      {
+        "lat": "44.16",
+        "lon": "-85.58"
+      }
+    ]
+  },
+  {
+    "tag": "3W",
+    "forecastHour": 3,
+    "validTime": "2026-11-11T12:00:00.000Z",
+    "hazard": "LLWS",
+    "geometryType": "AREA",
+    "latlonpairs": 11,
+    "frequency": null,
+    "severity": null,
+    "due_to": "AIR SPEED LOSS OR GAIN OF 20KTS OR MORE BELOW 2000 FT AGL",
+    "status": "NRML",
+    "top": null,
+    "base": null,
+    "fzltop": null,
+    "fzlbase": null,
+    "level": null,
+    "receiptTime": 1794386843,
+    "issueTime": 1794386700,
+    "expireTime": 1794409200,
+    "product": "TANGO",
+    "geom": "AREA",
+    "coords": [
+      {
+        "lat": "41.00",
+        "lon": "-96.99"
+      },
+      {
+        "lat": "40.89",
+        "lon": "-94.55"
+      },
+      {
+        "lat": "40.41",
+        "lon": "-93.48"
+      },
+      {
+        "lat": "39.69",
+        "lon": "-94.58"
+      },
+      {
+        "lat": "39.49",
+        "lon": "-95.88"
+      },
+      {
+        "lat": "39.49",
+        "lon": "-96.87"
+      },
+      {
+        "lat": "39.36",
+        "lon": "-97.89"
+      },
+      {
+        "lat": "39.27",
+        "lon": "-98.83"
+      },
+      {
+        "lat": "39.92",
+        "lon": "-99.34"
+      },
+      {
+        "lat": "40.89",
+        "lon": "-98.15"
+      },
+      {
+        "lat": "41.00",
+        "lon": "-96.99"
+      }
+    ]
+  },
+  {
+    "tag": "4C",
+    "forecastHour": 3,
+    "validTime": "2026-11-11T12:00:00.000Z",
+    "hazard": "ICE",
+    "geometryType": "AREA",
+    "latlonpairs": 14,
+    "frequency": null,
+    "severity": "MOD",
+    "due_to": "ICE",
+    "status": "NRML",
+    "top": "210",
+    "base": "150",
+    "fzltop": null,
+    "fzlbase": null,
+    "level": null,
+    "receiptTime": 1794385885,
+    "issueTime": 1794386700,
+    "expireTime": 1794409200,
+    "product": "ZULU",
+    "geom": "AREA",
+    "coords": [
+      {
+        "lat": "30.56",
+        "lon": "-83.11"
+      },
+      {
+        "lat": "30.55",
+        "lon": "-82.21"
+      },
+      {
+        "lat": "30.01",
+        "lon": "-81.63"
+      },
+      {
+        "lat": "29.46",
+        "lon": "-81.50"
+      },
+      {
+        "lat": "27.89",
+        "lon": "-82.45"
+      },
+      {
+        "lat": "27.38",
+        "lon": "-83.64"
+      },
+      {
+        "lat": "27.00",
+        "lon": "-84.25"
+      },
+      {
+        "lat": "27.51",
+        "lon": "-84.47"
+      },
+      {
+        "lat": "27.51",
+        "lon": "-85.25"
+      },
+      {
+        "lat": "27.01",
+        "lon": "-86.00"
+      },
+      {
+        "lat": "27.36",
+        "lon": "-86.39"
+      },
+      {
+        "lat": "29.14",
+        "lon": "-86.47"
+      },
+      {
+        "lat": "30.55",
+        "lon": "-84.45"
+      },
+      {
+        "lat": "30.56",
+        "lon": "-83.11"
+      }
+    ]
+  },
+  {
+    "tag": "1C",
+    "forecastHour": 3,
+    "validTime": "2026-11-11T12:00:00.000Z",
+    "hazard": "FZLVL",
+    "geometryType": "LINE",
+    "latlonpairs": 32,
+    "frequency": null,
+    "severity": null,
+    "due_to": null,
+    "status": "NRML",
+    "top": null,
+    "base": null,
+    "fzltop": null,
+    "fzlbase": null,
+    "level": "080",
+    "receiptTime": 1794385885,
+    "issueTime": 1794386700,
+    "expireTime": 1794409200,
+    "product": "ZULU",
+    "geom": "LINE",
+    "coords": [
+      {
+        "lat": "57.13",
+        "lon": "-120.02"
+      },
+      {
+        "lat": "54.04",
+        "lon": "-116.35"
+      },
+      {
+        "lat": "52.44",
+        "lon": "-114.50"
+      },
+      {
+        "lat": "51.09",
+        "lon": "-112.64"
+      },
+      {
+        "lat": "50.32",
+        "lon": "-111.45"
+      },
+      {
+        "lat": "49.91",
+        "lon": "-110.28"
+      },
+      {
+        "lat": "48.67",
+        "lon": "-108.10"
+      },
+      {
+        "lat": "48.25",
+        "lon": "-106.54"
+      },
+      {
+        "lat": "47.71",
+        "lon": "-105.45"
+      },
+      {
+        "lat": "47.22",
+        "lon": "-104.47"
+      },
+      {
+        "lat": "46.39",
+        "lon": "-103.35"
+      },
+      {
+        "lat": "45.72",
+        "lon": "-102.74"
+      },
+      {
+        "lat": "45.22",
+        "lon": "-101.25"
+      },
+      {
+        "lat": "44.83",
+        "lon": "-100.02"
+      },
+      {
+        "lat": "44.20",
+        "lon": "-98.84"
+      },
+      {
+        "lat": "43.00",
+        "lon": "-96.84"
+      },
+      {
+        "lat": "43.23",
+        "lon": "-95.39"
+      },
+      {
+        "lat": "43.43",
+        "lon": "-94.55"
+      },
+      {
+        "lat": "43.22",
+        "lon": "-93.58"
+      },
+      {
+        "lat": "42.05",
+        "lon": "-91.61"
+      },
+      {
+        "lat": "42.17",
+        "lon": "-90.21"
+      },
+      {
+        "lat": "42.52",
+        "lon": "-88.87"
+      },
+      {
+        "lat": "41.89",
+        "lon": "-82.80"
+      },
+      {
+        "lat": "41.67",
+        "lon": "-79.01"
+      },
+      {
+        "lat": "41.67",
+        "lon": "-75.76"
+      },
+      {
+        "lat": "41.79",
+        "lon": "-74.33"
+      },
+      {
+        "lat": "41.64",
+        "lon": "-72.40"
+      },
+      {
+        "lat": "40.72",
+        "lon": "-69.37"
+      },
+      {
+        "lat": "40.22",
+        "lon": "-68.09"
+      },
+      {
+        "lat": "39.54",
+        "lon": "-67.11"
+      },
+      {
+        "lat": "38.66",
+        "lon": "-64.31"
+      },
+      {
+        "lat": "38.47",
+        "lon": "-63.90"
+      }
+    ]
+  },
+  {
+    "tag": "2W",
+    "forecastHour": 3,
+    "validTime": "2026-11-11T12:00:00.000Z",
+    "hazard": "TURB-HI",
+    "geometryType": "AREA",
+    "latlonpairs": 15,
+    "frequency": null,
+    "severity": "MOD",
+    "due_to": null,
+    "status": "NRML",
+    "top": "360",
+    "base": "260",
+    "fzltop": null,
+    "fzlbase": null,
+    "level": null,
+    "receiptTime": 1794386843,
+    "issueTime": 1794386700,
+    "expireTime": 1794409200,
+    "product": "TANGO",
+    "geom": "AREA",
+    "coords": [
+      {
+        "lat": "36.95",
+        "lon": "-80.18"
+      },
+      {
+        "lat": "36.79",
+        "lon": "-78.09"
+      },
+      {
+        "lat": "36.11",
+        "lon": "-77.39"
+      },
+      {
+        "lat": "35.70",
+        "lon": "-78.66"
+      },
+      {
+        "lat": "35.65",
+        "lon": "-79.89"
+      },
+      {
+        "lat": "34.98",
+        "lon": "-83.68"
+      },
+      {
+        "lat": "34.67",
+        "lon": "-85.91"
+      },
+      {
+        "lat": "34.43",
+        "lon": "-87.24"
+      },
+      {
+        "lat": "34.36",
+        "lon": "-88.18"
+      },
+      {
+        "lat": "34.72",
+        "lon": "-88.49"
+      },
+      {
+        "lat": "35.13",
+        "lon": "-88.50"
+      },
+      {
+        "lat": "35.57",
+        "lon": "-88.42"
+      },
+      {
+        "lat": "35.91",
+        "lon": "-86.88"
+      },
+      {
+        "lat": "36.73",
+        "lon": "-83.56"
+      },
+      {
+        "lat": "36.95",
+        "lon": "-80.18"
+      }
+    ]
+  },
+  {
+    "tag": "5W",
+    "forecastHour": 3,
+    "validTime": "2026-11-11T12:00:00.000Z",
+    "hazard": "TURB-HI",
+    "geometryType": "AREA",
+    "latlonpairs": 11,
+    "frequency": null,
+    "severity": "MOD",
+    "due_to": null,
+    "status": "NRML",
+    "top": "340",
+    "base": "180",
+    "fzltop": null,
+    "fzlbase": null,
+    "level": null,
+    "receiptTime": 1794386843,
+    "issueTime": 1794386700,
+    "expireTime": 1794409200,
+    "product": "TANGO",
+    "geom": "AREA",
+    "coords": [
+      {
+        "lat": "33.54",
+        "lon": "-90.10"
+      },
+      {
+        "lat": "33.05",
+        "lon": "-87.83"
+      },
+      {
+        "lat": "31.66",
+        "lon": "-87.14"
+      },
+      {
+        "lat": "30.68",
+        "lon": "-87.30"
+      },
+      {
+        "lat": "29.66",
+        "lon": "-88.38"
+      },
+      {
+        "lat": "29.59",
+        "lon": "-88.50"
+      },
+      {
+        "lat": "29.78",
+        "lon": "-89.39"
+      },
+      {
+        "lat": "31.18",
+        "lon": "-96.04"
+      },
+      {
+        "lat": "32.63",
+        "lon": "-95.13"
+      },
+      {
+        "lat": "33.30",
+        "lon": "-92.32"
+      },
+      {
+        "lat": "33.54",
+        "lon": "-90.10"
+      }
+    ]
+  },
+  {
+    "tag": "1C",
+    "forecastHour": 3,
+    "validTime": "2026-11-11T12:00:00.000Z",
+    "hazard": "FZLVL",
+    "geometryType": "LINE",
+    "latlonpairs": 16,
+    "frequency": null,
+    "severity": null,
+    "due_to": null,
+    "status": "NRML",
+    "top": null,
+    "base": null,
+    "fzltop": null,
+    "fzlbase": null,
+    "level": "080",
+    "receiptTime": 1794385885,
+    "issueTime": 1794386700,
+    "expireTime": 1794409200,
+    "product": "ZULU",
+    "geom": "LINE",
+    "coords": [
+      {
+        "lat": "40.17",
+        "lon": "-133.30"
+      },
+      {
+        "lat": "41.44",
+        "lon": "-132.33"
+      },
+      {
+        "lat": "43.02",
+        "lon": "-131.55"
+      },
+      {
+        "lat": "44.28",
+        "lon": "-130.59"
+      },
+      {
+        "lat": "45.56",
+        "lon": "-129.43"
+      },
+      {
+        "lat": "46.77",
+        "lon": "-128.54"
+      },
+      {
+        "lat": "48.26",
+        "lon": "-127.88"
+      },
+      {
+        "lat": "49.40",
+        "lon": "-127.18"
+      },
+      {
+        "lat": "50.70",
+        "lon": "-126.17"
+      },
+      {
+        "lat": "52.03",
+        "lon": "-125.22"
+      },
+      {
+        "lat": "53.39",
+        "lon": "-124.91"
+      },
+      {
+        "lat": "54.08",
+        "lon": "-124.53"
+      },
+      {
+        "lat": "54.68",
+        "lon": "-123.87"
+      },
+      {
+        "lat": "55.88",
+        "lon": "-123.20"
+      },
+      {
+        "lat": "56.36",
+        "lon": "-122.27"
+      },
+      {
+        "lat": "56.95",
+        "lon": "-121.70"
+      }
+    ]
+  },
+  {
+    "tag": "1E",
+    "forecastHour": 3,
+    "validTime": "2026-11-11T12:00:00.000Z",
+    "hazard": "MT_OBSC",
+    "geometryType": "AREA",
+    "latlonpairs": 7,
+    "frequency": null,
+    "severity": null,
+    "due_to": "MTNS OBSC BY CLDS",
+    "status": "NRML",
+    "top": null,
+    "base": null,
+    "fzltop": null,
+    "fzlbase": null,
+    "level": null,
+    "receiptTime": 1794386423,
+    "issueTime": 1794386700,
+    "expireTime": 1794409200,
+    "product": "SIERRA",
+    "geom": "AREA",
+    "coords": [
+      {
+        "lat": "47.54",
+        "lon": "-69.22"
+      },
+      {
+        "lat": "45.65",
+        "lon": "-68.52"
+      },
+      {
+        "lat": "43.97",
+        "lon": "-71.16"
+      },
+      {
+        "lat": "43.92",
+        "lon": "-72.89"
+      },
+      {
+        "lat": "45.20",
+        "lon": "-72.72"
+      },
+      {
+        "lat": "45.48",
+        "lon": "-71.68"
+      },
+      {
+        "lat": "47.54",
+        "lon": "-69.22"
+      }
+    ]
+  },
+  {
+    "tag": "1W",
+    "forecastHour": 3,
+    "validTime": "2026-11-11T12:00:00.000Z",
+    "hazard": "TURB-LO",
+    "geometryType": "AREA",
+    "latlonpairs": 9,
+    "frequency": null,
+    "severity": "MOD",
+    "due_to": "MTN WAVE",
+    "status": "NRML",
+    "top": "140",
+    "base": "SFC",
+    "fzltop": null,
+    "fzlbase": null,
+    "level": null,
+    "receiptTime": 1794386843,
+    "issueTime": 1794386700,
+    "expireTime": 1794409200,
+    "product": "TANGO",
+    "geom": "AREA",
+    "coords": [
+      {
+        "lat": "49.04",
+        "lon": "-112.16"
+      },
+      {
+        "lat": "48.59",
+        "lon": "-111.97"
+      },
+      {
+        "lat": "47.48",
+        "lon": "-110.57"
+      },
+      {
+        "lat": "46.51",
+        "lon": "-109.66"
+      },
+      {
+        "lat": "46.09",
+        "lon": "-109.99"
+      },
+      {
+        "lat": "45.62",
+        "lon": "-110.70"
+      },
+      {
+        "lat": "46.77",
+        "lon": "-112.91"
+      },
+      {
+        "lat": "48.89",
+        "lon": "-114.29"
+      },
+      {
+        "lat": "49.04",
+        "lon": "-112.16"
+      }
+    ]
+  },
+  {
+    "tag": "5E",
+    "forecastHour": 3,
+    "validTime": "2026-11-11T12:00:00.000Z",
+    "hazard": "MT_OBSC",
+    "geometryType": "AREA",
+    "latlonpairs": 8,
+    "frequency": null,
+    "severity": null,
+    "due_to": "MTNS OBSC BY CLDS BR FG",
+    "status": "NRML",
+    "top": null,
+    "base": null,
+    "fzltop": null,
+    "fzlbase": null,
+    "level": null,
+    "receiptTime": 1794386423,
+    "issueTime": 1794386700,
+    "expireTime": 1794409200,
+    "product": "SIERRA",
+    "geom": "AREA",
+    "coords": [
+      {
+        "lat": "49.01",
+        "lon": "-116.43"
+      },
+      {
+        "lat": "47.91",
+        "lon": "-114.84"
+      },
+      {
+        "lat": "47.10",
+        "lon": "-114.87"
+      },
+      {
+        "lat": "46.81",
+        "lon": "-115.51"
+      },
+      {
+        "lat": "48.13",
+        "lon": "-117.33"
+      },
+      {
+        "lat": "47.96",
+        "lon": "-121.57"
+      },
+      {
+        "lat": "48.98",
+        "lon": "-120.96"
+      },
+      {
+        "lat": "49.01",
+        "lon": "-116.43"
+      }
+    ]
+  },
+  {
+    "tag": "1C",
+    "forecastHour": 3,
+    "validTime": "2026-11-11T12:00:00.000Z",
+    "hazard": "FZLVL",
+    "geometryType": "LINE",
+    "latlonpairs": 15,
+    "frequency": null,
+    "severity": null,
+    "due_to": null,
+    "status": "NRML",
+    "top": null,
+    "base": null,
+    "fzltop": null,
+    "fzlbase": null,
+    "level": "160",
+    "receiptTime": 1794385885,
+    "issueTime": 1794386700,
+    "expireTime": 1794409200,
+    "product": "ZULU",
+    "geom": "LINE",
+    "coords": [
+      {
+        "lat": "19.64",
+        "lon": "-99.47"
+      },
+      {
+        "lat": "19.91",
+        "lon": "-99.26"
+      },
+      {
+        "lat": "20.01",
+        "lon": "-99.20"
+      },
+      {
+        "lat": "20.32",
+        "lon": "-98.89"
+      },
+      {
+        "lat": "20.39",
+        "lon": "-98.81"
+      },
+      {
+        "lat": "20.59",
+        "lon": "-98.50"
+      },
+      {
+        "lat": "20.76",
+        "lon": "-98.12"
+      },
+      {
+        "lat": "20.77",
+        "lon": "-97.93"
+      },
+      {
+        "lat": "20.79",
+        "lon": "-97.73"
+      },
+      {
+        "lat": "20.78",
+        "lon": "-97.70"
+      },
+      {
+        "lat": "20.64",
+        "lon": "-97.34"
+      },
+      {
+        "lat": "20.42",
+        "lon": "-97.09"
+      },
+      {
+        "lat": "20.06",
+        "lon": "-96.94"
+      },
+      {
+        "lat": "20.04",
+        "lon": "-96.94"
+      },
+      {
+        "lat": "19.70",
+        "lon": "-96.90"
+      }
+    ]
+  },
+  {
+    "tag": "1C",
+    "forecastHour": 3,
+    "validTime": "2026-11-11T12:00:00.000Z",
+    "hazard": "FZLVL",
+    "geometryType": "LINE",
+    "latlonpairs": 22,
+    "frequency": null,
+    "severity": null,
+    "due_to": null,
+    "status": "NRML",
+    "top": null,
+    "base": null,
+    "fzltop": null,
+    "fzlbase": null,
+    "level": "SFC",
+    "receiptTime": 1794385885,
+    "issueTime": 1794386700,
+    "expireTime": 1794409200,
+    "product": "ZULU",
+    "geom": "LINE",
+    "coords": [
+      {
+        "lat": "57.76",
+        "lon": "-77.40"
+      },
+      {
+        "lat": "56.82",
+        "lon": "-77.05"
+      },
+      {
+        "lat": "56.18",
+        "lon": "-76.75"
+      },
+      {
+        "lat": "55.59",
+        "lon": "-77.09"
+      },
+      {
+        "lat": "55.00",
+        "lon": "-77.74"
+      },
+      {
+        "lat": "54.09",
+        "lon": "-78.07"
+      },
+      {
+        "lat": "52.76",
+        "lon": "-77.43"
+      },
+      {
+        "lat": "51.81",
+        "lon": "-77.69"
+      },
+      {
+        "lat": "51.45",
+        "lon": "-78.33"
+      },
+      {
+        "lat": "51.22",
+        "lon": "-79.44"
+      },
+      {
+        "lat": "51.37",
+        "lon": "-80.62"
+      },
+      {
+        "lat": "52.34",
+        "lon": "-82.38"
+      },
+      {
+        "lat": "52.91",
+        "lon": "-82.83"
+      },
+      {
+        "lat": "53.77",
+        "lon": "-83.07"
+      },
+      {
+        "lat": "54.42",
+        "lon": "-83.23"
+      },
+      {
+        "lat": "55.01",
+        "lon": "-84.13"
+      },
+      {
+        "lat": "55.77",
+        "lon": "-85.86"
+      },
+      {
+        "lat": "56.37",
+        "lon": "-86.71"
+      },
+      {
+        "lat": "57.02",
+        "lon": "-86.67"
+      },
+      {
+        "lat": "57.46",
+        "lon": "-84.33"
+      },
+      {
+        "lat": "57.67",
+        "lon": "-83.16"
+      },
+      {
+        "lat": "58.05",
+        "lon": "-82.31"
+      }
+    ]
+  },
+  {
+    "tag": "1E",
+    "forecastHour": 3,
+    "validTime": "2026-11-11T12:00:00.000Z",
+    "hazard": "MT_OBSC",
+    "geometryType": "AREA",
+    "latlonpairs": 6,
+    "frequency": null,
+    "severity": null,
+    "due_to": "MTNS OBSC BY CLDS",
+    "status": "NRML",
+    "top": null,
+    "base": null,
+    "fzltop": null,
+    "fzlbase": null,
+    "level": null,
+    "receiptTime": 1794386423,
+    "issueTime": 1794386700,
+    "expireTime": 1794409200,
+    "product": "SIERRA",
+    "geom": "AREA",
+    "coords": [
+      {
+        "lat": "44.96",
+        "lon": "-73.57"
+      },
+      {
+        "lat": "44.27",
+        "lon": "-73.45"
+      },
+      {
+        "lat": "43.41",
+        "lon": "-74.53"
+      },
+      {
+        "lat": "43.89",
+        "lon": "-75.15"
+      },
+      {
+        "lat": "44.89",
+        "lon": "-74.18"
+      },
+      {
+        "lat": "44.96",
+        "lon": "-73.57"
+      }
+    ]
+  }
+]
