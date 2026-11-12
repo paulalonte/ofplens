@@ -15,22 +15,25 @@ const deg = (value: number) => `${String(value).padStart(3, '0')}°`;
 /** A component that got this much worse than planned is highlighted. */
 const WORSE_BY_KT = 5;
 
-/** The latest live METAR wind at an airport. */
-export interface LiveWind {
+/** The latest live METAR at an airport, as far as this card uses it. */
+export interface LiveConditions {
   observedAt: string | null;
   /** Null when the METAR has no wind group. */
   wind: MetarWind | null;
+  temperatureC: number | null;
+  altimeterInHg: number | null;
 }
 
 interface Props {
   plan: FlightPlanSummary;
-  /** Saved plans pass the latest METAR wind per phase; sample pages show planning data only. */
-  live?: { takeoff: LiveWind | null; landing: LiveWind | null };
+  /** Saved plans pass the latest METAR per phase; sample pages show planning data only. */
+  live?: { takeoff: LiveConditions | null; landing: LiveConditions | null };
 }
 
 /**
  * The planned runways as SimBrief computed them at dispatch: conditions and wind components,
- * with the wind now (from the latest METAR) under the planned values when there is one.
+ * with the conditions now (wind, temperature, QNH from the latest METAR) under the planned
+ * values when there is one.
  * Every number comes from the OFP or is worked out in code. Setup (flaps, speeds, weights) is
  * left to the aircraft, which computes its own.
  */
@@ -75,7 +78,7 @@ function Phase({
   label: string;
   phase: TakeoffPlan | LandingPlan;
   /** Undefined on pages without live weather; null when there is no live METAR. */
-  live: LiveWind | null | undefined;
+  live: LiveConditions | null | undefined;
 }) {
   const length =
     'toraFt' in phase
@@ -121,10 +124,22 @@ function Phase({
         >
           {crosswind(phase.crosswindKt, phase.crosswindFrom)}
         </Line>
-        <Line label="Temperature">
+        <Line
+          label="Temperature"
+          now={
+            live?.temperatureC !== undefined &&
+            live.temperatureC !== null && <Now>{`${live.temperatureC}°C`}</Now>
+          }
+        >
           {phase.temperatureC === null ? null : `${phase.temperatureC}°C`}
         </Line>
-        <Line label="QNH">
+        <Line
+          label="QNH"
+          now={
+            live?.altimeterInHg !== undefined &&
+            live.altimeterInHg !== null && <Now>{formatAltimeter(live.altimeterInHg)}</Now>
+          }
+        >
           {phase.altimeterInHg === null ? null : formatAltimeter(phase.altimeterInHg)}
         </Line>
         <Line label="Runway">

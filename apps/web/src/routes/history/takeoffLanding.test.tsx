@@ -5,7 +5,7 @@ import { fixturePlan, fixtureWeather, PLAN_IDS } from '../../test/plans';
 import { jsonResponse } from '../../test/render';
 import { renderApp } from '../../test/renderApp';
 
-/** The saved-plan page's takeoff & landing card, with the wind now from the latest METAR. */
+/** The saved-plan page's takeoff & landing card, with the conditions now from the latest METAR. */
 const ID = PLAN_IDS.kgs;
 const PLAN = 'eddb-eddm-c750-kgs';
 const base = {
@@ -25,8 +25,8 @@ async function rows(name: 'Takeoff runway' | 'Landing runway') {
   );
 }
 
-describe('Saved plan: takeoff & landing with the wind now', () => {
-  it('shows the live METAR wind and its components under the planned values', async () => {
+describe('Saved plan: takeoff & landing with the conditions now', () => {
+  it('shows the live METAR wind, temperature and QNH under the planned values', async () => {
     mockApi({
       ...base,
       [`GET /api/flight-plans/${ID}/weather`]: () => jsonResponse(fixtureWeather(PLAN)),
@@ -41,12 +41,18 @@ describe('Saved plan: takeoff & landing with the wind now', () => {
     });
     const takeoff = screen.getByRole('region', { name: 'Takeoff runway' });
     expect(takeoff).toHaveTextContent(/METAR \d\d:\d\dZ/);
+    // EDDB 100850Z ... 03/01 Q1013: the pressure has dropped since dispatch.
+    expect(await rows('Takeoff runway')).toMatchObject({
+      Temperature: '3°CNow 3°C',
+      QNH: '1021 hPa · 30.15 inHgNow 1013 hPa · 29.91 inHg',
+    });
 
     // EDDM 08R (true 083): 270/03 now is a tailwind where a headwind was planned.
     expect(await rows('Landing runway')).toMatchObject({
       Wind: '087° / 6 ktNow 270° / 3 kt',
       Headwind: '6 ktNow 3 kt tailwind',
       Crosswind: '1 kt from the rightNow None',
+      QNH: expect.stringMatching(/Now 1012 hPa · 29\.88 inHg$/),
     });
     const tailwind = within(screen.getByRole('region', { name: 'Landing runway' })).getByText(
       'Now 3 kt tailwind',

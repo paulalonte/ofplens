@@ -117,6 +117,29 @@ describe('decodeMetar: clouds and ceiling', () => {
   });
 });
 
+describe('decodeMetar: temperature and QNH', () => {
+  it('reads temperature, minus temperatures and hPa QNH', () => {
+    expect(decode('EDDB 100850Z 34003KT 9999 FEW040 12/08 Q1013')).toMatchObject({
+      temperatureC: 12,
+      altimeterInHg: expect.closeTo(29.91, 2),
+    });
+    expect(decode('ENGM 100850Z 01005KT CAVOK M02/M05 Q0998').temperatureC).toBe(-2);
+    expect(decode('ENGM 100850Z 01005KT CAVOK M00/M01 Q0998').temperatureC).toBe(0);
+  });
+
+  it('reads inHg QNH and a temperature without dewpoint', () => {
+    expect(decode('KJFK 100851Z 31012KT 10SM FEW250 14/ A3013')).toMatchObject({
+      temperatureC: 14,
+      altimeterInHg: 30.13,
+    });
+  });
+
+  it('ignores the remarks (T group, SLP) and is null when the report has neither', () => {
+    const us = decode('KDEN 100853Z 24008KT 10SM CLR RMK AO2 SLP172 T00611039');
+    expect(us).toMatchObject({ temperatureC: null, altimeterInHg: null });
+  });
+});
+
 describe('decodeMetar: only the observation counts', () => {
   it('ignores trend groups (BECMG, TEMPO, NOSIG) and remarks', () => {
     const m = decode(
