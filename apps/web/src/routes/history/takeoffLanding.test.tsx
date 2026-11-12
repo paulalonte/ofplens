@@ -26,7 +26,7 @@ async function rows(name: 'Takeoff runway' | 'Landing runway') {
 }
 
 describe('Saved plan: takeoff & landing with the conditions now', () => {
-  it('shows the live METAR wind, temperature and QNH under the planned values', async () => {
+  it('shows the live METAR values first, with the planned values under them', async () => {
     mockApi({
       ...base,
       [`GET /api/flight-plans/${ID}/weather`]: () => jsonResponse(fixtureWeather(PLAN)),
@@ -35,14 +35,13 @@ describe('Saved plan: takeoff & landing with the conditions now', () => {
 
     // EDDB 06L (true 069): planned 095/05 from the right; 340/03 now, almost straight across from the left.
     expect(await rows('Takeoff runway')).toMatchObject({
-      Wind: '095° / 5 ktNow 340° / 3 kt',
-      Headwind: '4 ktNow 0 kt headwind',
-      Crosswind: '3 kt from the rightNow 3 kt from the left',
+      Wind: '340° / 3 ktBefore 095° / 5 kt',
+      Headwind: '0 ktBefore 4 kt headwind',
+      Crosswind: '3 kt from the leftBefore 3 kt from the right',
     });
     const takeoff = screen.getByRole('region', { name: 'Takeoff runway' });
     expect(takeoff).toHaveTextContent(/METAR \d\d:\d\dZ/);
-    // EDDB 100850Z ... 03/01 Q1013: the pressure has dropped since dispatch. Temperature and
-    // QNH show the value now first, with the dispatch value under it.
+    // EDDB 100850Z ... 03/01 Q1013: the pressure has dropped since dispatch.
     expect(await rows('Takeoff runway')).toMatchObject({
       Temperature: '3°CBefore 3°C',
       QNH: '1013 hPa · 29.91 inHgBefore 1021 hPa · 30.15 inHg',
@@ -50,17 +49,18 @@ describe('Saved plan: takeoff & landing with the conditions now', () => {
 
     // EDDM 08R (true 083): 270/03 now is a tailwind where a headwind was planned.
     expect(await rows('Landing runway')).toMatchObject({
-      Wind: '087° / 6 ktNow 270° / 3 kt',
-      Headwind: '6 ktNow 3 kt tailwind',
-      Crosswind: '1 kt from the rightNow None',
+      Wind: '270° / 3 ktBefore 087° / 6 kt',
+      Tailwind: '3 ktBefore 6 kt headwind',
+      Crosswind: 'NoneBefore 1 kt from the right',
       QNH: expect.stringMatching(/^1012 hPa · 29\.88 inHgBefore /),
     });
+    // A tailwind where a headwind was planned: the row is named after the wind now, in amber.
     const tailwind = within(screen.getByRole('region', { name: 'Landing runway' })).getByText(
-      'Now 3 kt tailwind',
+      '3 kt',
     );
     expect(tailwind).toHaveClass('text-amber-700');
     expect(screen.getByRole('region', { name: 'Takeoff & landing' })).toHaveTextContent(
-      'now from the latest METAR',
+      'Latest METAR · Before = SimBrief at dispatch',
     );
   });
 
@@ -89,7 +89,7 @@ describe('Saved plan: takeoff & landing with the conditions now', () => {
     await renderApp(`/sample/${PLAN}`);
 
     const takeoff = await screen.findByRole('region', { name: 'Takeoff runway' });
-    expect(takeoff).not.toHaveTextContent('Now');
+    expect(takeoff).not.toHaveTextContent('Before');
     expect(takeoff).not.toHaveTextContent('METAR');
   });
 });

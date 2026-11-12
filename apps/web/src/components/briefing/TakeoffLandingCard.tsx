@@ -31,9 +31,9 @@ interface Props {
 }
 
 /**
- * The planned runways as SimBrief computed them at dispatch: conditions and wind components,
- * with the conditions now (wind, temperature, QNH from the latest METAR) under the planned
- * values when there is one.
+ * The planned runways with their conditions and wind components. On a saved plan the latest
+ * METAR gives the main values (wind, components, temperature, QNH) with SimBrief's values at
+ * dispatch under them as "Before"; without a METAR, and on sample pages, SimBrief's only.
  * Every number comes from the OFP or is worked out in code. Setup (flaps, speeds, weights) is
  * left to the aircraft, which computes its own.
  */
@@ -46,7 +46,7 @@ export function TakeoffLandingCard({ plan, live }: Props) {
       title="Takeoff & landing"
       aside={
         <span className="text-xs text-slate-500 dark:text-slate-400">
-          SimBrief planning at dispatch{live && ' · now from the latest METAR'}
+          {live ? 'Latest METAR · Before = SimBrief at dispatch' : 'SimBrief planning at dispatch'}
         </span>
       }
     >
@@ -86,7 +86,6 @@ function Phase({
       : phase.ldaFt !== null && `LDA ${number.format(phase.ldaFt)} ft`;
   const now =
     live?.wind && phase.trueCourseDeg !== null ? runwayWind(live.wind, phase.trueCourseDeg) : null;
-  const along = phase.headwindKt ?? now?.headwindKt ?? null;
 
   return (
     <section aria-label={`${label} runway`} className="min-w-0">
@@ -105,25 +104,35 @@ function Phase({
         )}
       </div>
       <dl>
-        <Line label="Wind" now={live?.wind ? <Now>{describeWind(live.wind)}</Now> : null}>
-          {phase.windDirDeg !== null && phase.windSpeedKt !== null
-            ? `${deg(phase.windDirDeg)} / ${phase.windSpeedKt} kt`
-            : null}
-        </Line>
-        {along !== null && (
-          <Line
-            label={(phase.headwindKt ?? 0) < 0 ? 'Tailwind' : 'Headwind'}
-            now={now && <Now worse={tailwindWorse(phase, now)}>{describeAlong(now)}</Now>}
-          >
-            {phase.headwindKt === null ? '—' : `${Math.abs(phase.headwindKt)} kt`}
-          </Line>
+        <NowFirst
+          label="Wind"
+          planned={
+            phase.windDirDeg !== null && phase.windSpeedKt !== null
+              ? `${deg(phase.windDirDeg)} / ${phase.windSpeedKt} kt`
+              : null
+          }
+          now={live?.wind ? describeWind(live.wind) : null}
+        />
+        {now ? (
+          <NowFirst
+            label={(now.headwindKt ?? 0) < 0 ? 'Tailwind' : 'Headwind'}
+            planned={describePlannedAlong(phase.headwindKt)}
+            now={now.headwindKt === null ? 'variable' : `${Math.abs(now.headwindKt)} kt`}
+            worse={tailwindWorse(phase, now)}
+          />
+        ) : (
+          phase.headwindKt !== null && (
+            <Line label={phase.headwindKt < 0 ? 'Tailwind' : 'Headwind'}>
+              {`${Math.abs(phase.headwindKt)} kt`}
+            </Line>
+          )
         )}
-        <Line
+        <NowFirst
           label="Crosswind"
-          now={now && <Now worse={crosswindWorse(phase, now)}>{describeCrosswind(now)}</Now>}
-        >
-          {crosswind(phase.crosswindKt, phase.crosswindFrom)}
-        </Line>
+          planned={crosswind(phase.crosswindKt, phase.crosswindFrom)}
+          now={now && describeCrosswind(now)}
+          worse={now !== null && crosswindWorse(phase, now)}
+        />
         <NowFirst
           label="Temperature"
           planned={phase.temperatureC === null ? null : `${phase.temperatureC}°C`}
@@ -145,7 +154,7 @@ function Phase({
   );
 }
 
-/** A row, left out entirely when there is nothing to show (planned or now). */
+/** A row, left out entirely when there is nothing to show. */
 function Line({ label, now, children }: { label: string; now?: ReactNode; children: ReactNode }) {
   const empty =
     children === null || children === undefined || children === false || children === '';
@@ -159,41 +168,36 @@ function Line({ label, now, children }: { label: string; now?: ReactNode; childr
 }
 
 /**
- * A row where the value now is what the pilot sets (temperature, QNH): the latest METAR value
- * is the main one, with the dispatch value under it as "Before". Planned only without a METAR.
+ * A row with the latest METAR value as the main one and the dispatch value under it as
+ * "Before"; amber when the value now is worse than planned. Planned only without a METAR.
  */
 function NowFirst({
   label,
   planned,
   now,
+  worse = false,
 }: {
   label: string;
   planned: string | null;
   now: string | null;
+  worse?: boolean;
 }) {
   if (now === null) return <Line label={label}>{planned}</Line>;
   return (
-    <Line label={label} now={<Note>Before {planned ?? '—'}</Note>}>
-      {now}
-    </Line>
-  );
-}
-
-function Note({ children }: { children: ReactNode }) {
-  return <span className="block text-xs text-slate-500 dark:text-slate-400">{children}</span>;
-}
-
-function Now({ worse = false, children }: { worse?: boolean; children: ReactNode }) {
-  return (
-    <span
-      className={`block text-xs ${
-        worse
-          ? 'font-semibold text-amber-700 dark:text-amber-400'
-          : 'text-slate-500 dark:text-slate-400'
-      }`}
+    <Line
+      label={label}
+      now={
+        <span className="block text-xs text-slate-500 dark:text-slate-400">
+          Before {planned ?? '—'}
+        </span>
+      }
     >
-      Now {children}
-    </span>
+      {worse ? (
+        <span className="font-semibold text-amber-700 dark:text-amber-400">{now}</span>
+      ) : (
+        now
+      )}
+    </Line>
   );
 }
 
@@ -224,9 +228,10 @@ function describeWind(wind: MetarWind): string {
   return `${direction} / ${wind.speedKt}${wind.gustKt === null ? '' : `G${wind.gustKt}`} kt`;
 }
 
-function describeAlong(now: RunwayWind): string {
-  if (now.headwindKt === null) return 'variable';
-  return now.headwindKt < 0 ? `${-now.headwindKt} kt tailwind` : `${now.headwindKt} kt headwind`;
+/** The planned component along the runway, for the "Before" line: "6 kt headwind". */
+function describePlannedAlong(headwindKt: number | null): string | null {
+  if (headwindKt === null) return null;
+  return headwindKt < 0 ? `${-headwindKt} kt tailwind` : `${headwindKt} kt headwind`;
 }
 
 function describeCrosswind(now: RunwayWind): string {
