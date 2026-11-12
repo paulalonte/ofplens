@@ -41,10 +41,11 @@ describe('Saved plan: takeoff & landing with the conditions now', () => {
     });
     const takeoff = screen.getByRole('region', { name: 'Takeoff runway' });
     expect(takeoff).toHaveTextContent(/METAR \d\d:\d\dZ/);
-    // EDDB 100850Z ... 03/01 Q1013: the pressure has dropped since dispatch.
+    // EDDB 100850Z ... 03/01 Q1013: the pressure has dropped since dispatch. Temperature and
+    // QNH show the value now first, with the dispatch value under it.
     expect(await rows('Takeoff runway')).toMatchObject({
-      Temperature: '3°CNow 3°C',
-      QNH: '1021 hPa · 30.15 inHgNow 1013 hPa · 29.91 inHg',
+      Temperature: '3°CBefore 3°C',
+      QNH: '1013 hPa · 29.91 inHgBefore 1021 hPa · 30.15 inHg',
     });
 
     // EDDM 08R (true 083): 270/03 now is a tailwind where a headwind was planned.
@@ -52,7 +53,7 @@ describe('Saved plan: takeoff & landing with the conditions now', () => {
       Wind: '087° / 6 ktNow 270° / 3 kt',
       Headwind: '6 ktNow 3 kt tailwind',
       Crosswind: '1 kt from the rightNow None',
-      QNH: expect.stringMatching(/Now 1012 hPa · 29\.88 inHg$/),
+      QNH: expect.stringMatching(/^1012 hPa · 29\.88 inHgBefore /),
     });
     const tailwind = within(screen.getByRole('region', { name: 'Landing runway' })).getByText(
       'Now 3 kt tailwind',
@@ -76,6 +77,7 @@ describe('Saved plan: takeoff & landing with the conditions now', () => {
     expect(await rows('Takeoff runway')).toMatchObject({
       Wind: '095° / 5 kt',
       Headwind: '4 kt',
+      QNH: '1021 hPa · 30.15 inHg',
     });
     expect(screen.getByRole('region', { name: 'Takeoff runway' })).toHaveTextContent(
       'No live METAR',

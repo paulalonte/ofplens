@@ -124,24 +124,16 @@ function Phase({
         >
           {crosswind(phase.crosswindKt, phase.crosswindFrom)}
         </Line>
-        <Line
+        <NowFirst
           label="Temperature"
-          now={
-            live?.temperatureC !== undefined &&
-            live.temperatureC !== null && <Now>{`${live.temperatureC}°C`}</Now>
-          }
-        >
-          {phase.temperatureC === null ? null : `${phase.temperatureC}°C`}
-        </Line>
-        <Line
+          planned={phase.temperatureC === null ? null : `${phase.temperatureC}°C`}
+          now={live?.temperatureC == null ? null : `${live.temperatureC}°C`}
+        />
+        <NowFirst
           label="QNH"
-          now={
-            live?.altimeterInHg !== undefined &&
-            live.altimeterInHg !== null && <Now>{formatAltimeter(live.altimeterInHg)}</Now>
-          }
-        >
-          {phase.altimeterInHg === null ? null : formatAltimeter(phase.altimeterInHg)}
-        </Line>
+          planned={phase.altimeterInHg === null ? null : formatAltimeter(phase.altimeterInHg)}
+          now={live?.altimeterInHg == null ? null : formatAltimeter(live.altimeterInHg)}
+        />
         <Line label="Runway">
           {join([
             length,
@@ -164,6 +156,31 @@ function Line({ label, now, children }: { label: string; now?: ReactNode; childr
       {now}
     </Row>
   );
+}
+
+/**
+ * A row where the value now is what the pilot sets (temperature, QNH): the latest METAR value
+ * is the main one, with the dispatch value under it as "Before". Planned only without a METAR.
+ */
+function NowFirst({
+  label,
+  planned,
+  now,
+}: {
+  label: string;
+  planned: string | null;
+  now: string | null;
+}) {
+  if (now === null) return <Line label={label}>{planned}</Line>;
+  return (
+    <Line label={label} now={<Note>Before {planned ?? '—'}</Note>}>
+      {now}
+    </Line>
+  );
+}
+
+function Note({ children }: { children: ReactNode }) {
+  return <span className="block text-xs text-slate-500 dark:text-slate-400">{children}</span>;
 }
 
 function Now({ worse = false, children }: { worse?: boolean; children: ReactNode }) {

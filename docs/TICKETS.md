@@ -510,7 +510,8 @@ check and per prompt version, so prompt or model changes are measured, not guess
   planning data only.
 - *As built:* `decodeMetar` reads the temperature group (M for minus) and QNH (Q in hPa, A in
   inHg) from the observation only, never the remarks, so the same code reads the OFP's and
-  live METARs.
+  live METARs. Temperature and QNH are what the pilot sets, so the value now is the main one
+  and the dispatch value sits under it as "Before"; the wind keeps the planned value first.
 
 ---
 
