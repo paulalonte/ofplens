@@ -502,6 +502,19 @@ check and per prompt version, so prompt or model changes are measured, not guess
   time on screen. The app cannot tell whether the pilot actually pushed back, so the takeoff
   stage also says how long ago pushback was planned.
 
+### OFP-39 · Conditions now first in the Takeoff & landing card
+- The card showed the live METAR wind under the planned values but not the temperature and
+  QNH, so after a weather refresh the pressure still read as at dispatch.
+- **Done when:** a saved plan shows "Now" temperature and QNH from the latest METAR under the
+  planned values at both airports, updating with the weather refresh; sample pages show
+  planning data only.
+- *As built:* `decodeMetar` reads the temperature group (M for minus) and QNH (Q in hPa, A in
+  inHg) from the observation only, never the remarks, so the same code reads the OFP's and
+  live METARs. Every condition row (wind, headwind/tailwind, crosswind, temperature, QNH) shows
+  the value now as the main one, with SimBrief's value at dispatch under it as "Before", since
+  the value now is what the pilot sets and flies with. The headwind/tailwind row is named after
+  the wind now, and a value 5 kt or more worse than planned is amber.
+
 ---
 
 ## Later phases (not ticketed yet)

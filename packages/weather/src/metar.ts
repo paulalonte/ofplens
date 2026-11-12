@@ -27,11 +27,16 @@ export interface DecodedMetar {
   /** Our own flight category from ceiling and visibility (see category.ts). */
   category: FlightCategory | null;
   cavok: boolean;
+  /** Air temperature in °C (M02 is −2). */
+  temperatureC: number | null;
+  /** QNH in inHg, as SimBrief gives it: A2992 as is, Q1013 converted. */
+  altimeterInHg: number | null;
 }
 
 export type CloudCover = 'FEW' | 'SCT' | 'BKN' | 'OVC' | 'VV';
 
 const METRES_PER_SM = 1609.344;
+const HPA_PER_INHG = 33.8639;
 const KT_PER_MPS = 1.943844;
 const KT_PER_KMH = 0.539957;
 /** 10 km or more, as 9999 and CAVOK report it. */
@@ -56,6 +61,8 @@ export function decodeMetar(raw: string, referenceIso: string): DecodedMetar {
     ceilingFt: null,
     category: null,
     cavok: false,
+    temperatureC: null,
+    altimeterInHg: null,
   };
 
   if (body[i] && /^[A-Z][A-Z0-9]{3}$/.test(body[i]!)) result.station = body[i++]!;
@@ -104,7 +111,23 @@ export function decodeMetar(raw: string, referenceIso: string): DecodedMetar {
     }
 
     const cloud = decodeCloud(token);
-    if (cloud) result.clouds.push(cloud);
+    if (cloud) {
+      result.clouds.push(cloud);
+      continue;
+    }
+
+    // Temperature/dewpoint: 12/08, M02/M05, 12/ (no dewpoint).
+    const temperature = /^(M?\d{2})\/(?:M?\d{2}|\/\/)?$/.exec(token);
+    if (temperature && result.temperatureC === null) {
+      result.temperatureC = Number(temperature[1]!.replace('M', '-')) + 0; // + 0: M00 is 0, not −0
+      continue;
+    }
+
+    const altimeter = /^([QA])(\d{4})$/.exec(token);
+    if (altimeter && result.altimeterInHg === null) {
+      const value = Number(altimeter[2]);
+      result.altimeterInHg = altimeter[1] === 'A' ? value / 100 : value / HPA_PER_INHG;
+    }
   }
 
   result.ceilingFt = ceiling(result.clouds);

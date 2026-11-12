@@ -83,6 +83,8 @@ describe('decodeMetar on the METARs printed in the captured OFPs', () => {
       ceilingFt: 900,
       category: 'IFR',
       cavok: false,
+      temperatureC: 3,
+      altimeterInHg: expect.closeTo(30.15, 2),
     });
   });
 });
