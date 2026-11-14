@@ -19,9 +19,14 @@ const EnvSchema = z.object({
 
 export type Env = z.infer<typeof EnvSchema>;
 
-/** Parses and validates environment variables; throws one readable error listing every problem. */
+/**
+ * Parses and validates environment variables; throws one readable error listing every problem.
+ * An empty variable counts as unset (`ANTHROPIC_API_KEY=` in .env, or passed through empty by
+ * docker compose), so its default applies or the feature stays off.
+ */
 export function loadEnv(source: NodeJS.ProcessEnv = process.env): Env {
-  const result = EnvSchema.safeParse(source);
+  const set = Object.fromEntries(Object.entries(source).filter(([, value]) => value !== ''));
+  const result = EnvSchema.safeParse(set);
   if (!result.success) {
     throw new Error(`Invalid environment:\n${z.prettifyError(result.error)}`);
   }

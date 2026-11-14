@@ -1,0 +1,38 @@
+# nginx for the web image. ${API_UPSTREAM} is filled in from the environment when the container
+# starts (the official image runs envsubst on /etc/nginx/templates).
+server {
+    listen 8080;
+    server_name _;
+    root /usr/share/nginx/html;
+
+    # Liveness/readiness for Kubernetes: nginx is up, whatever the API is doing.
+    location = /healthz {
+        access_log off;
+        default_type text/plain;
+        return 200 "ok\n";
+    }
+
+    # Same origin as the page: the browser only calls /api. On Kubernetes the Ingress sends /api
+    # to the API directly; this keeps the image working on its own (docker compose).
+    location /api/ {
+        proxy_pass ${API_UPSTREAM};
+        proxy_set_header Host $host;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+        # AI briefings stream progress (server-sent events): pass it through as it comes.
+        proxy_buffering off;
+        proxy_read_timeout 120s;
+    }
+
+    # Built assets have a content hash in their name, so they never change: cache them for a year.
+    location /assets/ {
+        add_header Cache-Control "public, max-age=31536000, immutable";
+        try_files $uri =404;
+    }
+
+    # Client-side routing: any other path is the app (index.html), never cached.
+    location / {
+        add_header Cache-Control "no-cache";
+        try_files $uri /index.html;
+    }
+}
