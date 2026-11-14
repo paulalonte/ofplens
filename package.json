@@ -14,6 +14,8 @@
     "app:up": "docker compose --profile app up --build --wait",
     "app:down": "docker compose --profile app down",
     "app:logs": "docker compose --profile app logs -f api web",
+    "kind:up": "deploy/kind/up.sh",
+    "kind:down": "deploy/kind/down.sh",
     "db:generate": "pnpm --filter @ofplens/db db:generate",
     "db:migrate": "pnpm --filter @ofplens/db db:migrate",
     "db:studio": "pnpm --filter @ofplens/db db:studio",

@@ -1,0 +1,14 @@
+# kind on your Mac (deploy/kind/up.sh). Images are built locally and loaded into the nodes.
+image:
+  pullPolicy: Never
+
+api:
+  # Two pods on two worker nodes: try deleting one, or stopping a node.
+  replicas: 2
+  logLevel: info
+
+web:
+  replicas: 1
+
+ingress:
+  className: traefik

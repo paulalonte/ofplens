@@ -80,30 +80,37 @@ and layers (`docker images`, `docker history`).
 **Claude builds** a Helm chart in `deploy/helm/ofplens`:
 
 - Deployments and Services for the API and the web app, with readiness and liveness probes,
-  CPU/memory requests and limits.
-- An Ingress: `/api` to the API, everything else to the web app.
+  CPU/memory requests and limits, non-root and read-only containers, spread over nodes.
+- An Ingress: `/api` to the API, everything else to the web app (Traefik on kind).
 - The migration as a Job that runs before each install or upgrade (a Helm hook).
-- Settings in a ConfigMap, secrets (database URL, Claude key) in a Kubernetes Secret.
-- `values-kind.yaml` with a small Postgres inside the cluster; on AWS the chart uses RDS
-  instead.
+- Settings in a ConfigMap; the database URL and Claude key come from a Secret created outside
+  the chart.
+- PodDisruptionBudgets, so node drains keep one pod of each part running.
+- Postgres for kind in `deploy/kind/postgres.yaml`, deliberately **outside** the chart: on AWS
+  the database is RDS, so on both the chart only gets a `DATABASE_URL`.
+- `pnpm kind:up` / `pnpm kind:down`, and a CI job that installs the chart on kind for every PR.
 
 **You do:**
 
 ```bash
-kind create cluster --name ofplens
-helm install ofplens deploy/helm/ofplens -f deploy/helm/ofplens/values-kind.yaml
-kubectl get pods
-k9s
+pnpm kind:up                 # 3-node cluster, Traefik, images, Postgres, the chart → http://localhost:8088
+kubectl config use-context kind-ofplens
+kubectl get pods -n ofplens -o wide
+k9s -n ofplens
 ```
 
 Then try: read logs, delete a pod and watch it come back, change the image tag and run
-`helm upgrade`, roll back with `helm rollback`, and remove it all with `helm uninstall`.
+`helm upgrade`, roll back with `helm rollback`, and remove it all with `helm uninstall`
+(docs/LEARNING.md, step 2, has the commands).
 
 **You learn:** pods, deployments, services, ingress, config and secrets, jobs, Helm values,
 upgrades and rollbacks.
 
 **Done when:** the app works through the ingress on kind, an upgrade replaces pods without
-downtime, and `helm uninstall` leaves nothing behind.
+downtime, and `helm uninstall` leaves nothing of the chart behind.
+
+_As built:_ a rolling restart of the API answered all 282 requests sent during it, and
+`helm uninstall` left only what is outside the chart (Postgres and the Secret).
 
 ---
 

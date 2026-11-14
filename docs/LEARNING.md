@@ -150,3 +150,150 @@ our 17 MB of JavaScript on a pinned Node base, and it runs as a non-root user wi
 environment variables. Migrations are a separate one-off command so scaled-out pods never race
 on schema changes. CI builds the images and smoke-tests the whole stack with Compose on every
 PR."
+
+---
+
+## Step 2 — Kubernetes and Helm on kind
+
+**What was built**
+
+- `deploy/kind/cluster.yaml`: one control-plane and two worker nodes. Port 8088 on the Mac
+  goes to Traefik, the ingress controller, on every node (a NodePort).
+- `deploy/helm/ofplens`: the chart. API and web Deployments and Services, an Ingress, the
+  migration Job, a ConfigMap, a ServiceAccount and PodDisruptionBudgets.
+- `deploy/kind/postgres.yaml`: Postgres for kind only (a StatefulSet with its own disk).
+- `pnpm kind:up` / `pnpm kind:down` (`deploy/kind/up.sh`), and a CI job that runs the same
+  script on a fresh kind cluster for every PR.
+
+**How a request reaches the API**
+
+```
+Browser → localhost:8088 → kind node :30080 (NodePort) → Traefik (ingress controller)
+        → Ingress rule "/api" → Service ofplens-api → one of the API pods
+```
+
+On AWS only the start changes: the internet → an Application Load Balancer created from the
+same Ingress → the pods.
+
+**Concepts**
+
+- **Deployment → ReplicaSet → Pods:** you declare "2 API pods of this image"; the Deployment
+  keeps a ReplicaSet per version, and the ReplicaSet keeps that many pods alive. That's why a
+  deleted pod comes back with a new name.
+- **Service:** a stable name and IP (`ofplens-api:3000`) in front of pods that come and go. It
+  sends traffic only to pods that are **ready**.
+- **Ingress + ingress controller:** the Ingress is just a rule ("/api goes to that Service");
+  a controller (Traefik here, the AWS Load Balancer Controller on AWS) reads the rules and does
+  the routing. Without a controller, an Ingress does nothing. The newer **Gateway API** does the
+  same job with more features; worth knowing for interviews.
+- **ConfigMap vs Secret:** settings vs credentials. Both become environment variables. A
+  Secret is only base64-encoded, not encrypted; what protects it is who may read it (RBAC) and
+  encryption at rest, which EKS can do with a KMS key.
+- **Job:** a pod that runs to completion. As a Helm **hook** (`pre-install,pre-upgrade`) it
+  runs before the new version starts; if it fails, the upgrade stops and the running version
+  keeps serving.
+- **StatefulSet:** for things with an identity and a disk (databases): stable name
+  (`postgres-0`) and a volume that stays when the pod is replaced.
+- **Requests and limits:** a request is what the scheduler reserves on a node; a memory limit
+  is the ceiling (above it the container is killed: `OOMKilled`). No CPU limit on purpose: it
+  throttles the app even when the node is idle.
+- **Immutable tags:** each build gets a new tag (`<commit>-<time>`). Reusing a tag means
+  Kubernetes may run an old image and you can't roll back to a known version.
+
+**Probes: the most common production mistake**
+
+- **Readiness** (`/api/health`, which checks the database): "can this pod serve now?" Not
+  ready → no traffic, but the pod stays.
+- **Liveness** (only "is the port open?"): "is the process stuck?" Failing → the pod is
+  restarted.
+- If liveness checked the database, a short database outage would make Kubernetes restart
+  every API pod at once, which fixes nothing and turns a blip into an outage. Liveness checks
+  only the process itself.
+
+**Zero-downtime deploys**
+
+- `maxUnavailable: 0, maxSurge: 1`: a new pod must be ready before an old one stops.
+- When a pod stops, Kubernetes removes it from the Service and sends `SIGTERM` _at the same
+  time_. The `preStop` sleep of 5 s keeps it serving while the routers catch up, then the API
+  shuts down gracefully. Without it, a few requests fail on every deploy.
+- Tested: a rolling restart of the API while sending requests every 0.1 s, 282 of 282
+  answered.
+
+**Security defaults in the chart**
+
+- `runAsNonRoot`, no privilege escalation, all Linux capabilities dropped, default seccomp
+  profile, **read-only root filesystem** (nginx gets two small writable `emptyDir` folders).
+- The ServiceAccount doesn't mount a Kubernetes API token: the app never talks to the
+  Kubernetes API, so a break-in can't use one either.
+- What broke on the first install, and why: the image said `USER node`. With `runAsNonRoot`,
+  Kubernetes can only check a **numeric** user, so it refused to start the container
+  (`CreateContainerConfigError`, visible only in `kubectl get events`). The fix is `USER 1000`
+  in the Dockerfile. The migration Job then waited for its 5-minute deadline: a reminder to read
+  events when something is "in progress" for too long.
+
+**Resilience**
+
+- `topologySpreadConstraints` put the two API pods on different worker nodes.
+- A **PodDisruptionBudget** (`minAvailable: 1`) stops a node drain or cluster upgrade from
+  evicting both API pods at once.
+
+**Production pitfalls this avoids**
+
+- Liveness probes that depend on the database (restart storms).
+- Deploys that drop requests (no readiness, no `preStop`, `maxUnavailable` above 0).
+- Migrations run by every pod on start (races) or by hand (forgotten).
+- Secrets in values files, `latest` tags, root containers, writable filesystems.
+- Commands run against the wrong cluster: the script names its context on every command.
+
+**Try it** (the cluster is up after `pnpm kind:up`)
+
+```bash
+kubectl config use-context kind-ofplens
+kubectl get pods -n ofplens -o wide                  # which node each pod is on
+k9s -n ofplens
+
+# Self-healing: delete an API pod and watch a new one appear
+kubectl delete pod -n ofplens -l app.kubernetes.io/component=api --wait=false
+kubectl get pods -n ofplens -w                       # Ctrl+C to stop watching
+
+# Logs and details
+kubectl logs -n ofplens deploy/ofplens-api
+kubectl describe pod -n ofplens -l app.kubernetes.io/component=web
+kubectl get events -n ofplens --sort-by=.lastTimestamp
+
+# Helm releases: deploy a new build, look at the history, roll back
+pnpm kind:up                                         # builds a new tag and upgrades
+helm history ofplens -n ofplens
+helm rollback ofplens -n ofplens                     # back to the previous revision
+
+# What Helm sends to the cluster
+helm get manifest ofplens -n ofplens | less
+
+# A node failure: stop a worker, see the node go NotReady; after about 5 minutes its pods
+# are recreated on the other worker. Start it again afterwards.
+docker stop ofplens-worker
+kubectl get nodes -w
+docker start ofplens-worker
+
+# Turn on AI briefings on kind. read -s takes the key without showing it or saving it in your
+# shell history; it goes straight into the cluster's Secret, never into a file.
+read -rs CLAUDE_KEY        # paste the key, press Enter
+kubectl create secret generic ofplens-secrets -n ofplens \
+  --from-literal=DATABASE_URL=postgres://ofplens:ofplens@postgres:5432/ofplens \
+  --from-literal=ANTHROPIC_API_KEY="$CLAUDE_KEY" --dry-run=client -o yaml | kubectl apply -f -
+unset CLAUDE_KEY
+kubectl rollout restart deploy/ofplens-api -n ofplens
+
+pnpm kind:down                                       # delete the cluster
+```
+
+**Interview**
+
+"I packaged the app as a Helm chart with per-environment values. The API runs as a
+multi-replica Deployment spread across nodes with a PodDisruptionBudget; readiness checks the
+database, liveness deliberately doesn't, to avoid restart storms. Rolling updates use
+maxUnavailable 0 and a preStop delay, and I verified zero failed requests during a rollout.
+Migrations run as a pre-upgrade hook Job, so a failed migration stops the deploy and the old
+version keeps serving. Containers run non-root with read-only filesystems, config comes from
+a ConfigMap and credentials from a Secret created outside the chart. CI installs the chart on a
+fresh kind cluster for every PR."

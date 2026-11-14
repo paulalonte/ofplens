@@ -1,0 +1,19 @@
+{{- if .Values.podDisruptionBudget.enabled }}
+{{- range $part := list "api" "web" }}
+{{- if gt (int (index $.Values $part).replicas) 1 }}
+---
+# During a node drain or cluster upgrade, Kubernetes evicts at most one {{ $part }} pod at a time.
+apiVersion: policy/v1
+kind: PodDisruptionBudget
+metadata:
+  name: {{ include "ofplens.name" $ }}-{{ $part }}
+  labels:
+    {{- include "ofplens.labels" $ | nindent 4 }}
+spec:
+  minAvailable: 1
+  selector:
+    matchLabels:
+      {{- include "ofplens.selector" (list $ $part) | nindent 6 }}
+{{- end }}
+{{- end }}
+{{- end }}

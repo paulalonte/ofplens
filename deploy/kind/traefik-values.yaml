@@ -1,0 +1,16 @@
+# Traefik as the ingress controller on kind (chart traefik/traefik, pinned in deploy/kind/up.sh).
+# On AWS the AWS Load Balancer Controller does this job with an Application Load Balancer.
+ingressClass:
+  enabled: true
+  isDefaultClass: true
+  name: traefik
+service:
+  spec:
+    # No cloud load balancer on a laptop: expose a fixed port on every node instead.
+    type: NodePort
+ports:
+  web:
+    nodePort: 30080
+  websecure:
+    expose:
+      default: false

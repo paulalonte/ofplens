@@ -1,0 +1,18 @@
+# Local Kubernetes for OFP Lens (docs/DEPLOYMENT.md, step 2): one control-plane node and two
+# workers, so pods spread over machines as they will on EKS.
+#
+#   kind create cluster --config deploy/kind/cluster.yaml   (or: pnpm kind:up)
+#
+# Traefik (the ingress controller) listens on NodePort 30080; this maps it to
+# http://localhost:8088 on the Mac.
+kind: Cluster
+apiVersion: kind.x-k8s.io/v1alpha4
+name: ofplens
+nodes:
+  - role: control-plane
+    extraPortMappings:
+      - containerPort: 30080
+        hostPort: 8088
+        listenAddress: 127.0.0.1
+  - role: worker
+  - role: worker

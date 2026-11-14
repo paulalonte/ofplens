@@ -1,0 +1,11 @@
+# The API's settings that are not secret. A change rolls the API pods (checksum annotation).
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ include "ofplens.name" . }}-api
+  labels:
+    {{- include "ofplens.labels" . | nindent 4 }}
+data:
+  LOG_LEVEL: {{ .Values.api.logLevel | quote }}
+  BRIEFING_MODEL: {{ .Values.api.briefingModel | quote }}
+  BRIEFING_DAILY_LIMIT: {{ .Values.api.briefingDailyLimit | quote }}
