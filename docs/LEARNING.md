@@ -237,6 +237,25 @@ same Ingress → the pods.
 - A **PodDisruptionBudget** (`minAvailable: 1`) stops a node drain or cluster upgrade from
   evicting both API pods at once.
 
+**Values schema: typos fail loudly**
+
+`values.schema.json` describes every value the templates read. Helm checks the merged values
+against it on install, upgrade, lint and template; unknown keys are errors. Without it,
+`api.replica: 3` (missing "s") is silently ignored and you get the default 2 pods. With it:
+
+```
+- at '/api': additional properties 'replica' not allowed
+```
+
+It also rejects a `latest` tag, zero replicas, unknown log levels and memory like `lots`. The
+rule: whenever a template reads a new value, add it to the schema in the same change.
+
+**Pinned cluster version**
+
+`cluster.yaml` names the node image with its digest (`kindest/node:v1.37.0@sha256:…`), and CI
+installs the matching kind release, so every machine runs the same Kubernetes version. Upgrades
+are a deliberate PR, like the base images in step 1.
+
 **Production pitfalls this avoids**
 
 - Liveness probes that depend on the database (restart storms).

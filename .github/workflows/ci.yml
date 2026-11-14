@@ -182,6 +182,8 @@ jobs:
       # The same 3-node cluster and the same script as on your Mac (pnpm kind:up).
       - uses: helm/kind-action@v1.15.2
         with:
+          # The kind release the node image in cluster.yaml belongs to.
+          version: v0.33.0
           cluster_name: ofplens
           config: deploy/kind/cluster.yaml
 
