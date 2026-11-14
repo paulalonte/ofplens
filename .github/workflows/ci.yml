@@ -123,3 +123,47 @@ jobs:
             e2e/playwright-report/
             e2e/test-results/
           retention-days: 7
+
+  images:
+    name: Container images
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: docker/setup-buildx-action@v4
+
+      # Layers are cached in GitHub Actions between runs; a source-only change reuses the
+      # dependency layers.
+      - name: Build the API image
+        uses: docker/build-push-action@v7
+        with:
+          context: .
+          target: api
+          tags: ofplens-api:local
+          load: true
+          cache-from: type=gha,scope=api
+          cache-to: type=gha,mode=max,scope=api
+
+      - name: Build the web image
+        uses: docker/build-push-action@v7
+        with:
+          context: .
+          target: web
+          tags: ofplens-web:local
+          load: true
+          cache-from: type=gha,scope=web
+          cache-to: type=gha,mode=max,scope=web
+
+      # Smoke test: the whole app from the images (migrations, API, web) answers through nginx.
+      - name: Start the app from the images
+        run: docker compose --profile app up --no-build --wait --wait-timeout 120
+      - name: Health through the web container
+        run: |
+          curl --fail --silent localhost:8080/healthz
+          curl --fail --silent localhost:8080/api/health
+          curl --fail --silent localhost:8080/history | grep -q '<div id="root">'
+      - name: Logs
+        if: failure()
+        run: docker compose --profile app logs

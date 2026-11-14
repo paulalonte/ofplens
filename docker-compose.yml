@@ -16,5 +16,51 @@ services:
       timeout: 3s
       retries: 15
 
+  # The whole app from its container images (docs/DEPLOYMENT.md, step 1), next to the same
+  # Postgres. Only with the "app" profile, so `pnpm dev` still starts Postgres alone:
+  #   docker compose --profile app up --build   →  http://localhost:8080
+  migrate:
+    profiles: [app]
+    build: { context: ., target: api }
+    image: ofplens-api:local
+    command: ['node', 'dist/migrate.js']
+    environment:
+      DATABASE_URL: postgres://ofplens:ofplens@db:5432/ofplens
+    depends_on:
+      db: { condition: service_healthy }
+
+  api:
+    profiles: [app]
+    build: { context: ., target: api }
+    image: ofplens-api:local
+    environment:
+      DATABASE_URL: postgres://ofplens:ofplens@db:5432/ofplens
+      LOG_LEVEL: info
+      # From your .env if set there; empty switches AI briefings off.
+      ANTHROPIC_API_KEY: ${ANTHROPIC_API_KEY:-}
+      BRIEFING_MODEL: ${BRIEFING_MODEL:-claude-haiku-5-5}
+    depends_on:
+      migrate: { condition: service_completed_successfully }
+    healthcheck:
+      test:
+        [
+          'CMD',
+          'node',
+          '-e',
+          "fetch('http://127.0.0.1:3000/api/health').then(r => process.exit(r.ok ? 0 : 1), () => process.exit(1))",
+        ]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+
+  web:
+    profiles: [app]
+    build: { context: ., target: web }
+    image: ofplens-web:local
+    ports:
+      - '${WEB_PORT:-8080}:8080'
+    depends_on:
+      api: { condition: service_healthy }
+
 volumes:
   pgdata:
