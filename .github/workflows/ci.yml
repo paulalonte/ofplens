@@ -167,3 +167,37 @@ jobs:
       - name: Logs
         if: failure()
         run: docker compose --profile app logs
+
+  kubernetes:
+    name: Helm chart on kind
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+
+    steps:
+      - uses: actions/checkout@v7
+
+      - name: Lint the chart
+        run: helm lint deploy/helm/ofplens -f deploy/helm/ofplens/values-kind.yaml --set image.tag=ci
+
+      # The same 3-node cluster and the same script as on your Mac (pnpm kind:up).
+      - uses: helm/kind-action@v1.15.2
+        with:
+          # The kind release the node image in cluster.yaml belongs to.
+          version: v0.33.0
+          cluster_name: ofplens
+          config: deploy/kind/cluster.yaml
+
+      - name: Install the app (deploy/kind/up.sh)
+        run: deploy/kind/up.sh
+
+      - name: The app answers through the ingress
+        run: |
+          curl --fail --silent localhost:8088/api/health
+          curl --fail --silent localhost:8088/history | grep -q '<div id="root">'
+
+      - name: Cluster state
+        if: failure()
+        run: |
+          kubectl get all,ingress,jobs -n ofplens -o wide
+          kubectl get events -n ofplens --sort-by=.lastTimestamp | tail -40
+          kubectl logs -n ofplens -l app.kubernetes.io/name=ofplens --all-containers --tail=50

@@ -33,7 +33,7 @@ RUN pnpm --filter @ofplens/api build
 FROM source AS web-build
 RUN pnpm --filter @ofplens/web build
 
-# ---- API: one bundled file per command, no node_modules, runs as the unprivileged "node" user
+# ---- API: one bundled file per command, no node_modules, runs as the unprivileged node user (1000)
 FROM ${NODE_IMAGE} AS api
 ENV NODE_ENV=production \
     HOST=0.0.0.0 \
@@ -41,7 +41,8 @@ ENV NODE_ENV=production \
 WORKDIR /app
 COPY --from=api-build --chown=root:root /repo/apps/api/dist ./dist
 COPY --from=api-build --chown=root:root /repo/packages/db/migrations ./migrations
-USER node
+# The "node" user, by number: Kubernetes' runAsNonRoot can only verify a numeric user is not root.
+USER 1000:1000
 EXPOSE 3000
 # The migration Job runs the same image with: node dist/migrate.js
 CMD ["node", "--enable-source-maps", "dist/server.js"]

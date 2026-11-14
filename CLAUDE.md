@@ -21,6 +21,7 @@ history in Postgres. **For flight simulation (X-Plane 12) only.** The plan is in
 | `pnpm dev:apps`                        | Only web and API (Postgres already up and migrated)                                                                         |
 | `pnpm db:up` / `pnpm db:down`          | Start (and wait for) / stop the Postgres container                                                                          |
 | `pnpm app:up` / `pnpm app:down`        | The whole app from its container images (http://localhost:8080); `pnpm app:logs` follows it                                 |
+| `pnpm kind:up` / `pnpm kind:down`      | The app on a local 3-node Kubernetes cluster (kind + Helm), http://localhost:8088                                           |
 | `pnpm db:generate` / `pnpm db:migrate` | Create a migration from the Drizzle schema / apply it                                                                       |
 | `pnpm db:studio`                       | Browse the dev database in Drizzle Studio                                                                                   |
 | `pnpm test`                            | All Vitest tests: `web` (jsdom), `node` (api, packages), `integration` (`*.int.test.ts`, real Postgres: needs `pnpm db:up`) |
@@ -45,7 +46,7 @@ packages/ofp   OFP Zod schema, parseOfp(), shared domain types and formatters
 packages/db    Drizzle client, schema, migrations
 packages/weather  aviationweather.gov client (METAR/TAF, SIGMET/G-AIRMET hazards), METAR decoder, flight category, plan weather
 Dockerfile     Container images: `--target api` (bundled API + migrate command), `--target web` (nginx)
-deploy/        Deployment files (nginx config; the Helm chart and Terraform come next)
+deploy/        web/ (nginx config), helm/ofplens (the Helm chart), kind/ (local cluster, Postgres, up/down)
 packages/agent    Briefing agent: tools as plain functions (reused by the API and, later, MCP), Briefing schema
 fixtures/ofp   Real SimBrief OFP JSON samples (OFP-05)
 fixtures/weather  Real aviationweather.gov METAR/TAF responses (`pnpm fixture:weather`)

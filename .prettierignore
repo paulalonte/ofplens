@@ -14,3 +14,6 @@ e2e/playwright-report/
 e2e/test-results/
 # Eval results (JSON lines written by pnpm eval)
 packages/evals/runs/
+
+# Helm templates are Go templates, not YAML (checked by helm lint in CI instead).
+deploy/helm/*/templates/

@@ -1,0 +1,38 @@
+{{- if .Values.ingress.enabled }}
+# The front door: /api to the API, everything else to the web app, on one host name, so the
+# browser only ever calls its own origin.
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: {{ include "ofplens.name" . }}
+  labels:
+    {{- include "ofplens.labels" . | nindent 4 }}
+  {{- with .Values.ingress.annotations }}
+  annotations:
+    {{- toYaml . | nindent 4 }}
+  {{- end }}
+spec:
+  {{- with .Values.ingress.className }}
+  ingressClassName: {{ . }}
+  {{- end }}
+  rules:
+    - {{- with .Values.ingress.host }}
+      host: {{ . | quote }}
+      {{- end }}
+      http:
+        paths:
+          - path: /api
+            pathType: Prefix
+            backend:
+              service:
+                name: {{ include "ofplens.name" . }}-api
+                port:
+                  name: http
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: {{ include "ofplens.name" . }}-web
+                port:
+                  name: http
+{{- end }}

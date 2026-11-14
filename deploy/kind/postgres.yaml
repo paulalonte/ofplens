@@ -1,0 +1,65 @@
+# Postgres for the kind cluster only. It is deliberately not part of the Helm chart: on AWS the
+# database is RDS, outside the cluster, so on both the app chart just gets a DATABASE_URL.
+# Development credentials; never use these anywhere real.
+apiVersion: v1
+kind: Service
+metadata:
+  name: postgres
+  namespace: ofplens
+spec:
+  selector:
+    app: postgres
+  ports:
+    - name: postgres
+      port: 5432
+---
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: postgres
+  namespace: ofplens
+spec:
+  serviceName: postgres
+  replicas: 1
+  selector:
+    matchLabels:
+      app: postgres
+  template:
+    metadata:
+      labels:
+        app: postgres
+    spec:
+      containers:
+        - name: postgres
+          image: postgres:16-alpine
+          env:
+            - name: POSTGRES_USER
+              value: ofplens
+            - name: POSTGRES_PASSWORD
+              value: ofplens
+            - name: POSTGRES_DB
+              value: ofplens
+            - name: PGDATA
+              value: /var/lib/postgresql/data/pgdata
+          ports:
+            - name: postgres
+              containerPort: 5432
+          readinessProbe:
+            exec:
+              command: ['pg_isready', '-U', 'ofplens', '-d', 'ofplens']
+            periodSeconds: 5
+          resources:
+            requests: { cpu: 50m, memory: 128Mi }
+            limits: { memory: 512Mi }
+          volumeMounts:
+            - name: data
+              mountPath: /var/lib/postgresql/data
+  # One disk per pod, kept when the pod is replaced (kind's local-path storage).
+  volumeClaimTemplates:
+    - metadata:
+        name: data
+      spec:
+        accessModes: ['ReadWriteOnce']
+        resources:
+          requests:
+            storage: 1Gi

@@ -1,0 +1,10 @@
+# kind on your Mac (deploy/kind/up.sh): only what differs from values.yaml.
+# Images are built locally and loaded into the nodes, so they are never pulled.
+image:
+  pullPolicy: Never
+
+web:
+  replicas: 1
+
+ingress:
+  className: traefik

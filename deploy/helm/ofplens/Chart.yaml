@@ -1,0 +1,8 @@
+apiVersion: v2
+name: ofplens
+description: OFP Lens (SimBrief briefings for X-Plane 12) — web app, API and database migrations
+type: application
+# The chart's own version: bump it when the templates change.
+version: 0.1.0
+# The app version is the image tag, set per deploy (--set image.tag=...).
+appVersion: '0.0.0'

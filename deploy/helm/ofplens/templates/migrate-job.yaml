@@ -1,0 +1,40 @@
+{{- if .Values.migrate.enabled }}
+# Database migrations as a Helm hook: before each install and upgrade, once, before any new API
+# pod starts. If it fails, the upgrade stops and the running version keeps serving.
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: {{ include "ofplens.name" . }}-migrate
+  labels:
+    {{- include "ofplens.labels" . | nindent 4 }}
+    app.kubernetes.io/component: migrate
+  annotations:
+    helm.sh/hook: pre-install,pre-upgrade
+    # Replace the previous run's Job; delete it once it succeeded (a failed one stays to debug).
+    helm.sh/hook-delete-policy: before-hook-creation,hook-succeeded
+spec:
+  backoffLimit: 3
+  activeDeadlineSeconds: {{ .Values.migrate.timeoutSeconds }}
+  template:
+    metadata:
+      labels:
+        {{- include "ofplens.selector" (list . "migrate") | nindent 8 }}
+    spec:
+      restartPolicy: Never
+      serviceAccountName: default
+      automountServiceAccountToken: false
+      securityContext:
+        {{- include "ofplens.podSecurity" . | nindent 8 }}
+      containers:
+        - name: migrate
+          image: {{ include "ofplens.image" (list . .Values.image.api) }}
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          command: ['node', 'dist/migrate.js']
+          env:
+            {{- include "ofplens.secretEnv" . | nindent 12 }}
+          resources:
+            requests: { cpu: 50m, memory: 128Mi }
+            limits: { memory: 256Mi }
+          securityContext:
+            {{- include "ofplens.containerSecurity" . | nindent 12 }}
+{{- end }}

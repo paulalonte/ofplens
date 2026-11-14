@@ -1,0 +1,48 @@
+# Defaults for every environment. values-kind.yaml and values-aws.yaml override what differs.
+# Secrets are never set here: the chart reads them from an existing Secret (existingSecret).
+
+image:
+  # Empty for kind (images loaded into the nodes); the ECR registry on AWS.
+  registry: ''
+  api: ofplens-api
+  web: ofplens-web
+  # Required: one immutable tag per build (a commit or build id), never "latest".
+  tag: ''
+  pullPolicy: IfNotPresent
+
+# A Secret created outside the chart (kubectl on kind, External Secrets on AWS) with the keys
+# DATABASE_URL and, optionally, ANTHROPIC_API_KEY (without it, AI briefings are off).
+existingSecret: ofplens-secrets
+
+api:
+  replicas: 2
+  logLevel: info
+  briefingModel: claude-haiku-5-5
+  briefingDailyLimit: 20
+  resources:
+    requests: { cpu: 100m, memory: 192Mi }
+    limits: { memory: 384Mi }
+
+web:
+  replicas: 2
+  resources:
+    requests: { cpu: 20m, memory: 32Mi }
+    limits: { memory: 96Mi }
+
+# Database migrations, run once before each install and upgrade (a Helm hook Job).
+migrate:
+  enabled: true
+  timeoutSeconds: 300
+
+ingress:
+  enabled: true
+  # traefik on kind, alb on AWS.
+  className: ''
+  # Empty: any host name (kind's localhost). Your domain on AWS.
+  host: ''
+  annotations: {}
+
+# Keep at least one pod of each part running during voluntary disruptions (node drains,
+# cluster upgrades) when there is more than one replica.
+podDisruptionBudget:
+  enabled: true
