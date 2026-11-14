@@ -55,7 +55,7 @@ ofplens/
 └── docs/PLAN.md        # this proposal
 ```
 
-**Deployment:** AWS in eu-central-1 from phase 3b, defined with AWS CDK (TypeScript). Locally everything runs in Docker Compose.
+**Deployment:** AWS with Kubernetes (EKS), Helm and Terraform; see [DEPLOYMENT.md](DEPLOYMENT.md). Locally everything runs in Docker Compose.
 
 ## Architecture
 
@@ -125,12 +125,13 @@ Distribution: 8 MCP server · Stretch: X-Plane live tracking
 
 ### Phase 3b — Deploy to AWS
 
-- Infrastructure as code with AWS CDK (TypeScript), so the setup is reproducible and teardown is one command.
-- Postgres on RDS (smallest instance); API as a container on ECS Fargate behind a load balancer; web app built to S3 + CloudFront.
-- Secrets in SSM Parameter Store or Secrets Manager; migrations run as a one-off task on each deploy.
-- GitHub Actions deploys on merge to main; logs in CloudWatch.
-- Set an AWS Budgets alarm first: RDS and a load balancer cost money even when idle. Cheaper fallback: one small EC2 or Lightsail instance running the same Docker Compose setup.
-- **Done when:** the app is on a public URL, a deploy is one merge, and the budget alarm is active.
+Replaced (13 Nov 2026) by [DEPLOYMENT.md](DEPLOYMENT.md): containers, a Helm chart tried on a
+local kind cluster, logins and multiple pilots, then AWS with Terraform (a disposable EKS
+cluster, RDS, budget alarm first), HTTPS, deploy on merge, and safety nets. The earlier CDK +
+Fargate plan was dropped because learning Kubernetes, Helm and Terraform is part of the goal.
+
+- **Done when:** the app is on a public HTTPS URL, a deploy is one merge, the budget alarm is
+  active, and the cluster can be destroyed and recreated with the history kept.
 
 ### Phase 4 — Live weather
 
@@ -478,7 +479,7 @@ export const Briefing = z.object({
 | --- | --- |
 | Auth | None until the app is shared. Single pilot row; SimBrief username set in settings. |
 | API framework | Fastify, with Zod via a type provider (e.g. `fastify-type-provider-zod`). |
-| Deployment | AWS, after phase 3 (see phase 3b). Firebase skipped: it is built around Firestore and serverless functions, not a Postgres + Node API. |
+| Deployment | AWS with EKS, Helm and Terraform (see [DEPLOYMENT.md](DEPLOYMENT.md)). Firebase skipped: it is built around Firestore and serverless functions, not a Postgres + Node API. |
 | Weight units | Stored in the OFP's unit; UI toggle switches kg and lbs; preference saved on the pilot. |
 | LLM for briefings | Claude via the Anthropic API; model id in config so evals can compare models. |
 

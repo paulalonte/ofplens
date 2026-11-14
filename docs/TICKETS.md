@@ -521,6 +521,6 @@ check and per prompt version, so prompt or model changes are measured, not guess
 
 | Next | Summary |
 | --- | --- |
-| 3b Deploy | Budget alarm first; then CDK (RDS, Fargate, S3 + CloudFront) or the cheaper Lightsail + Compose fallback |
+| 3b Deploy | Steps in [DEPLOYMENT.md](DEPLOYMENT.md): containers, Helm on kind, logins, Terraform + EKS, HTTPS, CI/CD, safety nets |
 | 8 MCP | The `packages/agent` tools exposed to Claude Desktop / Claude Code |
-| Sharing | Auth and multi-pilot support before anyone else uses it |
+| Sharing | Auth and multi-pilot support before anyone else uses it (DEPLOYMENT.md step 3) |
