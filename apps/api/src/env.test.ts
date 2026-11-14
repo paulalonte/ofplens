@@ -25,6 +25,13 @@ describe('loadEnv', () => {
     );
   });
 
+  it('treats empty variables as unset (an empty key switches briefings off)', () => {
+    const env = loadEnv({ DATABASE_URL, ANTHROPIC_API_KEY: '', BRIEFING_MODEL: '', PORT: '' });
+    expect(env.ANTHROPIC_API_KEY).toBeUndefined();
+    expect(env).toMatchObject({ BRIEFING_MODEL: 'claude-haiku-5-5', PORT: 3000 });
+    expect(() => loadEnv({ DATABASE_URL: '' })).toThrow(/DATABASE_URL/);
+  });
+
   it('accepts an optional SimBrief URL (end-to-end tests) but only http(s)', () => {
     expect(
       loadEnv({ DATABASE_URL, SIMBRIEF_URL: 'http://127.0.0.1:4010/api/xml.fetcher.php' })

@@ -119,6 +119,11 @@ starts only after it succeeded (in compose: `service_completed_successfully`).
 - `latest` tags: you cannot tell what is running or roll back to it.
 - Root containers, and containers that ignore `SIGTERM` and drop requests on every deploy.
 - Rebuilding everything for a one-line change because the Dockerfile copies the source first.
+- Config that only works with your own `.env`. The first CI run of the smoke test failed: with
+  no `.env`, compose passed `ANTHROPIC_API_KEY` as an _empty_ string, and the API rejected it
+  instead of treating it as unset. It worked on the Mac only because the key was set there.
+  Now an empty variable counts as unset. Lesson: test the image the way a fresh environment
+  will run it, with nothing but what the deploy provides.
 - Images that only work on the machine that built them (the app's dev tools missing at run
   time); CI builds and starts the images on every PR, so that shows up before merging.
 
