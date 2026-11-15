@@ -316,3 +316,130 @@ Migrations run as a pre-upgrade hook Job, so a failed migration stops the deploy
 version keeps serving. Containers run non-root with read-only filesystems, config comes from
 a ConfigMap and credentials from a Secret created outside the chart. CI installs the chart on a
 fresh kind cluster for every PR."
+
+## Step 3 — Logins and multiple pilots
+
+**What was built**
+
+- Sign in with Google and GitHub (`apps/api/src/auth/`, `apps/api/src/routes/auth.ts`), and a
+  development sign-in by name for local work and tests (`DEV_SIGN_IN`, localhost only).
+- New tables: `pilot_identities` (who signs in how), `sessions` (signed-in browsers),
+  `briefing_usage` (the briefing quota). Every plan belongs to one pilot.
+- One hook that makes every `/api` route need a session, and one that checks plan ownership.
+- AI briefing limits per pilot and for everyone, and per-minute rate limits.
+- A sign-in page, the pilot's name and Sign out in the header (`apps/web`).
+- Setup steps for Google and GitHub: [AUTH.md](AUTH.md).
+
+**Concepts**
+
+- **Authentication vs authorization:** authentication is "who are you?" (sign-in), and
+  authorization is "may you do this?" (is this plan yours?). Most security bugs are in
+  authorization: the login works, but a route forgets to check the owner.
+- **OAuth 2.0 vs OpenID Connect:** OAuth 2.0 is for delegating *access* ("this app may read
+  your GitHub profile"). OpenID Connect (OIDC) is a layer on top for *identity*: Google also
+  returns an **ID token**, a signed JWT that says who signed in (`sub` = their permanent user
+  id). GitHub is plain OAuth 2.0, so we use the access token once to call `GET /user`.
+- **Authorization code flow:** the browser only carries a short-lived **code**. Our server
+  swaps it for tokens, server to server, using the **client secret**. Tokens never pass
+  through the browser.
+- **`state`:** a random value we set in a cookie before going to the provider, and that the
+  provider sends back unchanged. If they differ, someone is trying to sign you in with *their*
+  code (login CSRF), so we refuse.
+- **PKCE** (say "pixie"): a random `code_verifier` we keep, and its hash sent to the provider.
+  A stolen code is useless without the verifier. Required for mobile and browser-only apps,
+  and recommended for servers too (OAuth 2.1).
+- **Sessions vs JWTs:** we keep sessions in Postgres and give the browser a random token.
+  Signing out deletes the row, so the token stops working at once. A self-contained JWT
+  ("stateless") needs no lookup, but cannot be revoked before it expires. That trade-off
+  (instant revocation vs one query per request) is a classic interview question.
+- **Store a hash, not the token:** the database keeps SHA-256 of the session token, so a
+  leaked backup cannot be used to sign in. It's the same idea as password hashing, but a
+  plain fast hash is enough because the token is 256 random bits, not a guessable password.
+- **Cookie flags:** `HttpOnly` (JavaScript cannot read it, so a script injected into the
+  page cannot steal it), `Secure` (https only), `SameSite=Lax` (not sent on cross-site POSTs,
+  which blocks CSRF; still sent when the provider redirects back with a top-level GET).
+- **Stateless pods:** the session lives in the database, not in the API process, so any of
+  the two (or twenty) API pods can answer any request, with no "sticky sessions" on the load
+  balancer. That's why horizontal scaling works.
+- **Multi-tenancy:** every plan has a `pilot_id`, and every query filters by it. A further
+  step is Postgres **Row-Level Security**, where the database itself refuses rows of other
+  tenants even if the code forgets the filter.
+- **IDOR / BOLA:** "Insecure Direct Object Reference", or in OWASP's API list "Broken Object
+  Level Authorization" (#1 on that list). The bug is `/api/flight-plans/<someone else's id>`
+  working. We check ownership in **one hook for every `:id` route**, so a new route cannot
+  forget it, and answer **404, not 403**, so nobody can probe which ids exist.
+- **Open redirect:** `?redirect=https://evil.example` after sign-in would send pilots to a
+  phishing page that looks like it came from us. Only paths inside the app are allowed,
+  checked on the server and in the browser.
+- **Quotas vs rate limits:** a **quota** is a budget over a long window (10 briefings per
+  pilot per day, 50 for everyone), so the Claude bill has a ceiling. A **rate limit** is a
+  speed limit over a short window (5 per minute), so a bug or a script cannot hammer
+  SimBrief or the weather service. Both answer HTTP 429 with `Retry-After`.
+- **Atomic check-and-insert:** "count today's briefings, then insert one" has a race: two
+  requests at the same moment both see 9 of 10 and both start. We take a Postgres
+  **advisory lock** inside the transaction, so starts happen one at a time. The usage ledger
+  (`briefing_usage`) is separate from `briefings`, so deleting a plan doesn't refund the quota.
+- **Rate limits per pod:** the counts are kept in each API pod's memory, so with two pods a
+  pilot gets up to twice the limit. That's fine for protection. Exact limits need a shared
+  store such as Redis (ElastiCache on AWS), or the limit can be enforced at the edge (AWS WAF,
+  API gateway).
+- **`X-Forwarded-For` and trust proxy:** behind nginx and the ingress, every request seems to
+  come from the proxy's IP. `TRUST_PROXY=true` makes the API read the client's address from
+  the header the proxy adds. Only enable it when the API cannot be reached directly, or anyone
+  could fake their address in that header.
+- **Secrets per environment:** each environment has its own OAuth client (GitHub allows one
+  callback URL per app). The secrets go into the Kubernetes Secret, the same way as the
+  database URL, and later into AWS Secrets Manager. Never into values files or images.
+- **A test-only door, locked to localhost:** development sign-in makes end-to-end tests
+  possible without a real Google account. The API refuses to start with it unless
+  `PUBLIC_URL` is localhost, so a config mistake can't open it in production.
+
+**What would break in production, and how it's prevented**
+
+| Risk | Prevention here |
+| --- | --- |
+| A new route forgets the login check | One `onRequest` hook protects all of `/api` except health and sign-in; a test calls every route signed out and expects 401 |
+| A route forgets the owner check | One `preHandler` hook for every `/api/flight-plans/:id` route; a two-pilot test against real Postgres |
+| Pilot B sees A's data cached in the browser | The web app drops every cached query on sign-in, sign-out and any 401 |
+| Session token leaked from a DB backup | Only its SHA-256 is stored |
+| Signed-out pilot's cookie still works | Server-side sessions: sign-out deletes the row |
+| Briefing bill runs away | Per-pilot and global daily quotas, enforced atomically |
+| Dev sign-in enabled on AWS by mistake | The API refuses to start: `DEV_SIGN_IN` needs a localhost `PUBLIC_URL` |
+| Two first sign-ins race to claim the old data | Advisory lock in the sign-in transaction (tested) |
+
+**Try it**
+
+```bash
+# Locally: add DEV_SIGN_IN=true to .env yourself, then
+pnpm dev                                   # http://localhost:5173 → Sign in page
+
+# Two pilots at once: a normal and a private window, signed in with different names.
+# Pilot B opening pilot A's /history/<id> address gets "Plan not found".
+
+# Look at the tables (Drizzle Studio): pilots, pilot_identities, sessions, briefing_usage
+pnpm db:studio
+
+# The API without a cookie
+curl -i localhost:3000/api/flight-plans                       # 401 UNAUTHENTICATED
+
+# Sign in by name with curl and reuse the cookie (development sign-in only)
+curl -i -c /tmp/ofplens-cookies -H 'content-type: application/json' \
+  -d '{"name":"Curl Pilot"}' localhost:3000/api/auth/dev       # 204 + Set-Cookie
+curl -b /tmp/ofplens-cookies localhost:3000/api/auth/session
+
+# On kind: development sign-in is on at http://localhost:8088
+pnpm kind:up
+```
+
+**Interview**
+
+"I added multi-tenant sign-in with Google and GitHub using the OAuth 2.0 authorization code
+flow with state and PKCE. Google is OIDC, so I read the ID token's `sub`; GitHub is plain OAuth,
+so I read the profile once. Pilots are keyed by provider and subject, never by email. Sessions
+are server-side in Postgres with only a hash of the token stored, in HttpOnly, SameSite=Lax,
+Secure cookies, so the API pods stay stateless and sign-out is instant. Authorization is
+centralised: one hook requires a session on every API route and one checks ownership on every
+plan route, answering 404 for other tenants' objects to avoid IDOR. Costly operations have a
+per-tenant and global daily quota, enforced atomically with an advisory lock and kept in a
+ledger that deletes can't reset, plus per-minute rate limits. A development-only sign-in makes
+end-to-end tests possible and is refused unless the app runs on localhost."

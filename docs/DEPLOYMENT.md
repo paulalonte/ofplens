@@ -116,20 +116,27 @@ _As built:_ a rolling restart of the API answered all 282 requests sent during i
 
 ## Step 3 — Logins and multiple pilots
 
-Today the app has one pilot and no login. Before anyone else uses it:
+**Built (OFP-42).** Pilots sign in with Google or GitHub. Each pilot's plans, settings and
+briefings are theirs alone. Setup and design: [AUTH.md](AUTH.md); learnings: LEARNING.md,
+step 3.
 
-**You decide** how pilots sign in. Options (Claude gives a recommendation when we get there):
+**Decided:** Sign in with Google and GitHub, implemented in our own API (OAuth 2.0 / OpenID
+Connect via the `arctic` library), with sessions in Postgres. Not Cognito, so the app isn't
+tied to AWS and works the same on your Mac, kind and EKS. Not magic links, which would need an
+email service.
 
-- **AWS Cognito:** more AWS learning; AWS stores the passwords.
-- **Sign in with Google or GitHub:** simplest for pilots.
-- **Email magic link:** no passwords at all.
+**Built**
 
-**Claude builds**
+- Sign-in and sign-out; every plan, briefing and setting belongs to one pilot.
+- Tests that one pilot can never read, change or delete another pilot's plans (API, real
+  Postgres, and end to end in two browsers).
+- AI briefings: 10 per pilot and 50 overall per 24 hours, so the Claude bill has a ceiling.
+- Rate limits on the endpoints that call SimBrief, aviationweather.gov and Claude, and on
+  sign-in.
 
-- Sign-in and sign-out, and every plan, briefing and setting belonging to one pilot.
-- A test that one pilot can never read or delete another pilot's plans.
-- A daily limit of AI briefings per pilot, so the Claude bill stays predictable.
-- Rate limits on the endpoints that call SimBrief, aviationweather.gov and Claude.
+**You do, before AWS:** register an OAuth app with GitHub and/or a client with Google for
+each address the app runs at ([AUTH.md](AUTH.md)), and put the IDs and secrets in `.env`
+locally, or in the Kubernetes Secret.
 
 **Done when:** two pilots each see only their own plans, and the limits are tested.
 

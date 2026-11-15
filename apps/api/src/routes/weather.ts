@@ -8,26 +8,23 @@ import {
 } from '@ofplens/weather';
 import type { FastifyPluginCallbackZod } from 'fastify-type-provider-zod';
 import { z } from 'zod';
+import { planNotFound } from '../auth/sessions';
 import { AppError } from '../errors';
+import { perMinute } from '../rateLimits';
 
 export interface WeatherRouteOptions {
   weatherReports: WeatherRepository;
   /** Usually the cached aviationweather.gov client (5 minutes per station). */
   weather: WeatherClient;
+  /** Refreshes per minute per pilot. */
+  rateLimit?: number | undefined;
 }
 
 const PlanParams = z.object({ id: z.uuid('Not a flight plan id') });
 
-const planNotFound = () =>
-  new AppError(
-    404,
-    'FLIGHT_PLAN_NOT_FOUND',
-    'That flight plan does not exist (it may have been deleted).',
-  );
-
 export const weatherRoutes: FastifyPluginCallbackZod<WeatherRouteOptions> = (
   app,
-  { weatherReports, weather },
+  { weatherReports, weather, rateLimit },
   done,
 ) => {
   /** At dispatch (OFP) vs now (latest stored live report), per airport. No network. */
@@ -45,7 +42,10 @@ export const weatherRoutes: FastifyPluginCallbackZod<WeatherRouteOptions> = (
    */
   app.post(
     '/api/flight-plans/:id/weather/refresh',
-    { schema: { params: PlanParams, response: { 200: FlightPlanWeatherResponse } } },
+    {
+      schema: { params: PlanParams, response: { 200: FlightPlanWeatherResponse } },
+      config: perMinute(rateLimit),
+    },
     async (request) => {
       try {
         return (

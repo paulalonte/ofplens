@@ -1,4 +1,5 @@
 import {
+  createAuthRepository,
   createBriefingRepository,
   createDb,
   createFlightPlanRepository,
@@ -13,7 +14,7 @@ import { parseOfp } from '@ofplens/ofp';
 import { loadFixture } from '@ofplens/ofp/testing';
 import { afterAll, afterEach, beforeAll, describe, expect, it } from 'vitest';
 import { buildApp, type App } from '../app';
-import { createFakeSimbrief } from '../testing/fakes';
+import { asPilot, createFakeSimbrief } from '../testing/fakes';
 
 /**
  * The import end to end through the real app and a real Postgres. Only SimBrief is faked.
@@ -22,10 +23,12 @@ import { createFakeSimbrief } from '../testing/fakes';
 let testDb: TestDatabase;
 let conn: DbConnection;
 let app: App | undefined;
+let pilotId: string;
 
 beforeAll(async () => {
   testDb = await createTestDatabase();
   conn = createDb(testDb.url);
+  pilotId = (await createPilotRepository(conn.db).create()).id;
 });
 afterEach(async () => {
   await app?.close();
@@ -39,6 +42,9 @@ afterAll(async () => {
 async function startApp(fixture: string) {
   app = await buildApp({
     pingDb: () => pingDb(conn.db),
+    auth: createAuthRepository(conn.db),
+    authenticate: asPilot(pilotId),
+    rateLimits: false,
     pilots: createPilotRepository(conn.db),
     flightPlans: createFlightPlanRepository(conn.db),
     weatherReports: createWeatherRepository(conn.db),

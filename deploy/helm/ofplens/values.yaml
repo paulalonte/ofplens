@@ -10,15 +10,24 @@ image:
   tag: ''
   pullPolicy: IfNotPresent
 
-# A Secret created outside the chart (kubectl on kind, External Secrets on AWS) with the keys
-# DATABASE_URL and, optionally, ANTHROPIC_API_KEY (without it, AI briefings are off).
+# A Secret created outside the chart (kubectl on kind, External Secrets on AWS) with the key
+# DATABASE_URL and, optionally, ANTHROPIC_API_KEY (without it, AI briefings are off) and
+# GOOGLE_CLIENT_ID/SECRET, GITHUB_CLIENT_ID/SECRET (each pair adds a sign-in button).
 existingSecret: ofplens-secrets
 
 api:
   replicas: 2
   logLevel: info
   briefingModel: claude-haiku-5-5
-  briefingDailyLimit: 20
+  # Per pilot, and for everyone together, per rolling 24 hours.
+  briefingDailyLimit: 10
+  briefingGlobalDailyLimit: 50
+  # Required: where pilots open the app, e.g. https://ofplens.example.com. Sign-in callbacks
+  # go to <publicUrl>/api/auth/<provider>/callback; https makes cookies Secure.
+  publicUrl: ''
+  # Sign in by any name without a password. Development only: the API refuses it unless
+  # publicUrl is localhost.
+  devSignIn: false
   resources:
     requests: { cpu: 100m, memory: 192Mi }
     limits: { memory: 384Mi }

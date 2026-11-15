@@ -3,6 +3,7 @@ import type { Briefing } from '@ofplens/agent/contract';
 import { answer, callTools, fakeClaude } from '@ofplens/agent/testing';
 import { PROMPT_VERSION } from '@ofplens/agent';
 import {
+  createAuthRepository,
   createBriefingRepository,
   createDb,
   createFlightPlanRepository,
@@ -19,6 +20,7 @@ import { createCachedWeatherClient, createWeatherClient } from '@ofplens/weather
 import { loadWeatherFixture } from '@ofplens/weather/testing';
 import { afterAll, afterEach, beforeAll, beforeEach, describe, expect, it } from 'vitest';
 import { buildApp, type App } from '../app';
+import { asPilot } from '../testing/fakes';
 
 /**
  * Briefings end to end through the API: the real app, Postgres, the agent and the captured
@@ -27,6 +29,7 @@ import { buildApp, type App } from '../app';
 let testDb: TestDatabase;
 let conn: DbConnection;
 let app: App | undefined;
+let pilotId: string;
 let planId: string;
 
 beforeAll(async () => {
@@ -35,11 +38,13 @@ beforeAll(async () => {
 });
 beforeEach(async () => {
   await truncateAll(conn.db);
-  await createPilotRepository(conn.db).save({ simbriefUsername: 'jetpilot', weightUnit: 'kgs' });
+  pilotId = (
+    await createPilotRepository(conn.db).create({ simbriefUsername: 'jetpilot', weightUnit: 'kgs' })
+  ).id;
   const rawOfp = loadFixture('eddb-eddm-c750-kgs');
   planId = (
     await createFlightPlanRepository(conn.db).import({
-      simbriefUsername: 'jetpilot',
+      pilotId,
       plan: parseOfp(rawOfp),
       rawOfp,
     })
@@ -69,6 +74,9 @@ async function start(replies: Parameters<typeof fakeClaude>[0] | null, { dailyLi
   const claude = replies ? fakeClaude(replies) : null;
   app = await buildApp({
     pingDb: () => pingDb(conn.db),
+    auth: createAuthRepository(conn.db),
+    authenticate: asPilot(pilotId),
+    rateLimits: false,
     pilots: createPilotRepository(conn.db),
     flightPlans: createFlightPlanRepository(conn.db),
     weatherReports: createWeatherRepository(conn.db),
@@ -235,7 +243,7 @@ describe('POST /api/flight-plans/:id/briefings', () => {
     expect(second.json()).toEqual({
       error: {
         code: 'BRIEFING_DAILY_LIMIT',
-        message: 'The limit of 1 briefings per day has been reached. Try again later.',
+        message: 'You have used your 1 briefings for the last 24 hours. Try again later.',
       },
     });
     expect(claude!.requests).toHaveLength(1);
@@ -245,6 +253,7 @@ describe('POST /api/flight-plans/:id/briefings', () => {
     const { app: a, claude } = await start([]);
     await createBriefingRepository(conn.db).start({
       flightPlanId: planId,
+      pilotId,
       model: 'claude-haiku-5-5',
       promptVersion: PROMPT_VERSION,
     });

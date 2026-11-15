@@ -10,7 +10,6 @@ import {
   flightPlanFuel,
   flightPlans,
   flightPlanWeights,
-  pilots,
   waypoints,
   weatherReports,
   type FlightPlanRow,
@@ -18,8 +17,8 @@ import {
 } from './schema';
 
 export interface ImportFlightPlanInput {
-  /** The pilot the plan belongs to; must already exist (saved in Settings). */
-  simbriefUsername: string;
+  /** The pilot the plan belongs to. */
+  pilotId: string;
   plan: FlightPlanSummary;
   /** The full OFP as fetched, kept in raw_ofp so plans can be re-parsed later. */
   rawOfp: unknown;
@@ -27,15 +26,8 @@ export interface ImportFlightPlanInput {
 
 export interface ImportFlightPlanResult {
   id: string;
-  /** false when this SimBrief request was already imported; nothing was written. */
+  /** false when this pilot already imported this SimBrief request; nothing was written. */
   created: boolean;
-}
-
-export class PilotNotFoundError extends Error {
-  constructor(username: string) {
-    super(`No pilot with SimBrief username "${username}"`);
-    this.name = 'PilotNotFoundError';
-  }
 }
 
 export class InvalidCursorError extends Error {
@@ -46,8 +38,8 @@ export class InvalidCursorError extends Error {
 }
 
 export interface ListFlightPlansInput {
-  /** Whose history; an unknown username simply has no plans. */
-  simbriefUsername: string;
+  /** Whose history. */
+  pilotId: string;
   limit: number;
   /** `nextCursor` from the previous page; omit for the first page. */
   cursor?: string | undefined;
@@ -68,41 +60,46 @@ export interface StoredFlightPlan {
 export interface FlightPlanRepository {
   /**
    * Stores a parsed plan with its fuel, weights, waypoints and OFP weather in one transaction.
-   * Idempotent on the SimBrief request id: importing the same plan again changes nothing and
-   * returns the existing id, even when two imports race.
+   * Idempotent per pilot on the SimBrief request id: importing the same plan again changes
+   * nothing and returns the existing id, even when two imports race. Another pilot importing
+   * the same SimBrief plan gets their own copy.
    */
   import(input: ImportFlightPlanInput): Promise<ImportFlightPlanResult>;
   /** Newest SimBrief plan first (by generation time, then id), one page at a time. */
   list(input: ListFlightPlansInput): Promise<FlightPlanPage>;
-  /** The stored plan rebuilt as the same FlightPlanSummary parseOfp produced, or null. */
+  /**
+   * The stored plan rebuilt as the same FlightPlanSummary parseOfp produced, or null. Not
+   * scoped to a pilot: the API checks ownerOf() first for every /api/flight-plans/:id route.
+   */
   get(id: string): Promise<StoredFlightPlan | null>;
+  /** The pilot a plan belongs to, or null when there is no such plan. */
+  ownerOf(id: string): Promise<string | null>;
   /** Deletes the plan and everything under it. false when there was no such plan. */
   delete(id: string): Promise<boolean>;
 }
 
 export function createFlightPlanRepository(db: Database): FlightPlanRepository {
   return {
-    import: ({ simbriefUsername, plan, rawOfp }) =>
+    import: ({ pilotId, plan, rawOfp }) =>
       db.transaction(async (tx) => {
-        const [pilot] = await tx
-          .select({ id: pilots.id })
-          .from(pilots)
-          .where(eq(pilots.simbriefUsername, simbriefUsername));
-        if (!pilot) throw new PilotNotFoundError(simbriefUsername);
-
         // ON CONFLICT DO NOTHING: a concurrent import of the same request waits for the other
         // transaction, then inserts nothing instead of failing.
         const [inserted] = await tx
           .insert(flightPlans)
-          .values(toPlanRow(pilot.id, plan, rawOfp))
-          .onConflictDoNothing({ target: flightPlans.simbriefRequestId })
+          .values(toPlanRow(pilotId, plan, rawOfp))
+          .onConflictDoNothing({ target: [flightPlans.pilotId, flightPlans.simbriefRequestId] })
           .returning({ id: flightPlans.id });
 
         if (!inserted) {
           const [existing] = await tx
             .select({ id: flightPlans.id })
             .from(flightPlans)
-            .where(eq(flightPlans.simbriefRequestId, plan.simbriefRequestId));
+            .where(
+              and(
+                eq(flightPlans.pilotId, pilotId),
+                eq(flightPlans.simbriefRequestId, plan.simbriefRequestId),
+              ),
+            );
           if (!existing) throw new Error('Import conflicted but the existing plan was not found');
           return { id: existing.id, created: false };
         }
@@ -118,7 +115,7 @@ export function createFlightPlanRepository(db: Database): FlightPlanRepository {
         return { id: flightPlanId, created: true };
       }),
 
-    async list({ simbriefUsername, limit, cursor }) {
+    async list({ pilotId, limit, cursor }) {
       const after = cursor === undefined ? undefined : decodeCursor(cursor);
       const rows = await db
         .select({
@@ -136,10 +133,9 @@ export function createFlightPlanRepository(db: Database): FlightPlanRepository {
           units: flightPlans.units,
         })
         .from(flightPlans)
-        .innerJoin(pilots, eq(pilots.id, flightPlans.pilotId))
         .where(
           and(
-            eq(pilots.simbriefUsername, simbriefUsername),
+            eq(flightPlans.pilotId, pilotId),
             // Keyset pagination: strictly after the last row of the previous page.
             after &&
               sql`(${flightPlans.generatedAt}, ${flightPlans.id}) < (${after.generatedAt}::timestamptz, ${after.id}::uuid)`,
@@ -187,6 +183,14 @@ export function createFlightPlanRepository(db: Database): FlightPlanRepository {
         importedAt: toIso(row.plan.importedAt),
         plan: toSummary(row.plan, row.fuel, row.weights, fixes, reports),
       };
+    },
+
+    async ownerOf(id) {
+      const [row] = await db
+        .select({ pilotId: flightPlans.pilotId })
+        .from(flightPlans)
+        .where(eq(flightPlans.id, id));
+      return row?.pilotId ?? null;
     },
 
     async delete(id) {

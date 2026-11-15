@@ -2,11 +2,15 @@ import type { PilotRepository } from '@ofplens/db';
 import { FlightPlanSummary, SimbriefUsername } from '@ofplens/ofp';
 import type { FastifyPluginCallbackZod } from 'fastify-type-provider-zod';
 import { z } from 'zod';
+import { signedIn } from '../auth/sessions';
+import { perMinute } from '../rateLimits';
 import { fetchLatestPlan, usernameRequired, type SimbriefClient } from '../simbrief';
 
 export interface SimbriefRouteOptions {
   pilots: PilotRepository;
   simbrief: SimbriefClient;
+  /** Requests per minute per pilot. */
+  rateLimit?: number | undefined;
 }
 
 /**
@@ -17,7 +21,7 @@ export interface SimbriefRouteOptions {
  */
 export const simbriefRoutes: FastifyPluginCallbackZod<SimbriefRouteOptions> = (
   app,
-  { pilots, simbrief },
+  { pilots, simbrief, rateLimit },
   done,
 ) => {
   app.get(
@@ -27,9 +31,11 @@ export const simbriefRoutes: FastifyPluginCallbackZod<SimbriefRouteOptions> = (
         querystring: z.object({ username: SimbriefUsername.optional() }),
         response: { 200: FlightPlanSummary },
       },
+      config: perMinute(rateLimit),
     },
     async (request) => {
-      const username = request.query.username ?? (await pilots.get())?.simbriefUsername;
+      const username =
+        request.query.username ?? (await pilots.get(signedIn(request).id))?.simbriefUsername;
       if (!username) throw usernameRequired();
 
       const { plan } = await fetchLatestPlan(simbrief, username, request.log);

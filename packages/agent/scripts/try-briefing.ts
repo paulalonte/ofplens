@@ -101,6 +101,7 @@ const depsFor = (db: Database, hazardFeeds: HazardClient): ToolDeps => ({
 const open: {
   devDb?: ReturnType<typeof createDb>;
   scratch?: Awaited<ReturnType<typeof createTestDatabase>>;
+  scratchPilotId?: string;
 } = {};
 
 async function planFor(target: string): Promise<{ id: string; deps: ToolDeps }> {
@@ -112,14 +113,13 @@ async function planFor(target: string): Promise<{ id: string; deps: ToolDeps }> 
   }
   if (!open.scratch) {
     open.scratch = await createTestDatabase();
-    await createPilotRepository(open.scratch.db).save({
-      simbriefUsername: 'briefing-try',
-      weightUnit: 'kgs',
-    });
+    open.scratchPilotId = (
+      await createPilotRepository(open.scratch.db).create({ simbriefUsername: 'briefing-try' })
+    ).id;
   }
   const raw = loadFixture(target);
   const { id } = await createFlightPlanRepository(open.scratch.db).import({
-    simbriefUsername: 'briefing-try',
+    pilotId: open.scratchPilotId ?? usage('No scratch pilot'),
     plan: parseOfp(raw),
     rawOfp: raw,
   });

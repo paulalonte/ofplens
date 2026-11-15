@@ -14,7 +14,10 @@
     "podDisruptionBudget"
   ],
   "definitions": {
-    "replicas": { "type": "integer", "minimum": 1 },
+    "replicas": {
+      "type": "integer",
+      "minimum": 1
+    },
     "quantity": {
       "description": "A Kubernetes quantity: 100m, 0.5 or 1 CPUs; 192Mi or 1Gi of memory.",
       "type": ["string", "number"],
@@ -28,16 +31,24 @@
           "type": "object",
           "additionalProperties": false,
           "properties": {
-            "cpu": { "$ref": "#/definitions/quantity" },
-            "memory": { "$ref": "#/definitions/quantity" }
+            "cpu": {
+              "$ref": "#/definitions/quantity"
+            },
+            "memory": {
+              "$ref": "#/definitions/quantity"
+            }
           }
         },
         "limits": {
           "type": "object",
           "additionalProperties": false,
           "properties": {
-            "cpu": { "$ref": "#/definitions/quantity" },
-            "memory": { "$ref": "#/definitions/quantity" }
+            "cpu": {
+              "$ref": "#/definitions/quantity"
+            },
+            "memory": {
+              "$ref": "#/definitions/quantity"
+            }
           }
         }
       }
@@ -49,28 +60,76 @@
       "additionalProperties": false,
       "required": ["registry", "api", "web", "tag", "pullPolicy"],
       "properties": {
-        "registry": { "type": "string" },
-        "api": { "type": "string", "minLength": 1 },
-        "web": { "type": "string", "minLength": 1 },
+        "registry": {
+          "type": "string"
+        },
+        "api": {
+          "type": "string",
+          "minLength": 1
+        },
+        "web": {
+          "type": "string",
+          "minLength": 1
+        },
         "tag": {
           "description": "Set per deploy with --set image.tag=...; the templates require it.",
           "type": "string",
-          "not": { "const": "latest" }
+          "not": {
+            "const": "latest"
+          }
         },
-        "pullPolicy": { "enum": ["Always", "IfNotPresent", "Never"] }
+        "pullPolicy": {
+          "enum": ["Always", "IfNotPresent", "Never"]
+        }
       }
     },
-    "existingSecret": { "type": "string", "minLength": 1 },
+    "existingSecret": {
+      "type": "string",
+      "minLength": 1
+    },
     "api": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["replicas", "logLevel", "briefingModel", "briefingDailyLimit", "resources"],
+      "required": [
+        "replicas",
+        "logLevel",
+        "briefingModel",
+        "briefingDailyLimit",
+        "briefingGlobalDailyLimit",
+        "publicUrl",
+        "devSignIn",
+        "resources"
+      ],
       "properties": {
-        "replicas": { "$ref": "#/definitions/replicas" },
-        "logLevel": { "enum": ["fatal", "error", "warn", "info", "debug", "trace", "silent"] },
-        "briefingModel": { "type": "string", "minLength": 1 },
-        "briefingDailyLimit": { "type": "integer", "minimum": 0 },
-        "resources": { "$ref": "#/definitions/resources" }
+        "replicas": {
+          "$ref": "#/definitions/replicas"
+        },
+        "logLevel": {
+          "enum": ["fatal", "error", "warn", "info", "debug", "trace", "silent"]
+        },
+        "briefingModel": {
+          "type": "string",
+          "minLength": 1
+        },
+        "briefingDailyLimit": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "briefingGlobalDailyLimit": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "publicUrl": {
+          "description": "Where pilots open the app, without a trailing slash. Empty only until set per environment (the templates require it).",
+          "type": "string",
+          "pattern": "^(https?://[^/\\s]+)?$"
+        },
+        "devSignIn": {
+          "type": "boolean"
+        },
+        "resources": {
+          "$ref": "#/definitions/resources"
+        }
       }
     },
     "web": {
@@ -78,8 +137,12 @@
       "additionalProperties": false,
       "required": ["replicas", "resources"],
       "properties": {
-        "replicas": { "$ref": "#/definitions/replicas" },
-        "resources": { "$ref": "#/definitions/resources" }
+        "replicas": {
+          "$ref": "#/definitions/replicas"
+        },
+        "resources": {
+          "$ref": "#/definitions/resources"
+        }
       }
     },
     "migrate": {
@@ -87,8 +150,13 @@
       "additionalProperties": false,
       "required": ["enabled", "timeoutSeconds"],
       "properties": {
-        "enabled": { "type": "boolean" },
-        "timeoutSeconds": { "type": "integer", "minimum": 30 }
+        "enabled": {
+          "type": "boolean"
+        },
+        "timeoutSeconds": {
+          "type": "integer",
+          "minimum": 30
+        }
       }
     },
     "ingress": {
@@ -96,10 +164,21 @@
       "additionalProperties": false,
       "required": ["enabled", "className", "host", "annotations"],
       "properties": {
-        "enabled": { "type": "boolean" },
-        "className": { "type": "string" },
-        "host": { "type": "string" },
-        "annotations": { "type": "object", "additionalProperties": { "type": "string" } }
+        "enabled": {
+          "type": "boolean"
+        },
+        "className": {
+          "type": "string"
+        },
+        "host": {
+          "type": "string"
+        },
+        "annotations": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "string"
+          }
+        }
       }
     },
     "podDisruptionBudget": {
@@ -107,7 +186,9 @@
       "additionalProperties": false,
       "required": ["enabled"],
       "properties": {
-        "enabled": { "type": "boolean" }
+        "enabled": {
+          "type": "boolean"
+        }
       }
     }
   }

@@ -2,12 +2,10 @@ import { QueryClientProvider } from '@tanstack/react-query';
 import { RouterProvider } from '@tanstack/react-router';
 import { StrictMode } from 'react';
 import { createRoot } from 'react-dom/client';
-import { createQueryClient } from './queryClient';
-import { createAppRouter } from './router';
+import { createApp } from './router';
 import './styles.css';
 
-const queryClient = createQueryClient();
-const router = createAppRouter(queryClient);
+const { queryClient, router } = createApp();
 
 const rootElement = document.getElementById('root');
 if (!rootElement) throw new Error('#root element missing from index.html');

@@ -20,17 +20,26 @@ import {
  * packages/db/migrations; review the SQL before committing it.
  */
 
-/** The pilot using the app. Single row until multi-user support (see PLAN.md non-goals). */
+/**
+ * A pilot: one per person signed in (OFP-42). Created at first sign-in; the SimBrief username is
+ * set later in Settings. Several pilots may use the same SimBrief username: each keeps their
+ * own copy of the plans they import.
+ */
 export const pilots = pgTable(
   'pilots',
   {
     id: uuid('id').primaryKey().defaultRandom(),
-    simbriefUsername: text('simbrief_username').notNull().unique(),
+    /** Null until the pilot saves their settings. */
+    simbriefUsername: text('simbrief_username'),
     /** SimBrief's numeric Pilot ID, learned from the first imported OFP (params.user_id). */
     simbriefPilotId: text('simbrief_pilot_id'),
     weightUnit: text('weight_unit', { enum: ['kgs', 'lbs'] })
       .notNull()
       .default('kgs'),
+    /** From the sign-in provider, refreshed at every sign-in. */
+    displayName: text('display_name'),
+    email: text('email'),
+    avatarUrl: text('avatar_url'),
     createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
     updatedAt: timestamp('updated_at', { withTimezone: true })
       .notNull()
@@ -45,6 +54,50 @@ export type PilotRow = typeof pilots.$inferSelect;
 const timestamptz = (name: string) => timestamp(name, { withTimezone: true });
 
 /**
+ * How a pilot signs in: one row per provider account (Google's or GitHub's own user id).
+ * `dev` is the development-only sign-in (DEV_SIGN_IN), never enabled on a public server.
+ */
+export const pilotIdentities = pgTable(
+  'pilot_identities',
+  {
+    id: uuid('id').primaryKey().defaultRandom(),
+    pilotId: uuid('pilot_id')
+      .notNull()
+      .references(() => pilots.id, { onDelete: 'cascade' }),
+    provider: text('provider', { enum: ['google', 'github', 'dev'] }).notNull(),
+    /** The provider's stable user id (Google `sub`, GitHub numeric id): never the email. */
+    subject: text('subject').notNull(),
+    email: text('email'),
+    createdAt: timestamptz('created_at').notNull().defaultNow(),
+    lastSignInAt: timestamptz('last_sign_in_at').notNull().defaultNow(),
+  },
+  (t) => [
+    check('pilot_identities_provider_check', sql`${t.provider} in ('google', 'github', 'dev')`),
+    unique('pilot_identities_provider_subject_unique').on(t.provider, t.subject),
+    index('pilot_identities_pilot_idx').on(t.pilotId),
+  ],
+);
+
+/**
+ * Signed-in browsers. The cookie holds a random token; only its SHA-256 is stored, so a leaked
+ * database cannot be used to sign in. Every API pod reads the same table, so any pod can serve
+ * any request (no sticky sessions).
+ */
+export const sessions = pgTable(
+  'sessions',
+  {
+    /** SHA-256 of the cookie's token, hex. */
+    id: text('id').primaryKey(),
+    pilotId: uuid('pilot_id')
+      .notNull()
+      .references(() => pilots.id, { onDelete: 'cascade' }),
+    createdAt: timestamptz('created_at').notNull().defaultNow(),
+    expiresAt: timestamptz('expires_at').notNull(),
+  },
+  (t) => [index('sessions_pilot_idx').on(t.pilotId), index('sessions_expires_idx').on(t.expiresAt)],
+);
+
+/**
  * One row per imported SimBrief OFP. Holds every field of FlightPlanSummary that is not a list,
  * so a plan read back from the DB equals the parsed one. Weights and fuel live in the plan's own
  * `units`; times are UTC. `raw_ofp` keeps the full OFP so plans can be re-parsed later.
@@ -56,8 +109,8 @@ export const flightPlans = pgTable(
     pilotId: uuid('pilot_id')
       .notNull()
       .references(() => pilots.id, { onDelete: 'cascade' }),
-    /** SimBrief's params.request_id: the idempotent import key. */
-    simbriefRequestId: text('simbrief_request_id').notNull().unique(),
+    /** SimBrief's params.request_id: the idempotent import key, per pilot. */
+    simbriefRequestId: text('simbrief_request_id').notNull(),
     generatedAt: timestamptz('generated_at').notNull(),
     airac: text('airac'),
     units: text('units', { enum: ['kgs', 'lbs'] }).notNull(),
@@ -136,6 +189,7 @@ export const flightPlans = pgTable(
       'flight_plans_alternate_complete_check',
       sql`(${t.alternateIcao} is null) = (${t.alternateName} is null) and (${t.alternateIcao} is null) = (${t.alternateUtcOffsetMin} is null)`,
     ),
+    unique('flight_plans_pilot_request_unique').on(t.pilotId, t.simbriefRequestId),
     // History: newest first per pilot, with id as the cursor tie-breaker.
     index('flight_plans_pilot_generated_idx').on(t.pilotId, t.generatedAt.desc(), t.id.desc()),
     index('flight_plans_route_idx').on(t.originIcao, t.destinationIcao),
@@ -265,8 +319,6 @@ export const briefings = pgTable(
   (t) => [
     check('briefings_status_check', sql`${t.status} in ('pending', 'done', 'failed')`),
     index('briefings_plan_idx').on(t.flightPlanId, t.createdAt.desc()),
-    // The daily limit counts briefings across all plans by creation time.
-    index('briefings_created_idx').on(t.createdAt),
     // One running briefing per plan at a time.
     uniqueIndex('briefings_one_pending_per_plan')
       .on(t.flightPlanId)
@@ -275,6 +327,25 @@ export const briefings = pgTable(
 );
 
 export type BriefingRow = typeof briefings.$inferSelect;
+
+/**
+ * One row per briefing started, for the daily limits. Kept apart from `briefings` so deleting a
+ * plan (which deletes its briefings) does not give the pilot their quota back.
+ */
+export const briefingUsage = pgTable(
+  'briefing_usage',
+  {
+    id: bigint('id', { mode: 'number' }).primaryKey().generatedAlwaysAsIdentity(),
+    pilotId: uuid('pilot_id')
+      .notNull()
+      .references(() => pilots.id, { onDelete: 'cascade' }),
+    createdAt: timestamptz('created_at').notNull().defaultNow(),
+  },
+  (t) => [
+    index('briefing_usage_pilot_idx').on(t.pilotId, t.createdAt),
+    index('briefing_usage_created_idx').on(t.createdAt),
+  ],
+);
 
 /**
  * SIGMETs, AIRMETs and G-AIRMETs that touch the plan's route (phase 6), as found by the last

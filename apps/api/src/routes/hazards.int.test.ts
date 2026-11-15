@@ -1,5 +1,6 @@
 import { countRows, createTestDatabase, truncateAll, type TestDatabase } from '@ofplens/db/testing';
 import {
+  createAuthRepository,
   createBriefingRepository,
   createDb,
   createFlightPlanRepository,
@@ -19,7 +20,7 @@ import {
 import { loadHazardFixture } from '@ofplens/weather/testing';
 import { afterAll, afterEach, beforeAll, beforeEach, describe, expect, it, vi } from 'vitest';
 import { buildApp, type App } from '../app';
-import { createFakeWeatherClient } from '../testing/fakes';
+import { asPilot, createFakeWeatherClient } from '../testing/fakes';
 
 /**
  * Route hazards end to end through the API and Postgres. aviationweather.gov is replaced only
@@ -29,6 +30,7 @@ import { createFakeWeatherClient } from '../testing/fakes';
 let testDb: TestDatabase;
 let conn: DbConnection;
 let app: App | undefined;
+let pilotId: string;
 
 beforeAll(async () => {
   testDb = await createTestDatabase();
@@ -36,7 +38,9 @@ beforeAll(async () => {
 });
 beforeEach(async () => {
   await truncateAll(conn.db);
-  await createPilotRepository(conn.db).save({ simbriefUsername: 'jetpilot', weightUnit: 'kgs' });
+  pilotId = (
+    await createPilotRepository(conn.db).create({ simbriefUsername: 'jetpilot', weightUnit: 'kgs' })
+  ).id;
 });
 afterEach(async () => {
   await app?.close();
@@ -115,6 +119,9 @@ async function start(
 ) {
   app = await buildApp({
     pingDb: () => pingDb(conn.db),
+    auth: createAuthRepository(conn.db),
+    authenticate: asPilot(pilotId),
+    rateLimits: false,
     pilots: createPilotRepository(conn.db),
     flightPlans: createFlightPlanRepository(conn.db),
     weatherReports: createWeatherRepository(conn.db),
@@ -133,7 +140,7 @@ async function start(
 async function importPlan(fixture = 'eddb-eddm-c750-kgs'): Promise<string> {
   const rawOfp = loadFixture(fixture);
   const { id } = await createFlightPlanRepository(conn.db).import({
-    simbriefUsername: 'jetpilot',
+    pilotId,
     plan: parseOfp(rawOfp),
     rawOfp,
   });
