@@ -218,3 +218,28 @@ jobs:
           kubectl get all,ingress,jobs -n ofplens -o wide
           kubectl get events -n ofplens --sort-by=.lastTimestamp | tail -40
           kubectl logs -n ofplens -l app.kubernetes.io/name=ofplens --all-containers --tail=50
+
+  terraform:
+    name: Terraform format and validate
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+
+    # Checks the files only: no AWS credentials here, nothing is planned or applied.
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: hashicorp/setup-terraform@v4
+        with:
+          terraform_version: ~1.17.0
+
+      - name: Formatting (terraform fmt)
+        run: terraform fmt -check -recursive -diff infra
+
+      - name: Validate each stack
+        run: |
+          for stack in infra/*/; do
+            echo "::group::$stack"
+            terraform -chdir="$stack" init -backend=false -input=false
+            terraform -chdir="$stack" validate
+            echo "::endgroup::"
+          done

@@ -45,6 +45,7 @@ apps/api       Fastify; buildApp() in app.ts (testable), server.ts (listens)
 packages/ofp   OFP Zod schema, parseOfp(), shared domain types and formatters
 packages/db    Drizzle client, schema, migrations
 packages/weather  aviationweather.gov client (METAR/TAF, SIGMET/G-AIRMET hazards), METAR decoder, flight category, plan weather
+infra/         Terraform: bootstrap/ (budget, state bucket, ECR; kept). You run plan/apply (infra/README.md)
 Dockerfile     Container images: `--target api` (bundled API + migrate command), `--target web` (nginx)
 deploy/        web/ (nginx config), helm/ofplens (the Helm chart), kind/ (local cluster, Postgres, up/down)
 packages/agent    Briefing agent: tools as plain functions (reused by the API and, later, MCP), Briefing schema
