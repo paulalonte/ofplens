@@ -199,8 +199,13 @@ jobs:
 
       - name: The app answers through the ingress
         run: |
-          curl --fail --silent localhost:8088/api/health
-          curl --fail --silent localhost:8088/history | grep -q '<div id="root">'
+          # helm --wait returns as soon as the pods are ready; Traefik learns about them a
+          # moment later (it watches the cluster). Until then it has nowhere to route, so
+          # retry for up to 30 seconds instead of failing on that gap.
+          curl --fail --silent --retry 15 --retry-delay 2 --retry-all-errors \
+            localhost:8088/api/health
+          curl --fail --silent --retry 15 --retry-delay 2 --retry-all-errors \
+            localhost:8088/history | grep -q '<div id="root">'
           # Signed out: 401. Development sign-in, then the cookie works through the ingress.
           test "$(curl --silent -o /dev/null -w '%{http_code}' localhost:8088/api/pilot)" = 401
           curl --fail --silent -c cookies -H 'content-type: application/json' \
