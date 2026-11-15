@@ -7,6 +7,8 @@ import {
   createFakeSimbrief,
   createInMemoryFlightPlanRepository,
   createInMemoryPilotRepository,
+  OTHER_PILOT,
+  TEST_PILOT,
   testDeps,
 } from '../testing/fakes';
 
@@ -38,8 +40,8 @@ describe('POST /api/flight-plans/import', () => {
       plan: parseOfp(loadFixture('eddb-eddm-c750-kgs')),
     });
     expect(simbrief.requests).toEqual(['jetpilot']);
-    const stored = flightPlans.imported.get('192980256');
-    expect(stored).toMatchObject({ id: body.id, simbriefUsername: 'jetpilot' });
+    const stored = flightPlans.imported.get(`${TEST_PILOT.id}:192980256`);
+    expect(stored).toMatchObject({ id: body.id, pilotId: TEST_PILOT.id });
     expect(stored?.rawOfp).toBe(raw);
   });
 
@@ -109,7 +111,7 @@ describe('GET /api/flight-plans', () => {
     const flightPlans = createInMemoryFlightPlanRepository();
     for (const name of fixtures) {
       const rawOfp = loadFixture(name);
-      await flightPlans.import({ simbriefUsername: 'jetpilot', plan: parseOfp(rawOfp), rawOfp });
+      await flightPlans.import({ pilotId: TEST_PILOT.id, plan: parseOfp(rawOfp), rawOfp });
     }
     app = await buildApp(testDeps({ pilots: savedPilot(), flightPlans }));
     return app;
@@ -139,7 +141,7 @@ describe('GET /api/flight-plans', () => {
     expect(second.json<{ items: unknown[] }>().items).toHaveLength(1);
   });
 
-  it('is empty, not an error, before settings are saved', async () => {
+  it('is empty, not an error, before any plan is imported', async () => {
     app = await buildApp(testDeps());
 
     const res = await app.inject({ method: 'GET', url: '/api/flight-plans' });
@@ -161,7 +163,7 @@ describe('GET /api/flight-plans/:id', () => {
     const flightPlans = createInMemoryFlightPlanRepository();
     const rawOfp = loadFixture('ksfo-kjfk-b739-lbs');
     const { id } = await flightPlans.import({
-      simbriefUsername: 'jetpilot',
+      pilotId: TEST_PILOT.id,
       plan: parseOfp(rawOfp),
       rawOfp,
     });
@@ -197,7 +199,7 @@ describe('DELETE /api/flight-plans/:id', () => {
     const flightPlans = createInMemoryFlightPlanRepository();
     const rawOfp = loadFixture('eddb-eddm-c750-kgs');
     const { id } = await flightPlans.import({
-      simbriefUsername: 'jetpilot',
+      pilotId: TEST_PILOT.id,
       plan: parseOfp(rawOfp),
       rawOfp,
     });
@@ -210,5 +212,63 @@ describe('DELETE /api/flight-plans/:id', () => {
 
     const again = await app.inject({ method: 'DELETE', url: `/api/flight-plans/${id}` });
     expect(again.statusCode).toBe(404);
+  });
+});
+
+describe('another pilot’s plan', () => {
+  it('is not listed, cannot be opened or deleted, and stays as it was', async () => {
+    const flightPlans = createInMemoryFlightPlanRepository();
+    const rawOfp = loadFixture('eddb-eddm-c750-kgs');
+    const { id } = await flightPlans.import({
+      pilotId: TEST_PILOT.id,
+      plan: parseOfp(rawOfp),
+      rawOfp,
+    });
+    // Signed in as someone else.
+    app = await buildApp(
+      testDeps({ flightPlans, authenticate: () => Promise.resolve(OTHER_PILOT) }),
+    );
+
+    const list = await app.inject({ method: 'GET', url: '/api/flight-plans' });
+    const open = await app.inject({ method: 'GET', url: `/api/flight-plans/${id}` });
+    const remove = await app.inject({ method: 'DELETE', url: `/api/flight-plans/${id}` });
+
+    expect(list.json()).toEqual({ items: [], nextCursor: null });
+    // Exactly like a plan that does not exist: the id is not even confirmed.
+    for (const res of [open, remove]) {
+      expect(res.statusCode).toBe(404);
+      expect(res.json<{ error: { code: string } }>().error.code).toBe('FLIGHT_PLAN_NOT_FOUND');
+    }
+    await expect(flightPlans.get(id)).resolves.not.toBeNull();
+  });
+});
+
+describe('without signing in', () => {
+  it('every pilot route answers 401, while health stays open', async () => {
+    app = await buildApp(testDeps({ authenticate: () => Promise.resolve(null) }));
+    const id = '00000000-0000-4000-8000-000000000000';
+
+    for (const [method, url] of [
+      ['GET', '/api/pilot'],
+      ['PUT', '/api/pilot'],
+      ['GET', '/api/simbrief/latest'],
+      ['GET', '/api/flight-plans'],
+      ['POST', '/api/flight-plans/import'],
+      ['GET', `/api/flight-plans/${id}`],
+      ['DELETE', `/api/flight-plans/${id}`],
+      ['GET', `/api/flight-plans/${id}/weather`],
+      ['POST', `/api/flight-plans/${id}/weather/refresh`],
+      ['GET', `/api/flight-plans/${id}/hazards`],
+      ['POST', `/api/flight-plans/${id}/hazards/refresh`],
+      ['GET', `/api/flight-plans/${id}/briefings/latest`],
+      ['POST', `/api/flight-plans/${id}/briefings`],
+    ] as const) {
+      const res = await app.inject({ method, url });
+      expect(res.statusCode, `${method} ${url}`).toBe(401);
+      expect(res.json()).toEqual({
+        error: { code: 'UNAUTHENTICATED', message: 'Sign in to use OFP Lens.' },
+      });
+    }
+    expect((await app.inject({ method: 'GET', url: '/api/health' })).statusCode).toBe(200);
   });
 });

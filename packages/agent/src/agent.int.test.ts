@@ -26,6 +26,7 @@ import type { ToolDeps } from './tools';
  */
 let testDb: TestDatabase;
 let conn: DbConnection;
+let pilotId: string;
 let planId: string;
 
 beforeAll(async () => {
@@ -34,11 +35,11 @@ beforeAll(async () => {
 });
 beforeEach(async () => {
   await truncateAll(conn.db);
-  await createPilotRepository(conn.db).save({ simbriefUsername: 'jetpilot', weightUnit: 'kgs' });
+  pilotId = (await createPilotRepository(conn.db).create({ simbriefUsername: 'jetpilot' })).id;
   const rawOfp = loadFixture('eddb-eddm-c750-kgs');
   planId = (
     await createFlightPlanRepository(conn.db).import({
-      simbriefUsername: 'jetpilot',
+      pilotId,
       plan: parseOfp(rawOfp),
       rawOfp,
     })

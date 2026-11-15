@@ -1,5 +1,6 @@
 import { afterAll, beforeAll, beforeEach, describe, expect, it } from 'vitest';
-import { createPilotRepository } from './pilots';
+import { eq } from 'drizzle-orm';
+import { createPilotRepository, PilotNotFoundError } from './pilots';
 import { pilots } from './schema';
 import { createTestDatabase, truncateAll, type TestDatabase } from './testing';
 
@@ -15,34 +16,49 @@ beforeEach(async () => {
 });
 
 describe('pilot repository (Postgres)', () => {
-  it('returns null before anything is saved', async () => {
-    await expect(createPilotRepository(testDb.db).get()).resolves.toBeNull();
+  it('has no settings until the pilot saves them', async () => {
+    const repo = createPilotRepository(testDb.db);
+    const { id } = await repo.create();
+
+    await expect(repo.get(id)).resolves.toBeNull();
   });
 
-  it('creates the pilot on first save and reads it back', async () => {
+  it('saves and reads back one pilot’s settings, leaving other pilots alone', async () => {
     const repo = createPilotRepository(testDb.db);
+    const { id } = await repo.create();
+    const other = await repo.create({ simbriefUsername: 'otherpilot', weightUnit: 'kgs' });
+    const [before] = await testDb.db.select().from(pilots).where(eq(pilots.id, id));
 
-    await expect(repo.save({ simbriefUsername: 'jetpilot', weightUnit: 'lbs' })).resolves.toEqual({
+    await expect(
+      repo.save(id, { simbriefUsername: 'jetpilot', weightUnit: 'lbs' }),
+    ).resolves.toEqual({ simbriefUsername: 'jetpilot', weightUnit: 'lbs' });
+
+    await expect(repo.get(id)).resolves.toEqual({
       simbriefUsername: 'jetpilot',
       weightUnit: 'lbs',
     });
-    await expect(repo.get()).resolves.toEqual({ simbriefUsername: 'jetpilot', weightUnit: 'lbs' });
+    await expect(repo.get(other.id)).resolves.toEqual({
+      simbriefUsername: 'otherpilot',
+      weightUnit: 'kgs',
+    });
+    const [after] = await testDb.db.select().from(pilots).where(eq(pilots.id, id));
+    expect(after!.updatedAt.getTime()).toBeGreaterThan(before!.updatedAt.getTime());
   });
 
-  it('updates the same row on later saves', async () => {
+  it('allows two pilots with the same SimBrief username', async () => {
     const repo = createPilotRepository(testDb.db);
-    await repo.save({ simbriefUsername: 'jetpilot', weightUnit: 'kgs' });
-    const [before] = await testDb.db.select().from(pilots);
-
-    await repo.save({ simbriefUsername: 'otherpilot', weightUnit: 'lbs' });
-
-    const rows = await testDb.db.select().from(pilots);
-    expect(rows).toHaveLength(1);
-    expect(rows[0]).toMatchObject({
-      id: before!.id,
-      simbriefUsername: 'otherpilot',
-      weightUnit: 'lbs',
+    await repo.create({ simbriefUsername: 'jetpilot' });
+    await expect(repo.create({ simbriefUsername: 'jetpilot' })).resolves.toEqual({
+      id: expect.any(String),
     });
-    expect(rows[0]!.updatedAt.getTime()).toBeGreaterThan(before!.updatedAt.getTime());
+  });
+
+  it('refuses to save settings for a pilot that does not exist', async () => {
+    await expect(
+      createPilotRepository(testDb.db).save('00000000-0000-4000-8000-000000000000', {
+        simbriefUsername: 'jetpilot',
+        weightUnit: 'kgs',
+      }),
+    ).rejects.toBeInstanceOf(PilotNotFoundError);
   });
 });

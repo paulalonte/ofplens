@@ -50,6 +50,13 @@
       "when": 1794403039842,
       "tag": "0006_hazards_advisories_checked",
       "breakpoints": true
+    },
+    {
+      "idx": 7,
+      "version": "7",
+      "when": 1794740782866,
+      "tag": "0007_pilot_logins",
+      "breakpoints": true
     }
   ]
 }

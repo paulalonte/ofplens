@@ -6,44 +6,45 @@ import {
 } from '@ofplens/ofp';
 import type { FastifyPluginCallbackZod } from 'fastify-type-provider-zod';
 import { z } from 'zod';
+import { planNotFound, signedIn } from '../auth/sessions';
 import { AppError } from '../errors';
+import { perMinute } from '../rateLimits';
 import { fetchLatestPlan, usernameRequired, type SimbriefClient } from '../simbrief';
 
 const PlanParams = z.object({ id: z.uuid('Not a flight plan id') });
-
-const planNotFound = () =>
-  new AppError(
-    404,
-    'FLIGHT_PLAN_NOT_FOUND',
-    'That flight plan does not exist (it may have been deleted).',
-  );
 
 export interface FlightPlanRouteOptions {
   pilots: PilotRepository;
   flightPlans: FlightPlanRepository;
   simbrief: SimbriefClient;
+  /** Imports per minute per pilot (each one calls SimBrief). */
+  rateLimit?: number | undefined;
 }
 
 export const flightPlanRoutes: FastifyPluginCallbackZod<FlightPlanRouteOptions> = (
   app,
-  { pilots, flightPlans, simbrief },
+  { pilots, flightPlans, simbrief, rateLimit },
   done,
 ) => {
   /**
-   * Fetches the saved pilot's latest SimBrief plan and stores it with all its details.
+   * Fetches the signed-in pilot's latest SimBrief plan and stores it with all its details.
    * 201 when stored, 200 when that plan was already imported (nothing written).
    * Errors as for GET /api/simbrief/latest.
    */
   app.post(
     '/api/flight-plans/import',
-    { schema: { response: { 200: ImportFlightPlanResponse, 201: ImportFlightPlanResponse } } },
+    {
+      schema: { response: { 200: ImportFlightPlanResponse, 201: ImportFlightPlanResponse } },
+      config: perMinute(rateLimit),
+    },
     async (request, reply) => {
-      const pilot = await pilots.get();
-      if (!pilot) throw usernameRequired();
+      const pilotId = signedIn(request).id;
+      const settings = await pilots.get(pilotId);
+      if (!settings) throw usernameRequired();
 
-      const { raw, plan } = await fetchLatestPlan(simbrief, pilot.simbriefUsername, request.log);
+      const { raw, plan } = await fetchLatestPlan(simbrief, settings.simbriefUsername, request.log);
       const { id, created } = await flightPlans.import({
-        simbriefUsername: pilot.simbriefUsername,
+        pilotId,
         plan,
         rawOfp: raw,
       });
@@ -56,7 +57,7 @@ export const flightPlanRoutes: FastifyPluginCallbackZod<FlightPlanRouteOptions> 
     },
   );
 
-  /** History, newest first. Without saved settings there is simply no history yet. */
+  /** The signed-in pilot's history, newest first. */
   app.get(
     '/api/flight-plans',
     {
@@ -69,11 +70,9 @@ export const flightPlanRoutes: FastifyPluginCallbackZod<FlightPlanRouteOptions> 
       },
     },
     async (request) => {
-      const pilot = await pilots.get();
-      if (!pilot) return { items: [], nextCursor: null };
       try {
         return await flightPlans.list({
-          simbriefUsername: pilot.simbriefUsername,
+          pilotId: signedIn(request).id,
           limit: request.query.limit,
           cursor: request.query.cursor,
         });
@@ -85,7 +84,10 @@ export const flightPlanRoutes: FastifyPluginCallbackZod<FlightPlanRouteOptions> 
     },
   );
 
-  /** One stored plan, in the same FlightPlanSummary shape as the live briefing. */
+  /**
+   * One stored plan, in the same FlightPlanSummary shape as the live briefing. This and every
+   * other /api/flight-plans/:id route only run for the plan's own pilot (registerSessions).
+   */
   app.get(
     '/api/flight-plans/:id',
     { schema: { params: PlanParams, response: { 200: FlightPlanDetailResponse } } },

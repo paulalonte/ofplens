@@ -164,6 +164,13 @@ jobs:
           curl --fail --silent localhost:8080/healthz
           curl --fail --silent localhost:8080/api/health
           curl --fail --silent localhost:8080/history | grep -q '<div id="root">'
+      - name: Sign-in through the web container
+        run: |
+          test "$(curl --silent -o /dev/null -w '%{http_code}' localhost:8080/api/pilot)" = 401
+          curl --fail --silent -c cookies -H 'content-type: application/json' \
+            -d '{"name":"CI Pilot"}' localhost:8080/api/auth/dev
+          curl --fail --silent -b cookies localhost:8080/api/auth/session | grep -q '"CI Pilot"'
+          curl --fail --silent -b cookies localhost:8080/api/pilot
       - name: Logs
         if: failure()
         run: docker compose --profile app logs
@@ -192,8 +199,18 @@ jobs:
 
       - name: The app answers through the ingress
         run: |
-          curl --fail --silent localhost:8088/api/health
-          curl --fail --silent localhost:8088/history | grep -q '<div id="root">'
+          # helm --wait returns as soon as the pods are ready; Traefik learns about them a
+          # moment later (it watches the cluster). Until then it has nowhere to route, so
+          # retry for up to 30 seconds instead of failing on that gap.
+          curl --fail --silent --retry 15 --retry-delay 2 --retry-all-errors \
+            localhost:8088/api/health
+          curl --fail --silent --retry 15 --retry-delay 2 --retry-all-errors \
+            localhost:8088/history | grep -q '<div id="root">'
+          # Signed out: 401. Development sign-in, then the cookie works through the ingress.
+          test "$(curl --silent -o /dev/null -w '%{http_code}' localhost:8088/api/pilot)" = 401
+          curl --fail --silent -c cookies -H 'content-type: application/json' \
+            -d '{"name":"CI Pilot"}' localhost:8088/api/auth/dev
+          curl --fail --silent -b cookies localhost:8088/api/pilot
 
       - name: Cluster state
         if: failure()

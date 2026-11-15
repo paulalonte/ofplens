@@ -34,7 +34,8 @@ export async function apiFetch<T>(
     throw new ApiError(0, 'NETWORK_ERROR', 'Could not reach the API');
   }
 
-  const body: unknown = await res.json().catch(() => undefined);
+  // 204 No Content has no body to parse.
+  const body: unknown = res.status === 204 ? undefined : await res.json().catch(() => undefined);
 
   if (res.ok || acceptStatus.includes(res.status)) {
     const parsed = schema.safeParse(body);

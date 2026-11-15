@@ -76,11 +76,14 @@ describe('migrations', () => {
     `);
     expect(rows.map((r) => r.table_name)).toEqual([
       'advisories',
+      'briefing_usage',
       'briefings',
       'flight_plan_fuel',
       'flight_plan_weights',
       'flight_plans',
+      'pilot_identities',
       'pilots',
+      'sessions',
       'waypoints',
       'weather_reports',
     ]);

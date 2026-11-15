@@ -10,6 +10,7 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as SignInRouteImport } from './routes/sign-in'
 import { Route as HistoryIndexRouteImport } from './routes/history/index'
 import { Route as HistoryPlanIdRouteImport } from './routes/history/$planId'
 import { Route as SampleNameRouteImport } from './routes/sample/$name'
@@ -18,6 +19,11 @@ import { Route as SettingsIndexRouteImport } from './routes/settings/index'
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const SignInRoute = SignInRouteImport.update({
+  id: '/sign-in',
+  path: '/sign-in',
   getParentRoute: () => rootRouteImport,
 } as any)
 const HistoryIndexRoute = HistoryIndexRouteImport.update({
@@ -43,6 +49,7 @@ const SettingsIndexRoute = SettingsIndexRouteImport.update({
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/sign-in': typeof SignInRoute
   '/history/$planId': typeof HistoryPlanIdRoute
   '/sample/$name': typeof SampleNameRoute
   '/history/': typeof HistoryIndexRoute
@@ -50,6 +57,7 @@ export interface FileRoutesByFullPath {
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/sign-in': typeof SignInRoute
   '/history/$planId': typeof HistoryPlanIdRoute
   '/sample/$name': typeof SampleNameRoute
   '/history': typeof HistoryIndexRoute
@@ -58,6 +66,7 @@ export interface FileRoutesByTo {
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/sign-in': typeof SignInRoute
   '/history/$planId': typeof HistoryPlanIdRoute
   '/sample/$name': typeof SampleNameRoute
   '/history/': typeof HistoryIndexRoute
@@ -66,12 +75,24 @@ export interface FileRoutesById {
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
-    '/' | '/history/$planId' | '/sample/$name' | '/history/' | '/settings/'
+    | '/'
+    | '/sign-in'
+    | '/history/$planId'
+    | '/sample/$name'
+    | '/history/'
+    | '/settings/'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/history/$planId' | '/sample/$name' | '/history' | '/settings'
+  to:
+    | '/'
+    | '/sign-in'
+    | '/history/$planId'
+    | '/sample/$name'
+    | '/history'
+    | '/settings'
   id:
     | '__root__'
     | '/'
+    | '/sign-in'
     | '/history/$planId'
     | '/sample/$name'
     | '/history/'
@@ -80,6 +101,7 @@ export interface FileRouteTypes {
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  SignInRoute: typeof SignInRoute
   HistoryPlanIdRoute: typeof HistoryPlanIdRoute
   SampleNameRoute: typeof SampleNameRoute
   HistoryIndexRoute: typeof HistoryIndexRoute
@@ -93,6 +115,13 @@ declare module '@tanstack/react-router' {
       path: '/'
       fullPath: '/'
       preLoaderRoute: typeof IndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/sign-in': {
+      id: '/sign-in'
+      path: '/sign-in'
+      fullPath: '/sign-in'
+      preLoaderRoute: typeof SignInRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/history/': {
@@ -128,6 +157,7 @@ declare module '@tanstack/react-router' {
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  SignInRoute: SignInRoute,
   HistoryPlanIdRoute: HistoryPlanIdRoute,
   SampleNameRoute: SampleNameRoute,
   HistoryIndexRoute: HistoryIndexRoute,

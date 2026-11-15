@@ -1,10 +1,13 @@
 import type {
+  AuthRepository,
   BriefingRepository,
   FlightPlanRepository,
   HazardRepository,
   ImportFlightPlanInput,
   PilotRepository,
   PilotSettingsRecord,
+  SessionPilot,
+  SignInProfile,
   WeatherRepository,
 } from '@ofplens/db';
 import {
@@ -14,27 +17,86 @@ import {
   type WeatherClient,
 } from '@ofplens/weather';
 import type { AppDeps } from '../app';
+import type { Authenticate } from '../auth/sessions';
 import type { SimbriefClient } from '../simbrief';
 
-/** In-memory stand-in for the Postgres-backed pilot repository. */
+/** The pilot route tests run as (see testDeps), and a second one for isolation tests. */
+export const TEST_PILOT: SessionPilot = {
+  id: '11111111-1111-4111-8111-111111111111',
+  displayName: 'Test Pilot',
+  email: null,
+  avatarUrl: null,
+};
+export const OTHER_PILOT: SessionPilot = {
+  id: '22222222-2222-4222-8222-222222222222',
+  displayName: 'Other Pilot',
+  email: null,
+  avatarUrl: null,
+};
+
+/** In-memory stand-in for the pilot repository. `initial` = TEST_PILOT's saved settings. */
 export function createInMemoryPilotRepository(
   initial: PilotSettingsRecord | null = null,
-): PilotRepository & { saved: PilotSettingsRecord[] } {
-  let current = initial;
-  const saved: PilotSettingsRecord[] = [];
+): PilotRepository & { saved: (PilotSettingsRecord & { pilotId: string })[] } {
+  const settings = new Map<string, PilotSettingsRecord>();
+  if (initial) settings.set(TEST_PILOT.id, initial);
+  const saved: (PilotSettingsRecord & { pilotId: string })[] = [];
   return {
     saved,
-    get: () => Promise.resolve(current),
-    save: (settings) => {
-      current = { ...settings };
-      saved.push(current);
-      return Promise.resolve(current);
+    get: (pilotId) => Promise.resolve(settings.get(pilotId) ?? null),
+    save: (pilotId, record) => {
+      settings.set(pilotId, { ...record });
+      saved.push({ pilotId, ...record });
+      return Promise.resolve({ ...record });
+    },
+    create: () => Promise.reject(new Error('pilots.create was not expected in this test')),
+  };
+}
+
+/**
+ * In-memory sign-in: pilots by provider and subject, sessions by token. Postgres behaviour
+ * (hashing, expiry, claiming) is covered by the integration tests.
+ */
+export function createInMemoryAuthRepository(): AuthRepository & {
+  signIns: SignInProfile[];
+  sessions: Map<string, SessionPilot>;
+} {
+  const pilots = new Map<string, SessionPilot>();
+  const sessions = new Map<string, SessionPilot>();
+  const signIns: SignInProfile[] = [];
+  return {
+    signIns,
+    sessions,
+    signIn: (profile) => {
+      signIns.push(profile);
+      const key = `${profile.provider}:${profile.subject}`;
+      const existing = pilots.get(key);
+      const pilot = {
+        id: existing?.id ?? crypto.randomUUID(),
+        displayName: profile.displayName,
+        email: profile.email,
+        avatarUrl: profile.avatarUrl,
+      };
+      pilots.set(key, pilot);
+      return Promise.resolve({ pilotId: pilot.id, created: !existing, claimed: false });
+    },
+    createSession: (pilotId, { ttlMs }) => {
+      const pilot = [...pilots.values()].find((p) => p.id === pilotId);
+      if (!pilot) return Promise.reject(new Error(`No pilot ${pilotId}`));
+      const token = `token-${crypto.randomUUID()}`;
+      sessions.set(token, pilot);
+      return Promise.resolve({ token, expiresAt: new Date(Date.now() + ttlMs) });
+    },
+    findSession: (token) => Promise.resolve(sessions.get(token) ?? null),
+    deleteSession: (token) => {
+      sessions.delete(token);
+      return Promise.resolve();
     },
   };
 }
 
 /**
- * In-memory stand-in for the flight plan repository: idempotent on the SimBrief request id,
+ * In-memory stand-in for the flight plan repository: idempotent per pilot on the SimBrief request id,
  * newest first, cursor = id of the previous page's last item. The Postgres behaviour itself
  * is covered by the integration tests.
  */
@@ -44,19 +106,20 @@ export function createInMemoryFlightPlanRepository(): FlightPlanRepository & {
   const imported = new Map<string, ImportFlightPlanInput & { id: string }>();
   const importedAt = '2026-11-09T20:00:00Z';
   const byId = (id: string) => [...imported.values()].find((p) => p.id === id);
+  const key = (input: ImportFlightPlanInput) => `${input.pilotId}:${input.plan.simbriefRequestId}`;
 
   return {
     imported,
     import: (input) => {
-      const existing = imported.get(input.plan.simbriefRequestId);
+      const existing = imported.get(key(input));
       if (existing) return Promise.resolve({ id: existing.id, created: false });
       const id = crypto.randomUUID();
-      imported.set(input.plan.simbriefRequestId, { ...input, id });
+      imported.set(key(input), { ...input, id });
       return Promise.resolve({ id, created: true });
     },
-    list: ({ simbriefUsername, limit, cursor }) => {
+    list: ({ pilotId, limit, cursor }) => {
       const all = [...imported.values()]
-        .filter((p) => p.simbriefUsername === simbriefUsername)
+        .filter((p) => p.pilotId === pilotId)
         .sort(
           (a, b) =>
             b.plan.generatedAt.localeCompare(a.plan.generatedAt) || b.id.localeCompare(a.id),
@@ -85,9 +148,10 @@ export function createInMemoryFlightPlanRepository(): FlightPlanRepository & {
       const stored = byId(id);
       return Promise.resolve(stored ? { id, importedAt, plan: stored.plan } : null);
     },
+    ownerOf: (id) => Promise.resolve(byId(id)?.pilotId ?? null),
     delete: (id) => {
       const stored = byId(id);
-      if (stored) imported.delete(stored.plan.simbriefRequestId);
+      if (stored) imported.delete(key(stored));
       return Promise.resolve(stored !== undefined);
     },
   };
@@ -165,10 +229,16 @@ export function createFakeWeatherClient(
 const unavailable = () =>
   new WeatherUnavailableError('aviationweather.gov returned HTTP 503 (after one retry)');
 
-/** Dependencies for buildApp() in route tests: a healthy DB, empty repositories, no SimBrief. */
+/**
+ * Dependencies for buildApp() in route tests: a healthy DB, empty repositories, no SimBrief,
+ * signed in as TEST_PILOT, and no rate limits.
+ */
 export function testDeps(overrides: Partial<AppDeps> = {}): AppDeps {
   return {
     pingDb: () => Promise.resolve(),
+    auth: createInMemoryAuthRepository(),
+    authenticate: () => Promise.resolve(TEST_PILOT),
+    rateLimits: false,
     pilots: createInMemoryPilotRepository(),
     flightPlans: createInMemoryFlightPlanRepository(),
     weatherReports: createNoWeatherRepository(),
@@ -180,3 +250,9 @@ export function testDeps(overrides: Partial<AppDeps> = {}): AppDeps {
     ...overrides,
   };
 }
+
+/** Signs every request in as the pilot with this id (integration tests on a real database). */
+export const asPilot =
+  (id: string): Authenticate =>
+  () =>
+    Promise.resolve({ id, displayName: null, email: null, avatarUrl: null });

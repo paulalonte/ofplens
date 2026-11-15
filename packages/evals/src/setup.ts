@@ -5,8 +5,10 @@ import {
   createHazardRepository,
   createPilotRepository,
   createWeatherRepository,
+  schema,
   type Database,
 } from '@ofplens/db';
+import { eq } from 'drizzle-orm';
 import { parseOfp, type FlightPlanSummary } from '@ofplens/ofp';
 import { loadFixture } from '@ofplens/ofp/testing';
 import {
@@ -41,9 +43,9 @@ export async function prepareCase(db: Database, evalCase: EvalCase): Promise<Pre
   const plan = { ...parseOfp(raw), simbriefRequestId: `eval:${evalCase.id}:${randomUUID()}` };
   const briefAt = briefingTime(evalCase, plan.times.out);
 
-  await ensureEvalPilot(db);
+  const pilotId = await ensureEvalPilot(db);
   const { id } = await createFlightPlanRepository(db).import({
-    simbriefUsername: EVAL_PILOT,
+    pilotId,
     plan,
     rawOfp: raw,
   });
@@ -64,11 +66,18 @@ export async function prepareCase(db: Database, evalCase: EvalCase): Promise<Pre
 }
 
 /**
- * Creates the pilot the eval plans belong to. Call it once before preparing cases in parallel:
- * on an empty database two first saves at the same time would both insert the pilot.
+ * The pilot the eval plans belong to (SimBrief username EVAL_PILOT), created the first time.
+ * Call it once before preparing cases in parallel: on an empty database two first calls at
+ * the same time would both create one.
  */
-export async function ensureEvalPilot(db: Database): Promise<void> {
-  await createPilotRepository(db).save({ simbriefUsername: EVAL_PILOT, weightUnit: 'kgs' });
+export async function ensureEvalPilot(db: Database): Promise<string> {
+  const [existing] = await db
+    .select({ id: schema.pilots.id })
+    .from(schema.pilots)
+    .where(eq(schema.pilots.simbriefUsername, EVAL_PILOT))
+    .limit(1);
+  if (existing) return existing.id;
+  return (await createPilotRepository(db).create({ simbriefUsername: EVAL_PILOT })).id;
 }
 
 const down = () =>

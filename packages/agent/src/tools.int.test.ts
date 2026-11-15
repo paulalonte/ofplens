@@ -33,6 +33,7 @@ import { fixtureHazardClient } from './testing/routeHazards';
  */
 let testDb: TestDatabase;
 let conn: DbConnection;
+let pilotId: string;
 
 beforeAll(async () => {
   testDb = await createTestDatabase();
@@ -40,7 +41,7 @@ beforeAll(async () => {
 });
 beforeEach(async () => {
   await truncateAll(conn.db);
-  await createPilotRepository(conn.db).save({ simbriefUsername: 'jetpilot', weightUnit: 'kgs' });
+  pilotId = (await createPilotRepository(conn.db).create({ simbriefUsername: 'jetpilot' })).id;
 });
 afterAll(async () => {
   await conn.close();
@@ -78,7 +79,7 @@ function deps({ down = false, hazardsDown = false } = {}): ToolDeps {
 async function importPlan(fixture: string): Promise<string> {
   const rawOfp = loadFixture(fixture);
   const { id } = await createFlightPlanRepository(conn.db).import({
-    simbriefUsername: 'jetpilot',
+    pilotId,
     plan: parseOfp(rawOfp),
     rawOfp,
   });

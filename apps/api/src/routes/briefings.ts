@@ -15,7 +15,9 @@ import {
 import type { BriefingRepository, BriefingRow } from '@ofplens/db';
 import type { FastifyPluginCallbackZod } from 'fastify-type-provider-zod';
 import { z } from 'zod';
+import { signedIn } from '../auth/sessions';
 import { AppError } from '../errors';
+import { perMinute } from '../rateLimits';
 
 export interface BriefingRouteOptions {
   briefings: BriefingRepository;
@@ -24,9 +26,13 @@ export interface BriefingRouteOptions {
   /** Null when no ANTHROPIC_API_KEY is configured: briefings answer 503. */
   anthropic: Anthropic | null;
   config: Partial<BriefingConfig> & { model: string };
-  /** Briefings allowed in any rolling 24 hours, across all plans. */
+  /** Briefings one pilot may start in any rolling 24 hours, across all their plans. */
   dailyLimit: number;
+  /** Briefings all pilots together may start in any rolling 24 hours. */
+  globalDailyLimit: number;
   now?: () => Date;
+  /** Starts per minute per pilot (on top of the daily limits). */
+  rateLimit?: number | undefined;
 }
 
 const PlanParams = z.object({ id: z.uuid('Not a flight plan id') });
@@ -34,7 +40,16 @@ const DAY_MS = 24 * 3600 * 1000;
 
 export const briefingRoutes: FastifyPluginCallbackZod<BriefingRouteOptions> = (
   app,
-  { briefings, tools, anthropic, config, dailyLimit, now = () => new Date() },
+  {
+    briefings,
+    tools,
+    anthropic,
+    config,
+    dailyLimit,
+    globalDailyLimit,
+    now = () => new Date(),
+    rateLimit,
+  },
   done,
 ) => {
   /** The plan's most recent briefing (done, failed or still running), or null. */
@@ -42,7 +57,6 @@ export const briefingRoutes: FastifyPluginCallbackZod<BriefingRouteOptions> = (
     '/api/flight-plans/:id/briefings/latest',
     { schema: { params: PlanParams, response: { 200: LatestBriefingResponse } } },
     async (request) => {
-      if (!(await tools.flightPlans.get(request.params.id))) throw planNotFound();
       const row = await briefings.latest(request.params.id);
       return { briefing: row ? toStored(row) : null };
     },
@@ -51,11 +65,12 @@ export const briefingRoutes: FastifyPluginCallbackZod<BriefingRouteOptions> = (
   /**
    * Runs the briefing agent and streams progress as Server-Sent Events: `started`, one `tool`
    * per tool call, then `done` or `failed` with the stored briefing. Checks before streaming
-   * answer as ordinary JSON errors: 503 not configured, 404, 429 daily limit, 409 already running.
+   * answer as ordinary JSON errors: 503 not configured, 404, 429 a daily limit, 409 already
+   * running.
    */
   app.post(
     '/api/flight-plans/:id/briefings',
-    { schema: { params: PlanParams } },
+    { schema: { params: PlanParams }, config: perMinute(rateLimit) },
     async (request, reply) => {
       const flightPlanId = request.params.id;
       if (!anthropic) {
@@ -65,25 +80,39 @@ export const briefingRoutes: FastifyPluginCallbackZod<BriefingRouteOptions> = (
           'AI briefings are not set up on this server: add ANTHROPIC_API_KEY to .env and restart.',
         );
       }
-      if (!(await tools.flightPlans.get(flightPlanId))) throw planNotFound();
-      const at = now();
-      if ((await briefings.countSince(new Date(at.getTime() - DAY_MS))) >= dailyLimit) {
-        throw new AppError(
-          429,
-          'BRIEFING_DAILY_LIMIT',
-          `The limit of ${dailyLimit} briefings per day has been reached. Try again later.`,
-        );
-      }
       const started = await briefings.start(
-        { flightPlanId, model: config.model, promptVersion: PROMPT_VERSION },
-        { now: at },
+        {
+          flightPlanId,
+          pilotId: signedIn(request).id,
+          model: config.model,
+          promptVersion: PROMPT_VERSION,
+        },
+        {
+          now: now(),
+          limits: { perPilot: dailyLimit, global: globalDailyLimit, windowMs: DAY_MS },
+        },
       );
-      if (!started) {
-        throw new AppError(
-          409,
-          'BRIEFING_IN_PROGRESS',
-          'A briefing for this plan is already running.',
-        );
+      switch (started.status) {
+        case 'started':
+          break;
+        case 'in-progress':
+          throw new AppError(
+            409,
+            'BRIEFING_IN_PROGRESS',
+            'A briefing for this plan is already running.',
+          );
+        case 'pilot-limit':
+          throw new AppError(
+            429,
+            'BRIEFING_DAILY_LIMIT',
+            `You have used your ${dailyLimit} briefings for the last 24 hours. Try again later.`,
+          );
+        case 'global-limit':
+          throw new AppError(
+            429,
+            'BRIEFING_GLOBAL_LIMIT',
+            'OFP Lens has reached its briefing limit for today. Try again later.',
+          );
       }
 
       // From here on the answer is an event stream.
@@ -141,13 +170,6 @@ export const briefingRoutes: FastifyPluginCallbackZod<BriefingRouteOptions> = (
 
   done();
 };
-
-const planNotFound = () =>
-  new AppError(
-    404,
-    'FLIGHT_PLAN_NOT_FOUND',
-    'That flight plan does not exist (it may have been deleted).',
-  );
 
 function crashedRun(model: string, err: unknown): BriefingRun {
   return {

@@ -9,6 +9,15 @@ test.describe.configure({ mode: 'serial' });
 
 const PLAN_URL = /\/history\/[0-9a-f-]{36}(\?.*)?$/;
 
+/** Development sign-in (DEV_SIGN_IN): the same name is the same pilot across tests. */
+async function signIn(page: Page, name = 'E2E Pilot') {
+  await page.goto('/');
+  await expect(page.getByRole('heading', { name: 'Sign in' })).toBeVisible();
+  await page.getByLabel('Pilot name').fill(name);
+  await page.getByRole('button', { name: `Sign in as ${name}` }).click();
+  await expect(page.getByRole('navigation', { name: 'Main' })).toBeVisible();
+}
+
 async function saveSettings(page: Page, username: string, unit: 'kg' | 'lb') {
   await page
     .getByRole('navigation', { name: 'Main' })
@@ -28,8 +37,13 @@ async function goHome(page: Page) {
   await expect(page.getByRole('button', { name: 'Load latest plan' })).toBeVisible();
 }
 
-test('a new pilot is asked for their SimBrief username first', async ({ page }) => {
-  await page.goto('/');
+test('a new pilot signs in and is asked for their SimBrief username first', async ({ page }) => {
+  await page.goto('/history');
+  // Signed out: every page leads to sign-in, still marked as simulation only.
+  await expect(page).toHaveURL(/\/sign-in\?redirect=%2Fhistory$/);
+  await expect(page.getByText('For flight simulation use only.')).toBeVisible();
+
+  await signIn(page);
 
   await expect(page.getByRole('status').filter({ hasText: 'API ok, DB up' })).toBeVisible();
   await expect(page.getByText('Set your SimBrief username first.')).toBeVisible();
@@ -38,7 +52,7 @@ test('a new pilot is asked for their SimBrief username first', async ({ page }) 
 });
 
 test('load a plan, find it in History, open it, delete it', async ({ page }) => {
-  await page.goto('/');
+  await signIn(page);
   await saveSettings(page, 'e2epilot', 'kg');
   await goHome(page);
 
@@ -173,7 +187,7 @@ test('load a plan, find it in History, open it, delete it', async ({ page }) => 
 });
 
 test('an unknown SimBrief user gets a clear message and a way to fix it', async ({ page }) => {
-  await page.goto('/');
+  await signIn(page);
   await saveSettings(page, 'nobody', 'kg');
   await goHome(page);
 
@@ -184,4 +198,39 @@ test('an unknown SimBrief user gets a clear message and a way to fix it', async 
   await expect(alert).toContainText('Unknown UserID');
   await alert.getByRole('link', { name: 'Check your username in Settings' }).click();
   await expect(page.getByLabel('SimBrief username')).toHaveValue('nobody');
+});
+
+test('two pilots each see only their own plans, and signing out ends the session', async ({
+  browser,
+}) => {
+  // Two browsers with their own cookies: Ana and Ben.
+  const ana = await (await browser.newContext()).newPage();
+  const ben = await (await browser.newContext()).newPage();
+
+  await signIn(ana, 'Ana');
+  await saveSettings(ana, 'e2epilot', 'kg');
+  await goHome(ana);
+  await ana.getByRole('button', { name: 'Load latest plan' }).click();
+  await expect(ana).toHaveURL(PLAN_URL);
+  const anasPlan = new URL(ana.url()).pathname;
+
+  await signIn(ben, 'Ben');
+  await ben
+    .getByRole('navigation', { name: 'Main' })
+    .getByRole('link', { name: 'History' })
+    .click();
+  await expect(ben.getByText(/No saved plans yet/)).toBeVisible();
+  // Ana's plan, by its exact address, is not there for Ben.
+  await ben.goto(anasPlan);
+  await expect(ben.getByRole('heading', { name: 'Plan not found' })).toBeVisible();
+
+  // Ana still has it.
+  await ana.goto(anasPlan);
+  await expect(ana.getByRole('heading', { level: 1 })).toHaveText('N70P');
+
+  // Signing out: back to sign-in, and the plan's address leads there too.
+  await ana.getByRole('button', { name: 'Sign out' }).click();
+  await expect(ana.getByRole('heading', { name: 'Sign in' })).toBeVisible();
+  await ana.goto(anasPlan);
+  await expect(ana).toHaveURL(/\/sign-in\?redirect=/);
 });

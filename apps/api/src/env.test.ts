@@ -10,9 +10,43 @@ describe('loadEnv', () => {
       HOST: '127.0.0.1',
       PORT: 3000,
       LOG_LEVEL: 'info',
+      PUBLIC_URL: 'http://localhost:5173',
+      DEV_SIGN_IN: false,
+      TRUST_PROXY: false,
       BRIEFING_MODEL: 'claude-haiku-5-5',
-      BRIEFING_DAILY_LIMIT: 20,
+      BRIEFING_DAILY_LIMIT: 10,
+      BRIEFING_GLOBAL_DAILY_LIMIT: 50,
     });
+  });
+
+  it('reads the sign-in settings, and wants each provider’s id and secret together', () => {
+    const env = loadEnv({
+      DATABASE_URL,
+      PUBLIC_URL: 'https://ofplens.example.com/',
+      GITHUB_CLIENT_ID: 'id',
+      GITHUB_CLIENT_SECRET: 'secret',
+      TRUST_PROXY: 'true',
+    });
+    expect(env).toMatchObject({
+      PUBLIC_URL: 'https://ofplens.example.com',
+      GITHUB_CLIENT_ID: 'id',
+      TRUST_PROXY: true,
+    });
+    expect(env.GOOGLE_CLIENT_ID).toBeUndefined();
+    expect(() => loadEnv({ DATABASE_URL, GOOGLE_CLIENT_ID: 'id' })).toThrow(/GOOGLE_CLIENT_SECRET/);
+    expect(() => loadEnv({ DATABASE_URL, GITHUB_CLIENT_SECRET: 's' })).toThrow(/GITHUB_CLIENT_ID/);
+  });
+
+  it('allows development sign-in only on localhost', () => {
+    expect(loadEnv({ DATABASE_URL, DEV_SIGN_IN: 'true' }).DEV_SIGN_IN).toBe(true);
+    expect(
+      loadEnv({ DATABASE_URL, DEV_SIGN_IN: 'true', PUBLIC_URL: 'http://127.0.0.1:4173' })
+        .DEV_SIGN_IN,
+    ).toBe(true);
+    expect(() =>
+      loadEnv({ DATABASE_URL, DEV_SIGN_IN: 'true', PUBLIC_URL: 'https://ofplens.example.com' }),
+    ).toThrow(/DEV_SIGN_IN/);
+    expect(() => loadEnv({ DATABASE_URL, DEV_SIGN_IN: 'maybe' })).toThrow(/DEV_SIGN_IN/);
   });
 
   it('switches briefings off without an API key, and reads the briefing settings', () => {

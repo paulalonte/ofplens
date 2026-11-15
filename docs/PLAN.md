@@ -17,7 +17,8 @@ The core design rule: **numbers come from code, judgement comes from the agent.*
 
 **Non-goals (for now)**
 
-- Multi-user SaaS, payments, or public sign-up. Single user first; auth comes later if it is ever shared.
+- Payments, or a polished public SaaS. Pilots sign in with Google or GitHub (OFP-42) and each
+  sees only their own plans, but this stays a hobby app.
 - Generating SimBrief plans. The app only reads plans I generate on SimBrief.
 - Real-world use. This is for flight simulation only and must say so in the UI.
 
@@ -477,7 +478,7 @@ export const Briefing = z.object({
 
 | Question | Decision |
 | --- | --- |
-| Auth | None until the app is shared. Single pilot row; SimBrief username set in settings. |
+| Auth | Sign in with Google or GitHub (OFP-42, [AUTH.md](AUTH.md)): server-side sessions in Postgres, one pilot per provider account, every plan owned by one pilot. SimBrief username set per pilot in settings. |
 | API framework | Fastify, with Zod via a type provider (e.g. `fastify-type-provider-zod`). |
 | Deployment | AWS with EKS, Helm and Terraform (see [DEPLOYMENT.md](DEPLOYMENT.md)). Firebase skipped: it is built around Firestore and serverless functions, not a Postgres + Node API. |
 | Weight units | Stored in the OFP's unit; UI toggle switches kg and lbs; preference saved on the pilot. |

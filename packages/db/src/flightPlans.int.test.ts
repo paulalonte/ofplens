@@ -4,10 +4,10 @@ import { parseOfp } from '@ofplens/ofp';
 import { loadFixture } from '@ofplens/ofp/testing';
 import { eq, sql } from 'drizzle-orm';
 import { afterAll, beforeAll, beforeEach, describe, expect, it } from 'vitest';
-import { createFlightPlanRepository, InvalidCursorError, PilotNotFoundError } from './flightPlans';
+import { createFlightPlanRepository, InvalidCursorError } from './flightPlans';
 import { MIGRATIONS_FOLDER } from './migrate';
 import { createPilotRepository } from './pilots';
-import { flightPlans, pilots, weatherReports } from './schema';
+import { flightPlans, weatherReports } from './schema';
 import { createTestDatabase, truncateAll, type TestDatabase } from './testing';
 
 let testDb: TestDatabase;
@@ -17,14 +17,15 @@ beforeAll(async () => {
 afterAll(async () => {
   await testDb.destroy();
 });
+let pilotId: string;
 beforeEach(async () => {
   await truncateAll(testDb.db);
-  await createPilotRepository(testDb.db).save({ simbriefUsername: 'jetpilot', weightUnit: 'kgs' });
+  pilotId = (await createPilotRepository(testDb.db).create()).id;
 });
 
 function input(fixture: string) {
   const rawOfp = loadFixture(fixture);
-  return { simbriefUsername: 'jetpilot', plan: parseOfp(rawOfp), rawOfp };
+  return { pilotId, plan: parseOfp(rawOfp), rawOfp };
 }
 
 /** Row counts of every flight plan table. */
@@ -43,9 +44,9 @@ async function counts() {
 describe('flight plan import (Postgres)', () => {
   it('stores the plan with fuel, weights, every waypoint, OFP weather and the raw OFP', async () => {
     const repo = createFlightPlanRepository(testDb.db);
-    const { plan, rawOfp, simbriefUsername } = input('eddb-eddm-c750-kgs');
+    const { plan, rawOfp } = input('eddb-eddm-c750-kgs');
 
-    const result = await repo.import({ simbriefUsername, plan, rawOfp });
+    const result = await repo.import({ pilotId, plan, rawOfp });
 
     expect(result).toEqual({ id: expect.any(String), created: true });
     expect(await counts()).toEqual({ plans: 1, fuel: 1, weights: 1, waypoints: 19, weather: 6 });
@@ -126,12 +127,12 @@ describe('flight plan import (Postgres)', () => {
   });
 
   it('writes nothing when a later step fails (one transaction)', async () => {
-    const { plan, rawOfp, simbriefUsername } = input('eddb-eddm-c750-kgs');
+    const { plan, rawOfp } = input('eddb-eddm-c750-kgs');
     // Plan, fuel and weights insert fine; the waypoint insert then fails on a non-integer.
     plan.waypoints[5] = { ...plan.waypoints[5]!, altitudeFt: 1.5 };
 
     await expect(
-      createFlightPlanRepository(testDb.db).import({ simbriefUsername, plan, rawOfp }),
+      createFlightPlanRepository(testDb.db).import({ pilotId, plan, rawOfp }),
     ).rejects.toThrow();
 
     expect(await counts()).toEqual({ plans: 0, fuel: 0, weights: 0, waypoints: 0, weather: 0 });
@@ -141,10 +142,26 @@ describe('flight plan import (Postgres)', () => {
     await expect(
       createFlightPlanRepository(testDb.db).import({
         ...input('eddb-eddm-c750-kgs'),
-        simbriefUsername: 'nobody',
+        pilotId: '00000000-0000-4000-8000-000000000000',
       }),
-    ).rejects.toBeInstanceOf(PilotNotFoundError);
+    ).rejects.toThrow();
     expect(await counts()).toMatchObject({ plans: 0 });
+  });
+
+  it('gives each pilot their own copy of the same SimBrief plan', async () => {
+    const repo = createFlightPlanRepository(testDb.db);
+    const other = (await createPilotRepository(testDb.db).create()).id;
+
+    const mine = await repo.import(input('eddb-eddm-c750-kgs'));
+    const theirs = await repo.import({ ...input('eddb-eddm-c750-kgs'), pilotId: other });
+    const again = await repo.import({ ...input('eddb-eddm-c750-kgs'), pilotId: other });
+
+    expect(theirs).toEqual({ id: expect.any(String), created: true });
+    expect(theirs.id).not.toBe(mine.id);
+    expect(again).toEqual({ id: theirs.id, created: false });
+    await expect(repo.ownerOf(mine.id)).resolves.toBe(pilotId);
+    await expect(repo.ownerOf(theirs.id)).resolves.toBe(other);
+    await expect(repo.ownerOf('00000000-0000-4000-8000-000000000000')).resolves.toBeNull();
   });
 });
 
@@ -214,7 +231,7 @@ describe('listing plans (Postgres)', () => {
 
   it('is empty before anything is imported', async () => {
     await expect(
-      createFlightPlanRepository(testDb.db).list({ simbriefUsername: 'jetpilot', limit: 10 }),
+      createFlightPlanRepository(testDb.db).list({ pilotId, limit: 10 }),
     ).resolves.toEqual({ items: [], nextCursor: null });
   });
 
@@ -223,7 +240,7 @@ describe('listing plans (Postgres)', () => {
     await repo.import(input('eddb-eddm-c750-kgs')); // generated 13:28:39Z
     const { id } = await repo.import(input('ksfo-kjfk-b739-lbs')); // generated later
 
-    const { items } = await repo.list({ simbriefUsername: 'jetpilot', limit: 10 });
+    const { items } = await repo.list({ pilotId, limit: 10 });
 
     expect(items.map((i) => i.callsign)).toEqual(['UAL1234', 'N70P']);
     expect(items[0]).toEqual({
@@ -254,7 +271,7 @@ describe('listing plans (Postgres)', () => {
     const pageSizes: number[] = [];
     let cursor: string | undefined;
     do {
-      const page = await repo.list({ simbriefUsername: 'jetpilot', limit: 2, cursor });
+      const page = await repo.list({ pilotId, limit: 2, cursor });
       seen.push(...page.items.map((i) => i.simbriefRequestId));
       pageSizes.push(page.items.length);
       cursor = page.nextCursor ?? undefined;
@@ -273,7 +290,7 @@ describe('listing plans (Postgres)', () => {
     await importAt('2026-11-02T10:00:00Z', 'r2');
 
     const page = await createFlightPlanRepository(testDb.db).list({
-      simbriefUsername: 'jetpilot',
+      pilotId,
       limit: 2,
     });
 
@@ -283,12 +300,11 @@ describe('listing plans (Postgres)', () => {
 
   it('only lists the given pilot’s plans', async () => {
     await importAt('2026-11-01T10:00:00Z', 'mine');
-    await testDb.db.insert(pilots).values({ simbriefUsername: 'someoneelse' });
+    const other = (await createPilotRepository(testDb.db).create()).id;
     const repo = createFlightPlanRepository(testDb.db);
-    const theirs = input('ksfo-kjfk-b739-lbs');
-    await repo.import({ ...theirs, simbriefUsername: 'someoneelse' });
+    await repo.import({ ...input('ksfo-kjfk-b739-lbs'), pilotId: other });
 
-    const { items } = await repo.list({ simbriefUsername: 'jetpilot', limit: 10 });
+    const { items } = await repo.list({ pilotId, limit: 10 });
 
     expect(items.map((i) => i.simbriefRequestId)).toEqual(['mine']);
   });
@@ -298,7 +314,7 @@ describe('listing plans (Postgres)', () => {
     async (cursor) => {
       await expect(
         createFlightPlanRepository(testDb.db).list({
-          simbriefUsername: 'jetpilot',
+          pilotId,
           limit: 2,
           cursor,
         }),

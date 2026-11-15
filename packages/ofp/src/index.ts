@@ -5,6 +5,14 @@ export { LandingPlan, parsePerformance, Performance, TakeoffPlan } from './perfo
 export * from './format';
 export { PilotResponse, PilotSettings, SimbriefUsername } from './settings';
 export {
+  AuthSessionResponse,
+  DevSignInRequest,
+  SIGN_IN_ERRORS,
+  SignedInPilot,
+  SignInProvider,
+  type SignInError,
+} from './auth';
+export {
   FlightPlanDetailResponse,
   FlightPlanListItem,
   FlightPlanListResponse,

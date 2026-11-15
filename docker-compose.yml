@@ -39,6 +39,16 @@ services:
       # From your .env if set there; empty switches AI briefings off.
       ANTHROPIC_API_KEY: ${ANTHROPIC_API_KEY:-}
       BRIEFING_MODEL: ${BRIEFING_MODEL:-claude-haiku-5-5}
+      # Sign-in: by name on this local stack, plus Google/GitHub when your .env has a client
+      # registered for this address.
+      PUBLIC_URL: http://localhost:${WEB_PORT:-8080}
+      DEV_SIGN_IN: 'true'
+      GOOGLE_CLIENT_ID: ${GOOGLE_CLIENT_ID:-}
+      GOOGLE_CLIENT_SECRET: ${GOOGLE_CLIENT_SECRET:-}
+      GITHUB_CLIENT_ID: ${GITHUB_CLIENT_ID:-}
+      GITHUB_CLIENT_SECRET: ${GITHUB_CLIENT_SECRET:-}
+      # Only reached through nginx.
+      TRUST_PROXY: 'true'
     depends_on:
       migrate: { condition: service_completed_successfully }
     healthcheck:

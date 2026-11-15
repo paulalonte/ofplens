@@ -26,7 +26,7 @@ history in Postgres. **For flight simulation (X-Plane 12) only.** The plan is in
 | `pnpm db:studio`                       | Browse the dev database in Drizzle Studio                                                                                   |
 | `pnpm test`                            | All Vitest tests: `web` (jsdom), `node` (api, packages), `integration` (`*.int.test.ts`, real Postgres: needs `pnpm db:up`) |
 | `pnpm test --project web`              | Only the web tests (no `--` with pnpm; it is passed on literally)                                                           |
-| `pnpm e2e`                             | Playwright end to end (`e2e/`): real web + API, fresh `ofplens_e2e` DB, fake SimBrief, aviationweather.gov and Claude       |
+| `pnpm e2e`                             | Playwright end to end (`e2e/`): real web + API, fresh `ofplens_e2e` DB, development sign-in, fake SimBrief, weather, Claude |
 | `pnpm lint` / `pnpm typecheck`         | ESLint (type-aware) / `tsc --noEmit` in every workspace                                                                     |
 | `pnpm format` / `pnpm format:check`    | Prettier                                                                                                                    |
 | `pnpm fixture:capture <name>`          | Save your latest SimBrief OFP (pilot ID redacted) to `fixtures/ofp/`                                                        |
@@ -101,6 +101,11 @@ there is no build step between packages.
 - API routes are tested with `app.inject()` and
   injected dependencies (e.g. `pingDb`), not a live server.
 - Every page shows that the app is for simulation use only.
+- **Sign-in (OFP-42, docs/AUTH.md):** every `/api` route needs a session except `/api/health`
+  and `/api/auth/*` (one hook in `apps/api/src/auth/sessions.ts`). Routes read the pilot with
+  `signedIn(request)` and scope queries by pilot id. `/api/flight-plans/:id/...` routes are
+  checked for ownership by the same hook (404 for another pilot's plan), so put new plan routes
+  under that path. Locally, `DEV_SIGN_IN=true` in `.env` signs in by name.
 
 ## Workflow
 

@@ -9,3 +9,8 @@ data:
   LOG_LEVEL: {{ .Values.api.logLevel | quote }}
   BRIEFING_MODEL: {{ .Values.api.briefingModel | quote }}
   BRIEFING_DAILY_LIMIT: {{ .Values.api.briefingDailyLimit | quote }}
+  BRIEFING_GLOBAL_DAILY_LIMIT: {{ .Values.api.briefingGlobalDailyLimit | quote }}
+  PUBLIC_URL: {{ required "api.publicUrl is required: where pilots open the app (sign-in callbacks go there)" .Values.api.publicUrl | quote }}
+  DEV_SIGN_IN: {{ .Values.api.devSignIn | quote }}
+  # The API is only reached through the ingress (and nginx): trust their X-Forwarded-For.
+  TRUST_PROXY: "true"

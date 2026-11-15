@@ -36,6 +36,13 @@ export default defineConfig({
       env: {
         DATABASE_URL: e2eDatabaseUrl(),
         PORT: String(API_PORT),
+        // Sign in by name; no Google or GitHub (env set here wins over .env).
+        PUBLIC_URL: `http://127.0.0.1:${WEB_PORT}`,
+        DEV_SIGN_IN: 'true',
+        GOOGLE_CLIENT_ID: '',
+        GOOGLE_CLIENT_SECRET: '',
+        GITHUB_CLIENT_ID: '',
+        GITHUB_CLIENT_SECRET: '',
         SIMBRIEF_URL: `http://127.0.0.1:${FAKE_UPSTREAMS_PORT}/api/xml.fetcher.php`,
         AVIATION_WEATHER_URL: `http://127.0.0.1:${FAKE_UPSTREAMS_PORT}/api/data`,
         // Never a real key or the real API here, even when .env has one: env set here wins.

@@ -1,5 +1,6 @@
 import { countRows, createTestDatabase, truncateAll, type TestDatabase } from '@ofplens/db/testing';
 import {
+  createAuthRepository,
   createBriefingRepository,
   createDb,
   createFlightPlanRepository,
@@ -15,6 +16,7 @@ import { createCachedWeatherClient, createWeatherClient } from '@ofplens/weather
 import { loadWeatherFixture } from '@ofplens/weather/testing';
 import { afterAll, afterEach, beforeAll, beforeEach, describe, expect, it, vi } from 'vitest';
 import { buildApp, type App } from '../app';
+import { asPilot } from '../testing/fakes';
 
 /**
  * Live weather end to end through the API and Postgres. aviationweather.gov is replaced only at
@@ -24,6 +26,7 @@ import { buildApp, type App } from '../app';
 let testDb: TestDatabase;
 let conn: DbConnection;
 let app: App | undefined;
+let pilotId: string;
 
 beforeAll(async () => {
   testDb = await createTestDatabase();
@@ -31,7 +34,9 @@ beforeAll(async () => {
 });
 beforeEach(async () => {
   await truncateAll(conn.db);
-  await createPilotRepository(conn.db).save({ simbriefUsername: 'jetpilot', weightUnit: 'kgs' });
+  pilotId = (
+    await createPilotRepository(conn.db).create({ simbriefUsername: 'jetpilot', weightUnit: 'kgs' })
+  ).id;
 });
 afterEach(async () => {
   await app?.close();
@@ -76,6 +81,9 @@ function fakeAviationWeather(
 async function start(fake: ReturnType<typeof fakeAviationWeather>, now = () => Date.now()) {
   app = await buildApp({
     pingDb: () => pingDb(conn.db),
+    auth: createAuthRepository(conn.db),
+    authenticate: asPilot(pilotId),
+    rateLimits: false,
     pilots: createPilotRepository(conn.db),
     flightPlans: createFlightPlanRepository(conn.db),
     weatherReports: createWeatherRepository(conn.db),
@@ -92,7 +100,7 @@ async function start(fake: ReturnType<typeof fakeAviationWeather>, now = () => D
 async function importPlan(fixture: string): Promise<string> {
   const rawOfp = loadFixture(fixture);
   const { id } = await createFlightPlanRepository(conn.db).import({
-    simbriefUsername: 'jetpilot',
+    pilotId,
     plan: parseOfp(rawOfp),
     rawOfp,
   });

@@ -5,7 +5,7 @@ type Handler = (request: { body: unknown; url: URL }) => Response | Promise<Resp
 
 /**
  * Replaces fetch with a tiny fake API. Keys are "METHOD /path", e.g. "GET /api/pilot".
- * /api/health answers "ok" unless overridden, and a plan's weather answers "nothing to show,
+ * /api/health answers "ok" and /api/auth/session "signed in as TEST_SESSION" unless overridden, and a plan's weather answers "nothing to show,
  * checked just now" (so nothing auto-refreshes), its hazards "none, checked just now", and a
  * plan's latest AI briefing answers "none",
  * unless a test gives its own handler.
@@ -15,6 +15,7 @@ export function mockApi(handlers: Record<string, Handler>) {
   const calls: { method: string; path: string; body: unknown }[] = [];
   const all: Record<string, Handler> = {
     'GET /api/health': () => jsonResponse({ status: 'ok', db: 'up' }),
+    'GET /api/auth/session': () => jsonResponse(TEST_SESSION),
     ...handlers,
   };
 
@@ -26,7 +27,7 @@ export function mockApi(handlers: Record<string, Handler>) {
       const method = (init?.method ?? 'GET').toUpperCase();
       const body: unknown = typeof init?.body === 'string' ? JSON.parse(init.body) : undefined;
       const key = `${method} ${url.pathname}`;
-      if (key !== 'GET /api/health') calls.push({ method, path: url.pathname + url.search, body });
+      if (!UNRECORDED.has(key)) calls.push({ method, path: url.pathname + url.search, body });
       const handler =
         all[key] ??
         (QUIET_WEATHER.test(key)
@@ -43,6 +44,21 @@ export function mockApi(handlers: Record<string, Handler>) {
 
   return { calls };
 }
+
+/** Asked on every page: not recorded in `calls`, so tests list only what they care about. */
+const UNRECORDED = new Set(['GET /api/health', 'GET /api/auth/session']);
+
+export const TEST_SESSION = {
+  pilot: {
+    id: '11111111-1111-4111-8111-111111111111',
+    displayName: 'Test Pilot',
+    email: null,
+    avatarUrl: null,
+  },
+  providers: [{ id: 'github', label: 'GitHub' }],
+  devSignIn: false,
+};
+export const SIGNED_OUT = { ...TEST_SESSION, pilot: null };
 
 const QUIET_WEATHER = /^GET \/api\/flight-plans\/[^/]+\/weather$/;
 const quietWeather: Handler = () =>

@@ -1,6 +1,6 @@
 import { afterEach, describe, expect, it } from 'vitest';
 import { buildApp, type App } from '../app';
-import { createInMemoryPilotRepository, testDeps } from '../testing/fakes';
+import { createInMemoryPilotRepository, OTHER_PILOT, TEST_PILOT, testDeps } from '../testing/fakes';
 
 let app: App | undefined;
 afterEach(async () => {
@@ -31,6 +31,20 @@ describe('GET /api/pilot', () => {
   });
 });
 
+describe('settings per pilot', () => {
+  it('shows each pilot only their own settings', async () => {
+    const pilots = createInMemoryPilotRepository({
+      simbriefUsername: 'jetpilot',
+      weightUnit: 'lbs',
+    });
+    app = await buildApp(testDeps({ pilots, authenticate: () => Promise.resolve(OTHER_PILOT) }));
+
+    expect((await app.inject({ method: 'GET', url: '/api/pilot' })).json()).toEqual({
+      pilot: null,
+    });
+  });
+});
+
 describe('PUT /api/pilot', () => {
   it('saves trimmed settings and returns them', async () => {
     const pilots = createInMemoryPilotRepository();
@@ -44,7 +58,9 @@ describe('PUT /api/pilot', () => {
 
     expect(res.statusCode).toBe(200);
     expect(res.json()).toEqual({ pilot: { simbriefUsername: 'jetpilot', weightUnit: 'kgs' } });
-    expect(pilots.saved).toEqual([{ simbriefUsername: 'jetpilot', weightUnit: 'kgs' }]);
+    expect(pilots.saved).toEqual([
+      { pilotId: TEST_PILOT.id, simbriefUsername: 'jetpilot', weightUnit: 'kgs' },
+    ]);
 
     const after = await app.inject({ method: 'GET', url: '/api/pilot' });
     expect(after.json()).toEqual({ pilot: { simbriefUsername: 'jetpilot', weightUnit: 'kgs' } });

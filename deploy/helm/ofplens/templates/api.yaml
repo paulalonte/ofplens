@@ -48,12 +48,15 @@ spec:
                 name: {{ include "ofplens.name" . }}-api
           env:
             {{- include "ofplens.secretEnv" . | nindent 12 }}
-            - name: ANTHROPIC_API_KEY
+            # Optional keys: a feature without its key is simply off (no briefings, no button).
+            {{- range list "ANTHROPIC_API_KEY" "GOOGLE_CLIENT_ID" "GOOGLE_CLIENT_SECRET" "GITHUB_CLIENT_ID" "GITHUB_CLIENT_SECRET" }}
+            - name: {{ . }}
               valueFrom:
                 secretKeyRef:
-                  name: {{ .Values.existingSecret }}
-                  key: ANTHROPIC_API_KEY
+                  name: {{ $.Values.existingSecret }}
+                  key: {{ . }}
                   optional: true
+            {{- end }}
           # Ready = can serve: the API and its database answer. Not ready pods get no traffic.
           readinessProbe:
             httpGet:

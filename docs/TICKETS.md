@@ -515,6 +515,21 @@ check and per prompt version, so prompt or model changes are measured, not guess
   the value now is what the pilot sets and flies with. The headwind/tailwind row is named after
   the wind now, and a value 5 kt or more worse than planned is amber.
 
+### OFP-42 · Pilot logins and multiple pilots
+- Deployment step 3 ([DEPLOYMENT.md](DEPLOYMENT.md)): before anyone else uses the app, pilots
+  sign in, and each one's plans, settings and briefings are theirs alone.
+- **Done when:** two pilots each see only their own plans, and the limits are tested.
+- *As built:* Sign in with Google (OpenID Connect) and GitHub (OAuth 2.0) through `arctic`,
+  with state and PKCE; server-side sessions in Postgres (hash of the token only) in an
+  HttpOnly, SameSite=Lax cookie; development sign-in by name, refused unless `PUBLIC_URL` is
+  localhost, for local work and end-to-end tests. One hook requires a session on every `/api`
+  route but health and sign-in; one checks ownership on every `/api/flight-plans/:id` route and
+  answers 404 for another pilot's plan. The same SimBrief plan imported by two pilots is two
+  copies. The first account to sign in takes over the pilot (and history) from before sign-in.
+  AI briefings: 10 per pilot and 50 overall per 24 hours, counted atomically in a usage ledger
+  that deleting plans does not reset; per-minute rate limits on SimBrief, weather, hazards,
+  briefings and sign-in. Setup in [AUTH.md](AUTH.md); learnings in LEARNING.md, step 3.
+
 ---
 
 ## Later phases (not ticketed yet)
@@ -523,4 +538,3 @@ check and per prompt version, so prompt or model changes are measured, not guess
 | --- | --- |
 | 3b Deploy | Steps in [DEPLOYMENT.md](DEPLOYMENT.md): containers, Helm on kind, logins, Terraform + EKS, HTTPS, CI/CD, safety nets |
 | 8 MCP | The `packages/agent` tools exposed to Claude Desktop / Claude Code |
-| Sharing | Auth and multi-pilot support before anyone else uses it (DEPLOYMENT.md step 3) |
