@@ -144,6 +144,10 @@ locally, or in the Kubernetes Secret.
 
 ## Step 4 — AWS foundation with Terraform
 
+**Progress:** step 0's AWS setup is done (Identity Center user, SSO profile `ofplens`,
+eu-central-1). **4a, the bootstrap stack, is built (OFP-43)**: see [infra/README.md](../infra/README.md)
+to apply it. 4b, the cluster stack `infra/aws`, is next.
+
 **You do first:** step 0's AWS items, then log in on your Mac:
 
 ```bash

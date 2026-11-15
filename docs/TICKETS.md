@@ -530,6 +530,19 @@ check and per prompt version, so prompt or model changes are measured, not guess
   that deleting plans does not reset; per-minute rate limits on SimBrief, weather, hazards,
   briefings and sign-in. Setup in [AUTH.md](AUTH.md); learnings in LEARNING.md, step 3.
 
+### OFP-43 · Terraform bootstrap: budget, state bucket, image registry
+- Deployment step 4a ([DEPLOYMENT.md](DEPLOYMENT.md)): what has to exist before any cluster,
+  and stays when the cluster is destroyed.
+- **Done when:** `infra/bootstrap` creates the budget alarm, the state bucket and the ECR
+  repositories, its own state lives in that bucket, and CI checks the Terraform.
+- *As built:* AWS Budgets with alerts at 50% and 100% actual and 100% forecast of $20; state
+  bucket `ofplens-tfstate-<account id>` (versioned, AES-256, Block Public Access, owner
+  enforced, TLS-only policy, 90-day old versions, `prevent_destroy`), S3-native locking (no
+  DynamoDB); ECR `ofplens-api` and `ofplens-web` (immutable tags, scan on push, keep 15,
+  untagged gone after a day). Credentials only from `AWS_PROFILE`; the email only in a
+  git-ignored tfvars. CI: `terraform fmt -check` and `validate`, no AWS access.
+  Run book: [infra/README.md](../infra/README.md).
+
 ---
 
 ## Later phases (not ticketed yet)

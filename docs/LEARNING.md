@@ -443,3 +443,116 @@ plan route, answering 404 for other tenants' objects to avoid IDOR. Costly opera
 per-tenant and global daily quota, enforced atomically with an advisory lock and kept in a
 ledger that deletes can't reset, plus per-minute rate limits. A development-only sign-in makes
 end-to-end tests possible and is refused unless the app runs on localhost."
+
+## Step 4a — AWS account and Terraform bootstrap
+
+**What was set up (by you, in the console)**
+
+- Root user locked away with MFA (a passkey plus an authenticator app); billing visible to
+  IAM; Free Tier alerts on.
+- IAM Identity Center (single-Region, eu-central-1) with your user `paul`, MFA required, and
+  the `AdministratorAccess` permission set assigned to the account.
+- `aws configure sso` on your Mac: profile `ofplens`, temporary credentials, no access keys.
+
+**What was built (in `infra/bootstrap`)**
+
+- An AWS Budgets alarm: emails at 50% and 100% of $20 spent, and when the month is
+  *forecast* to go over.
+- The S3 bucket for Terraform state: private, encrypted, versioned, https-only, and
+  protected from `terraform destroy`.
+- ECR repositories `ofplens-api` and `ofplens-web`: immutable tags, a vulnerability scan on
+  every push, and old images cleaned up automatically.
+- A CI job that checks formatting and validity (no AWS access).
+
+**Concepts: identity**
+
+- **Root vs everyday identities:** root owns the account and can't be limited, so it's only
+  for emergencies. People sign in through IAM Identity Center and *assume a role*
+  (`AWSReservedSSO_AdministratorAccess_…`) with temporary credentials.
+- **Users, permission sets, assignments:** who (a person or group), what (a set of
+  permissions), and where (which AWS account). In companies, groups get the permission sets,
+  and the users come from the company directory (Okta, Google, Entra ID).
+- **No long-lived keys:** `aws configure sso` uses the same OAuth flow with PKCE that you
+  built in step 3, with the CLI listening on `127.0.0.1` for the code. Leaked access keys
+  are the most common way AWS accounts get compromised; SSO doesn't create any.
+- **Least privilege:** you're admin because you're alone. Students, CI and the cluster's pods
+  each get their own narrow role (CI via GitHub OIDC in step 6, pods via IRSA in step 4b).
+- **AWS Organizations:** turning on Identity Center made this account an Organization's
+  *management account*. Companies keep it empty and run workloads in member accounts (dev,
+  prod), one blast radius each. We use one account to keep it simple.
+
+**Concepts: Terraform**
+
+- **Declarative:** the `.tf` files say what should exist. `plan` compares that with what
+  exists (according to the state) and lists the difference; `apply` makes the difference
+  real. It's the same idea as Kubernetes manifests, but for cloud resources.
+- **State:** Terraform's record of which real resource belongs to which block in the code.
+  Lose it and Terraform forgets it created things (they keep running and costing money).
+  Hence: kept in **S3**, **versioned** (any old state can be restored), **encrypted** (state
+  can contain secrets), and **locked** (`use_lockfile`), so two `apply`s can't run at once and
+  corrupt it.
+- **The bootstrap problem:** the stack that creates the state bucket can't store its state
+  there yet. The usual fix, used here: apply once with local state, then
+  `terraform init -migrate-state` into the new bucket.
+- **Providers and the lock file:** the AWS provider is a plugin that turns `.tf` into AWS API
+  calls. `.terraform.lock.hcl` pins its exact build and checksums for Mac and Linux, just
+  like `pnpm-lock.yaml`, so your Mac and CI use identical code. Commit it.
+- **Variables, outputs, `for_each`:** variables are the inputs (your email stays in a
+  git-ignored `terraform.tfvars`); outputs are what other steps need (the bucket name, the
+  ECR URLs); `for_each` creates one resource per item in a set (one ECR repository per image).
+- **`default_tags`:** every resource gets `Project=ofplens`, `ManagedBy=terraform`, so Cost
+  Explorer can show what OFP Lens costs, and anything without the tags was made by hand.
+- **`prevent_destroy`:** Terraform refuses to delete the state bucket. That's a guard rail for
+  the one resource whose loss would be a real problem.
+- **Data sources:** `data "aws_caller_identity"` reads facts, here the account id, without
+  creating anything, so no account-specific value is hard-coded in the repository.
+
+**Concepts: the resources**
+
+- **Budgets, actual vs forecast:** "actual" fires after the money is spent. "Forecast" fires
+  when the trend says the month will go over, which is the alert that catches a cluster
+  someone forgot to destroy. Budgets check a few times a day; it's a net, not a brake. AWS
+  doesn't stop anything when a budget is exceeded.
+- **S3 hardening:** Block Public Access (four switches), `BucketOwnerEnforced` (no ACLs, only
+  IAM and bucket policies), default encryption, and a bucket policy that denies anything not
+  using TLS. That's the standard checklist for any bucket holding something private.
+- **ECR:** a private registry next to the cluster (fast, no Docker Hub rate limits).
+  **Immutable tags** mean `abc123` can never be overwritten with different contents.
+  **Scan on push** lists known CVEs in the image's OS packages. **Lifecycle policies** delete
+  old images so storage costs stay flat.
+
+**What would break in production, and how it's prevented**
+
+| Risk | Prevention here |
+| --- | --- |
+| Root credentials stolen | Root has MFA, no access keys, and isn't used |
+| Access key leaked from a laptop or repo | No access keys: SSO with temporary credentials |
+| A forgotten cluster runs all month | Forecast budget alert, and nightly teardown later |
+| State file lost or corrupted | S3 versioning, locking, `prevent_destroy` |
+| State leaks secrets | Private, encrypted bucket, https-only, never in git |
+| Same image tag pointing at different code | ECR immutable tags |
+| Broken Terraform merged | CI runs `fmt -check` and `validate` on every PR |
+
+**Try it**
+
+```bash
+export AWS_PROFILE=ofplens
+aws sts get-caller-identity
+cd infra/bootstrap
+terraform init && terraform plan     # read it: what will be created, and why
+terraform apply                      # infra/README.md has the whole sequence
+terraform state list                 # what Terraform now manages
+terraform output                     # the bucket name and ECR URLs
+aws budgets describe-budgets --account-id "$(aws sts get-caller-identity --query Account --output text)"
+```
+
+**Interview**
+
+"The account follows AWS's baseline: root is MFA-protected and unused; people sign in through
+IAM Identity Center with permission sets and short-lived credentials, so there are no IAM
+access keys anywhere. Infrastructure is Terraform with remote state in a versioned, encrypted,
+TLS-only S3 bucket with S3-native locking. The bootstrap stack that creates that bucket
+migrates its own state into it after the first apply. A cost budget with actual and forecast
+alerts goes in before anything that costs money. Images live in ECR with immutable tags,
+scan-on-push and lifecycle policies. CI checks formatting and validity on every PR, and
+plan/apply run with human review."

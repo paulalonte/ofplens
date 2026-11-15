@@ -13,3 +13,11 @@ test-results/
 # rebuilt (pnpm eval:report)
 packages/evals/runs/*/traces/
 packages/evals/runs/report.html
+# Terraform: provider downloads, local state (can hold secrets) and your own variable values.
+# .terraform.lock.hcl IS committed: it pins the exact provider builds, like pnpm-lock.yaml.
+.terraform/
+*.tfstate
+*.tfstate.*
+*.tfvars
+!*.tfvars.example
+crash.log
