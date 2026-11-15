@@ -11,10 +11,14 @@ step 4. What each part teaches: [docs/LEARNING.md](../docs/LEARNING.md), step 4.
 **You run every `plan` and `apply` yourself**, signed in with your SSO profile. Nothing here
 holds credentials, and CI only checks formatting and validity.
 
-## Before each session
+## Before running terraform or aws commands
+
+Only your terminal needs this, and only when you run commands: what Terraform created stays on
+AWS without your login. The SSO login expires after a few hours, so check it each time you sit
+down to work (a new terminal tab also needs the `export` again).
 
 ```bash
-export AWS_PROFILE=ofplens          # every terraform and aws command uses your SSO login
+export AWS_PROFILE=ofplens          # this tab's terraform and aws commands use the ofplens profile
 aws sts get-caller-identity         # works? If it says the token expired:
 aws sso login
 ```
@@ -47,8 +51,9 @@ ownership, lifecycle, policy), and two ECR repositories with their lifecycle pol
 **3. Move the state into the bucket:**
 
 ```bash
-BUCKET=$(terraform output -raw state_bucket)
-# Uncomment the terraform { backend "s3" { ... } } block in backend.tf, then:
+BUCKET=$(terraform output -raw state_bucket)   # first: output stops working until the move is done
+# Uncomment the terraform { backend "s3" { ... } } block in backend.tf (already done in git
+# after the first bootstrap; on a brand-new account, comment it out again for step 2), then:
 terraform init -migrate-state -backend-config="bucket=$BUCKET"
 # "Do you want to copy existing state to the new backend?" → yes
 terraform plan        # expect: No changes. The state is now read from S3.
@@ -56,7 +61,8 @@ rm terraform.tfstate terraform.tfstate.backup
 ```
 
 From now on, `terraform init` in this folder needs `-backend-config="bucket=$BUCKET"` once per
-fresh checkout (it is remembered in `.terraform/`).
+fresh checkout (it is remembered in `.terraform/`). The bucket is `ofplens-tfstate-<account id>`;
+the account id stays out of git, which is why it is passed here and not written in `backend.tf`.
 
 **4. Check in the console:**
 
