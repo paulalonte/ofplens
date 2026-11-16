@@ -1,5 +1,14 @@
 # nginx for the web image. ${API_UPSTREAM} is filled in from the environment when the container
 # starts (the official image runs envsubst on /etc/nginx/templates).
+
+# nginx's own MIME list knows .js but not .mjs, so .mjs files went out as
+# application/octet-stream, and browsers refuse to run a module script with that type (the
+# route map's web worker is an .mjs file). This file is included in the http block after
+# mime.types, so this adds to that list instead of replacing it.
+types {
+    text/javascript mjs;
+}
+
 server {
     listen 8080;
     server_name _;
