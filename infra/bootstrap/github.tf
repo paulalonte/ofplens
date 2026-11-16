@@ -24,7 +24,7 @@ resource "aws_iam_openid_connect_provider" "github" {
 
 # Only workflows running on main of this repository (the schedule and manual runs both do).
 # A pull request, a fork or another branch gets a different "sub" and is refused.
-data "aws_iam_policy_document" "teardown_trust" {
+data "aws_iam_policy_document" "main_branch_trust" {
   statement {
     actions = ["sts:AssumeRoleWithWebIdentity"]
 
@@ -50,7 +50,7 @@ data "aws_iam_policy_document" "teardown_trust" {
 resource "aws_iam_role" "github_teardown" {
   name                 = "ofplens-github-teardown"
   description          = "Nightly teardown of infra/aws from GitHub Actions"
-  assume_role_policy   = data.aws_iam_policy_document.teardown_trust.json
+  assume_role_policy   = data.aws_iam_policy_document.main_branch_trust.json
   max_session_duration = 3600
 }
 
@@ -106,4 +106,52 @@ resource "aws_iam_role_policy" "teardown_extra" {
   name   = "teardown-extra"
   role   = aws_iam_role.github_teardown.id
   policy = data.aws_iam_policy_document.teardown_extra.json
+}
+
+# --- Deploy on merge (.github/workflows/deploy.yml) -------------------------------------------
+
+# Same trust as the teardown role (main_branch_trust): only workflows on main of this repository.
+resource "aws_iam_role" "github_deploy" {
+  name                 = "ofplens-github-deploy"
+  description          = "Builds and pushes the images, and deploys the app when a cluster is up"
+  assume_role_policy   = data.aws_iam_policy_document.main_branch_trust.json
+  max_session_duration = 3600
+}
+
+# Much narrower than the teardown role: it can push images to the two repositories and find
+# the cluster. What it may do inside the cluster is set by its EKS access entry in infra/aws
+# (edit the ofplens namespace only). It can't create or delete any AWS infrastructure.
+data "aws_iam_policy_document" "deploy" {
+  statement {
+    sid       = "EcrLogin"
+    actions   = ["ecr:GetAuthorizationToken"]
+    resources = ["*"]
+  }
+
+  statement {
+    sid = "PushAndReadImages"
+    actions = [
+      "ecr:BatchCheckLayerAvailability",
+      "ecr:BatchGetImage",
+      "ecr:CompleteLayerUpload",
+      "ecr:DescribeImages",
+      "ecr:GetDownloadUrlForLayer",
+      "ecr:InitiateLayerUpload",
+      "ecr:PutImage",
+      "ecr:UploadLayerPart",
+    ]
+    resources = [for repo in aws_ecr_repository.images : repo.arn]
+  }
+
+  statement {
+    sid       = "FindTheCluster"
+    actions   = ["eks:DescribeCluster"]
+    resources = ["arn:aws:eks:${var.region}:${data.aws_caller_identity.current.account_id}:cluster/ofplens"]
+  }
+}
+
+resource "aws_iam_role_policy" "deploy" {
+  name   = "deploy"
+  role   = aws_iam_role.github_deploy.id
+  policy = data.aws_iam_policy_document.deploy.json
 }

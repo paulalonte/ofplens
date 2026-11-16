@@ -37,6 +37,20 @@ module "eks" {
   # The nightly teardown (GitHub Actions, OFP-45) must uninstall Helm releases before
   # destroying, so its role is a cluster admin too. The role is created by infra/bootstrap.
   access_entries = {
+    # Deploy on merge (OFP-47): may change things in the ofplens namespace only (Kubernetes'
+    # "edit" role there), enough for helm upgrade, nothing cluster-wide.
+    github_deploy = {
+      principal_arn = data.aws_iam_role.github_deploy.arn
+      policy_associations = {
+        edit = {
+          policy_arn = "arn:aws:eks::aws:cluster-access-policy/AmazonEKSEditPolicy"
+          access_scope = {
+            type       = "namespace"
+            namespaces = ["ofplens"]
+          }
+        }
+      }
+    }
     github_teardown = {
       principal_arn = data.aws_iam_role.github_teardown.arn
       policy_associations = {
@@ -77,4 +91,8 @@ module "eks" {
 
 data "aws_iam_role" "github_teardown" {
   name = "ofplens-github-teardown"
+}
+
+data "aws_iam_role" "github_deploy" {
+  name = "ofplens-github-deploy"
 }

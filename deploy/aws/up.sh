@@ -14,14 +14,27 @@ run terraform -chdir="$TF_DIR" apply
 
 use_cluster
 
-# 2. The images, built for ARM (the t4g nodes) and pushed to ECR. One immutable tag per build.
-TAG="$(git rev-parse --short HEAD)-$(date +%Y%m%d%H%M%S)"
-echo "+ aws ecr get-login-password | docker login $REGISTRY" >&2
-aws ecr get-login-password --region "$REGION" | docker login --username AWS --password-stdin "$REGISTRY" >/dev/null
-for part in api web; do
-  run docker build --platform linux/arm64 --target "$part" -t "$REGISTRY/ofplens-$part:$TAG" .
-  run docker push "$REGISTRY/ofplens-$part:$TAG"
-done
+# 2. The images. Every merge to main already has them in ECR, built by CI (deploy.yml) and
+#    tagged with the commit. On a clean checkout of such a commit, use those: the exact images
+#    CI tested, and no local build. Otherwise (local changes, or a commit CI hasn't built) build
+#    them here for ARM (the t4g nodes), with a timestamp so every build gets its own tag.
+COMMIT="$(git rev-parse --short=7 HEAD)"
+image_exists() {
+  aws ecr describe-images --region "$REGION" --repository-name "ofplens-$1" \
+    --image-ids imageTag="$COMMIT" >/dev/null 2>&1
+}
+if [[ -z "$(git status --porcelain --untracked-files=no)" ]] && image_exists api && image_exists web; then
+  TAG="$COMMIT"
+  echo "Using the images CI built for $COMMIT (no local build)." >&2
+else
+  TAG="$COMMIT-$(date +%Y%m%d%H%M%S)"
+  echo "+ aws ecr get-login-password | docker login $REGISTRY" >&2
+  aws ecr get-login-password --region "$REGION" | docker login --username AWS --password-stdin "$REGISTRY" >/dev/null
+  for part in api web; do
+    run docker build --platform linux/arm64 --target "$part" -t "$REGISTRY/ofplens-$part:$TAG" .
+    run docker push "$REGISTRY/ofplens-$part:$TAG"
+  done
+fi
 
 # 3. The app's Secret, copied from Secrets Manager by External Secrets.
 k create namespace "$NAMESPACE" --dry-run=client -o yaml | k apply -f -

@@ -580,6 +580,17 @@ check and per prompt version, so prompt or model changes are measured, not guess
   record in Route 53's API before checking DNS (negative caching); `down.sh` waits for the
   record to be removed before destroying ExternalDNS.
 
+### OFP-47 · Deploy on merge (CI/CD)
+- Deployment step 6 ([DEPLOYMENT.md](DEPLOYMENT.md)).
+- **Done when:** a merge to `main` builds and pushes the images, and reaches the running app on
+  `ofplens.app` with no manual step; with no cluster, the images are still published.
+- *As built:* `ofplens-github-deploy` in bootstrap (same main-only OIDC trust; ECR push on the
+  two repositories and `eks:DescribeCluster` only) with an EKS access entry for `edit` in the
+  `ofplens` namespace. `deploy.yml` on `workflow_run` of CI (push events on this repository
+  only) and by hand: builds on the free ARM runner, tag = commit, skips existing tags, then
+  `helm upgrade --rollback-on-failure --wait` and a health check when the app is installed.
+  `aws:up` reuses CI's images on a clean checkout.
+
 ---
 
 ## Later phases (not ticketed yet)

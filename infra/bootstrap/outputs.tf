@@ -35,3 +35,8 @@ output "certificate_arn" {
   description = "ACM certificate for the domain (the load balancer controller finds it by host name)."
   value       = aws_acm_certificate_validation.main.certificate_arn
 }
+
+output "github_deploy_role_arn" {
+  description = "Store as the GitHub secret AWS_DEPLOY_ROLE_ARN (infra/aws/README.md)."
+  value       = aws_iam_role.github_deploy.arn
+}
