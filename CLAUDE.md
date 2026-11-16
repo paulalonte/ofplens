@@ -38,6 +38,11 @@ history in Postgres. **For flight simulation (X-Plane 12) only.** The plan is in
 Before saying a change is done, run `pnpm format:check && pnpm lint && pnpm typecheck && pnpm test`
 (the same steps CI runs, plus `pnpm --filter @ofplens/web build`).
 
+GitHub Actions (`.github/workflows/`): `ci.yml` on every PR and push to `main`; `deploy.yml` after
+CI passes on `main` (pushes images tagged with the commit to ECR, `helm upgrade` if the app runs on
+AWS); `nightly-teardown.yml` at 01:00 UTC (`pnpm aws:down`). Both AWS workflows use GitHub OIDC
+roles from `infra/bootstrap`; nothing in the repo holds AWS keys.
+
 ## Layout
 
 ```
