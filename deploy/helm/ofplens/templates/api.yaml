@@ -90,6 +90,10 @@ metadata:
   labels:
     {{- include "ofplens.labels" . | nindent 4 }}
     app.kubernetes.io/component: api
+  {{- with .Values.api.serviceAnnotations }}
+  annotations:
+    {{- toYaml . | nindent 4 }}
+  {{- end }}
 spec:
   selector:
     {{- include "ofplens.selector" (list . "api") | nindent 4 }}

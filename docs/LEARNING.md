@@ -476,7 +476,7 @@ end-to-end tests possible and is refused unless the app runs on localhost."
   built in step 3, with the CLI listening on `127.0.0.1` for the code. Leaked access keys
   are the most common way AWS accounts get compromised; SSO doesn't create any.
 - **Least privilege:** you're admin because you're alone. Students, CI and the cluster's pods
-  each get their own narrow role (CI via GitHub OIDC in step 6, pods via IRSA in step 4b).
+  each get their own narrow role (CI via GitHub OIDC, pods via EKS Pod Identity in step 4b).
 - **AWS Organizations:** turning on Identity Center made this account an Organization's
   *management account*. Companies keep it empty and run workloads in member accounts (dev,
   prod), one blast radius each. We use one account to keep it simple.
@@ -556,3 +556,140 @@ migrates its own state into it after the first apply. A cost budget with actual 
 alerts goes in before anything that costs money. Images live in ECR with immutable tags,
 scan-on-push and lifecycle policies. CI checks formatting and validity on every PR, and
 plan/apply run with human review."
+
+## Step 4b — The cluster on AWS (EKS, RDS, load balancer, secrets)
+
+**What was built (in `infra/aws`, `deploy/aws`, `values-aws.yaml`)**
+
+- A VPC in two availability zones: public subnets for the nodes and the load balancer,
+  database subnets with no internet route, **no NAT gateway**.
+- EKS with two Graviton (ARM) worker nodes in a managed node group, and AWS-managed add-ons
+  (VPC CNI, CoreDNS, kube-proxy, the Pod Identity agent).
+- RDS Postgres 16, reachable only from the nodes, with its URL in Secrets Manager.
+- Two Helm-installed controllers with their own narrow AWS permissions: the **AWS Load
+  Balancer Controller** and **External Secrets**.
+- `pnpm aws:up` / `pnpm aws:down`, and the cost-first run book [infra/aws/README.md](../infra/aws/README.md).
+- The same Helm chart as on kind; only `values-aws.yaml` differs.
+
+**Concepts: the platform under the chart**
+
+| On kind (step 2)                          | On AWS (step 4b)                                    |
+| ----------------------------------------- | --------------------------------------------------- |
+| `kind create cluster` (control plane in Docker) | EKS: AWS runs and patches the control plane     |
+| Three Docker containers as nodes          | A managed node group: EC2 instances AWS replaces    |
+| Traefik turns the Ingress into routing    | The load balancer controller turns it into an ALB  |
+| A Postgres pod (`kind/postgres.yaml`)     | RDS, outside the cluster                            |
+| `kubectl create secret` in `up.sh`        | External Secrets copies from Secrets Manager        |
+| `kind load docker-image`                  | `docker push` to ECR; nodes pull from it            |
+
+The app's chart doesn't change. That's the separation platform teams aim for: app teams ship
+one chart, and the platform decides what's underneath.
+
+**Concepts: networking**
+
+- **VPC, subnets, route tables:** a VPC is your private network. A subnet is *public* when its
+  route table sends `0.0.0.0/0` to an **internet gateway**. The database subnets have no such
+  route, so nothing there can reach the internet or be reached from it.
+- **NAT gateway, and why there's none:** private subnets reach the internet through a NAT
+  gateway (~$35/month each, before traffic). The usual production layout is nodes in private
+  subnets behind NAT. Here the nodes are in public subnets with public IPs, and their security
+  group admits nothing from the internet. It's cheaper, and the trade-off is a node with a
+  public address (defence in depth is thinner, so this is a learning choice, not a production one).
+- **Security groups:** stateful firewalls on each network interface. The database's group
+  allows port 5432 **from the nodes' security group** (a reference, not an IP range), so it
+  keeps working when nodes are replaced and get new IPs.
+- **VPC CNI:** on EKS every pod gets a real VPC IP address. That's why the load balancer can
+  send traffic **straight to pods** (`target-type: ip`), and why a t4g.medium can run only
+  17 pods (each network interface holds a limited number of addresses).
+
+**Concepts: permissions for pods**
+
+- **The problem:** the load balancer controller must call AWS APIs, and External Secrets must
+  read Secrets Manager. Putting access keys in a Kubernetes Secret would bring back the
+  long-lived keys you avoided in step 4a.
+- **EKS Pod Identity (used here):** an IAM role is *associated* with a namespace and service
+  account. The Pod Identity agent on each node gives pods using that service account
+  temporary credentials for that role. No keys, and each controller gets only its own policy.
+- **IRSA, the older way (same goal):** the cluster's OIDC issuer is registered in IAM, and the
+  role trusts tokens for a specific service account. You'll still meet it everywhere. Pod
+  Identity needs no OIDC provider per cluster and the role doesn't name the cluster, which
+  suits a cluster that's recreated every session.
+- **Least privilege in practice:** External Secrets may read exactly two secrets
+  (`ofplens/app`, `ofplens/database`); it can't list, create or read anything else.
+
+**Concepts: getting traffic in**
+
+- **Ingress → controller → ALB:** the chart's Ingress is only rules. The AWS Load Balancer
+  Controller watches it and creates an Application Load Balancer, listeners, target groups
+  and security group rules, and keeps the targets in sync as pods come and go.
+- **Health checks:** the ALB checks every pod itself (`/api/health` for the API, `/healthz` for
+  nginx, set as Service annotations) and only sends traffic to healthy ones. That's on top of
+  Kubernetes' own readiness probes.
+- **Things Terraform didn't create:** the ALB belongs to the controller. Destroy the cluster
+  first and the ALB stays, billed, with nothing left to delete it. That's why
+  `aws:down` uninstalls the app and waits for the ALB to disappear **before**
+  `terraform destroy`. The tags `ManagedBy=aws-load-balancer-controller` and `Project=ofplens`
+  help you find leftovers.
+
+**Concepts: secrets**
+
+- **Secrets Manager → External Secrets → Kubernetes Secret:** the values live in AWS. A
+  `SecretStore` says where to read, and an `ExternalSecret` says what to copy into which
+  Kubernetes Secret, refreshed every hour. The chart still just reads `ofplens-secrets`, the
+  same as on kind.
+- **Two lifetimes:** your keys (`ofplens/app`) live in **bootstrap**, so they survive every
+  teardown. The database URL (`ofplens/database`) is created with the database and deleted
+  with it (`recovery_window_in_days = 0`, otherwise the name would be blocked for a week).
+- **Terraform never sees your keys:** it creates the empty secret and ignores later changes
+  (`ignore_changes`). The database password *is* in Terraform's state (it generated it), which
+  is one more reason the state bucket is private and encrypted.
+
+**Concepts: Terraform beyond one stack**
+
+- **Modules:** `terraform-aws-modules/vpc`, `/eks` and `/eks-pod-identity` are community modules
+  most companies use: hundreds of lines of subnets, routes and IAM per call, tested by many.
+  Pin them (`~> 21.29`) like any dependency, and read what they create in `plan`.
+- **Providers configured from resources:** the Helm provider gets the cluster's address from
+  `module.eks`, and its token from `aws eks get-token`. It's convenient but has a trap: if the
+  cluster is deleted outside Terraform, the provider can't connect and `destroy` gets stuck.
+- **Two stacks, one bucket:** `bootstrap/terraform.tfstate` and `aws/terraform.tfstate` are
+  separate keys. Destroying `aws` can't touch the bootstrap.
+
+**What would break in production, and how it's handled**
+
+| Risk | Here | Production would add |
+| --- | --- | --- |
+| Forgotten cluster runs all month | `aws:down`, budget alerts; nightly teardown (OFP-45) | Scheduled teardown of non-prod, cost anomaly alerts |
+| Orphaned load balancer after teardown | Uninstall first, wait, tagged resources | The same, plus tag-based cleanup jobs |
+| Database lost on destroy | Accepted: disposable | Backups, final snapshot, deletion protection, Multi-AZ |
+| Nodes reachable from the internet | Security group admits nothing inbound | Private subnets behind NAT, or VPC endpoints |
+| Pods with too much AWS access | One role per controller, two secrets only | The same; plus policy reviews and IAM Access Analyzer |
+| Keys in code or chat | Pasted in the console only; External Secrets copies them | Secret rotation, audit via CloudTrail |
+| TLS to the database not verified | `sslmode=require` encrypts but doesn't check the certificate | `verify-full` with the RDS CA bundle |
+| Old Kubernetes version | Newest version pinned | Planned upgrades; extended support costs 6× |
+
+**Try it** (with the cluster up)
+
+```bash
+kubectl --context ofplens-aws get nodes -o wide              # two ARM nodes, two zones, public IPs
+kubectl --context ofplens-aws get pods -A -o wide            # which pod runs where, with VPC IPs
+kubectl --context ofplens-aws describe ingress ofplens -n ofplens   # events from the ALB controller
+kubectl --context ofplens-aws get externalsecret,secretstore -n ofplens
+aws eks list-pod-identity-associations --cluster-name ofplens --region eu-central-1
+aws elbv2 describe-target-health --region eu-central-1 --target-group-arn \
+  "$(aws elbv2 describe-target-groups --region eu-central-1 --query 'TargetGroups[0].TargetGroupArn' --output text)"
+kubectl --context ofplens-aws delete pod -n ofplens -l app.kubernetes.io/component=api --wait=false
+#   …then watch the ALB's target health: old IP draining, new pod IP registering
+```
+
+**Interview**
+
+"The app runs on EKS, provisioned with Terraform using the community VPC and EKS modules: two
+AZs, a managed node group on Graviton, and RDS Postgres in isolated subnets that only admit
+traffic from the node security group. Ingress is handled by the AWS Load Balancer Controller
+in IP mode, so the ALB targets pods directly with per-service health checks. Controllers get
+AWS access through EKS Pod Identity with least-privilege roles, with no static keys. Secrets
+live in Secrets Manager and are synced into the namespace by External Secrets, so the Helm
+chart is identical to the one used on a local kind cluster. It's a non-production,
+cost-optimised setup: no NAT gateway, a disposable database, and a teardown that removes
+controller-created resources before `terraform destroy`, so nothing is orphaned."

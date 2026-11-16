@@ -28,12 +28,15 @@ api:
   # Sign in by any name without a password. Development only: the API refuses it unless
   # publicUrl is localhost.
   devSignIn: false
+  # On the api Service (e.g. the load balancer's health check path on AWS).
+  serviceAnnotations: {}
   resources:
     requests: { cpu: 100m, memory: 192Mi }
     limits: { memory: 384Mi }
 
 web:
   replicas: 2
+  serviceAnnotations: {}
   resources:
     requests: { cpu: 20m, memory: 32Mi }
     limits: { memory: 96Mi }

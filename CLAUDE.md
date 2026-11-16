@@ -22,6 +22,7 @@ history in Postgres. **For flight simulation (X-Plane 12) only.** The plan is in
 | `pnpm db:up` / `pnpm db:down`          | Start (and wait for) / stop the Postgres container                                                                          |
 | `pnpm app:up` / `pnpm app:down`        | The whole app from its container images (http://localhost:8080); `pnpm app:logs` follows it                                 |
 | `pnpm kind:up` / `pnpm kind:down`      | The app on a local 3-node Kubernetes cluster (kind + Helm), http://localhost:8088                                           |
+| `pnpm aws:up` / `pnpm aws:down`        | Create the AWS cluster and deploy (costs ~$0.25/h) / remove it all; the user runs these (infra/aws/README.md)               |
 | `pnpm db:generate` / `pnpm db:migrate` | Create a migration from the Drizzle schema / apply it                                                                       |
 | `pnpm db:studio`                       | Browse the dev database in Drizzle Studio                                                                                   |
 | `pnpm test`                            | All Vitest tests: `web` (jsdom), `node` (api, packages), `integration` (`*.int.test.ts`, real Postgres: needs `pnpm db:up`) |
@@ -45,9 +46,9 @@ apps/api       Fastify; buildApp() in app.ts (testable), server.ts (listens)
 packages/ofp   OFP Zod schema, parseOfp(), shared domain types and formatters
 packages/db    Drizzle client, schema, migrations
 packages/weather  aviationweather.gov client (METAR/TAF, SIGMET/G-AIRMET hazards), METAR decoder, flight category, plan weather
-infra/         Terraform: bootstrap/ (budget, state bucket, ECR; kept). You run plan/apply (infra/README.md)
+infra/         Terraform: bootstrap/ (budget, state bucket, ECR, app secret; kept), aws/ (VPC, EKS, RDS; per session). The user runs plan/apply
 Dockerfile     Container images: `--target api` (bundled API + migrate command), `--target web` (nginx)
-deploy/        web/ (nginx config), helm/ofplens (the Helm chart), kind/ (local cluster, Postgres, up/down)
+deploy/        web/ (nginx config), helm/ofplens (the Helm chart), kind/ (local cluster, Postgres, up/down), aws/ (up/down, ExternalSecret)
 packages/agent    Briefing agent: tools as plain functions (reused by the API and, later, MCP), Briefing schema
 fixtures/ofp   Real SimBrief OFP JSON samples (OFP-05)
 fixtures/weather  Real aviationweather.gov METAR/TAF responses (`pnpm fixture:weather`)

@@ -11,3 +11,8 @@ output "ecr_repository_urls" {
 output "region" {
   value = var.region
 }
+
+output "app_secret_name" {
+  description = "Secrets Manager secret with the app's keys; paste values in the console."
+  value       = aws_secretsmanager_secret.app.name
+}

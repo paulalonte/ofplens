@@ -1,0 +1,29 @@
+# AWS (EKS) via deploy/aws/up.sh: only what differs from values.yaml.
+# up.sh also sets, per deploy:
+#   image.registry   <account>.dkr.ecr.<region>.amazonaws.com (the ECR repositories from bootstrap)
+#   image.tag        the commit and a timestamp
+#   api.publicUrl    http://<the load balancer's address>, until there is a domain (step 5)
+
+api:
+  # The load balancer checks each pod directly (target type ip). Ready = API and database answer.
+  serviceAnnotations:
+    alb.ingress.kubernetes.io/healthcheck-path: /api/health
+
+web:
+  serviceAnnotations:
+    alb.ingress.kubernetes.io/healthcheck-path: /healthz
+
+ingress:
+  # The AWS Load Balancer Controller (infra/aws/addons.tf) turns this Ingress into an
+  # Application Load Balancer.
+  className: alb
+  annotations:
+    alb.ingress.kubernetes.io/load-balancer-name: ofplens
+    alb.ingress.kubernetes.io/scheme: internet-facing
+    # Send traffic straight to pod IPs (the VPC CNI gives every pod one), not via node ports.
+    alb.ingress.kubernetes.io/target-type: ip
+    # HTTP only until step 5 (a domain and a certificate make it HTTPS).
+    alb.ingress.kubernetes.io/listen-ports: '[{"HTTP": 80}]'
+    # Created by the controller, not Terraform: these tags make it easy to find and to check
+    # that it is gone after a teardown (infra/aws/README.md).
+    alb.ingress.kubernetes.io/tags: Project=ofplens,ManagedBy=aws-load-balancer-controller
