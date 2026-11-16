@@ -39,3 +39,9 @@ variable "app_secret_name" {
   type        = string
   default     = "ofplens/app"
 }
+
+variable "domain" {
+  description = "The app's domain (infra/bootstrap reads its zone and holds its certificate)."
+  type        = string
+  default     = "ofplens.app"
+}

@@ -28,7 +28,7 @@ GitHub allows **one callback URL per OAuth app**, so register one app per addres
 1. GitHub → Settings → Developer settings → OAuth Apps → **New OAuth App**.
 2. Application name: `OFP Lens (dev)`. Homepage URL: `http://localhost:5173`.
 3. Authorization callback URL: `http://localhost:5173/api/auth/github/callback`
-   (on AWS: `https://<your domain>/api/auth/github/callback`).
+   (on AWS, a second app: `https://ofplens.app/api/auth/github/callback`).
 4. Register, then **Generate a new client secret**.
 5. Put both in `.env` yourself (never paste the secret into chat or a file in git):
 
@@ -50,7 +50,7 @@ No scopes are requested: the app reads only the public profile (id, name, pictur
 3. **APIs & Services → Credentials → Create credentials → OAuth client ID**, type **Web
    application**.
 4. Authorized redirect URIs: `http://localhost:5173/api/auth/google/callback`. Google allows
-   several, so add the kind and AWS addresses to the same client later.
+   several, so add `https://ofplens.app/api/auth/google/callback` to the same client for AWS.
 5. Put the client ID and secret in `.env` yourself:
 
    ```bash
@@ -65,8 +65,9 @@ Restart `pnpm dev`; the sign-in page shows a button for each configured provider
 The chart reads the client IDs and secrets from the existing Secret (`existingSecret`), each
 key optional: `GOOGLE_CLIENT_ID`, `GOOGLE_CLIENT_SECRET`, `GITHUB_CLIENT_ID`,
 `GITHUB_CLIENT_SECRET`. `api.publicUrl` is required and must be the address pilots use.
-`values-kind.yaml` sets `http://localhost:8088` and switches development sign-in on; the AWS
-values will set the real domain and leave it off.
+`values-kind.yaml` sets `http://localhost:8088` and switches development sign-in on;
+`values-aws.yaml` sets `https://ofplens.app` and leaves it off. On AWS the keys come from the
+Secrets Manager secret `ofplens/app` ([infra/aws/README.md](../infra/aws/README.md), "Sign-in on AWS").
 
 ## How it works
 

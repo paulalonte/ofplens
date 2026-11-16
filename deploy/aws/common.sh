@@ -7,6 +7,7 @@ CLUSTER=ofplens
 NAMESPACE=ofplens
 CONTEXT=ofplens-aws
 TF_DIR=infra/aws
+DOMAIN=ofplens.app
 
 run() { echo "+ $*" >&2; "$@"; }
 # Every kubectl and helm command names the context, so it can never hit kind (or work) by accident.

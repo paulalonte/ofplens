@@ -568,6 +568,18 @@ check and per prompt version, so prompt or model changes are measured, not guess
   switched off two EKS module defaults that cost money per session (a KMS key, control plane
   logs).
 
+### OFP-46 · Domain and HTTPS: ofplens.app
+- Deployment step 5 ([DEPLOYMENT.md](DEPLOYMENT.md)).
+- **Done when:** `https://ofplens.app` opens the app on AWS, `http://` redirects to it, and
+  Google and GitHub sign-in work there.
+- *As built:* the domain bought by hand in Route 53. `infra/bootstrap/domain.tf`: reads the
+  hosted zone, a DNS-validated ACM certificate for the apex and `www` (kept). `infra/aws`:
+  ExternalDNS (Helm, Pod Identity limited to the one zone, `sync` with a TXT ownership
+  registry). `values-aws.yaml`: host and `PUBLIC_URL` `https://ofplens.app`, HTTPS listener
+  with certificate discovery, HTTP→HTTPS redirect, TLS 1.2/1.3 policy. `up.sh` waits for the
+  record in Route 53's API before checking DNS (negative caching); `down.sh` waits for the
+  record to be removed before destroying ExternalDNS.
+
 ---
 
 ## Later phases (not ticketed yet)

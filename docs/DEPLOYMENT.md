@@ -191,12 +191,15 @@ everything except the bootstrap part.
 
 ## Step 5 — Domain and HTTPS
 
+**Progress:** the domain is `ofplens.app` (bought 2026-11-16); the Terraform is built (OFP-46).
+
 **You do:** buy the domain in Route 53 (about $10–20/year, depending on the ending).
 
 **Claude builds:** the DNS records and a free ACM certificate in Terraform, HTTPS on the load
 balancer with HTTP redirected to it, and DNS kept up to date when the cluster is recreated.
 
-**Done when:** `https://<your domain>` opens the app, and `http://` redirects to it.
+**Done when:** `https://ofplens.app` opens the app, `http://` redirects to it, and signing in
+with Google or GitHub works there.
 
 ---
 

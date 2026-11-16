@@ -21,3 +21,17 @@ output "github_teardown_role_arn" {
   description = "Store as the GitHub secret AWS_TEARDOWN_ROLE_ARN (infra/aws/README.md)."
   value       = aws_iam_role.github_teardown.arn
 }
+
+output "domain" {
+  value = var.domain
+}
+
+output "hosted_zone_id" {
+  description = "Route 53 zone of the domain; ExternalDNS in infra/aws writes the app's record here."
+  value       = data.aws_route53_zone.main.zone_id
+}
+
+output "certificate_arn" {
+  description = "ACM certificate for the domain (the load balancer controller finds it by host name)."
+  value       = aws_acm_certificate_validation.main.certificate_arn
+}

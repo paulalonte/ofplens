@@ -22,6 +22,17 @@ if cluster_exists; then
   k delete namespace "$NAMESPACE" --ignore-not-found --wait --timeout=5m
 fi
 
+# ExternalDNS deletes the DNS record when the Ingress goes. Give it the time to do so before
+# Terraform removes ExternalDNS itself (otherwise ofplens.app would point at nothing).
+ZONE_ID=$(aws route53 list-hosted-zones-by-name --dns-name "$DOMAIN" --max-items 1 \
+  --query 'HostedZones[0].Id' --output text)
+echo "Checking that the $DOMAIN record is gone..." >&2
+for _ in $(seq 18); do
+  [[ "$(aws route53 list-resource-record-sets --hosted-zone-id "$ZONE_ID" \
+    --query "length(ResourceRecordSets[?Name=='$DOMAIN.' && Type=='A'])" --output text)" == 0 ]] && break
+  sleep 10
+done
+
 echo "Checking that the load balancer is gone..." >&2
 for _ in $(seq 60); do
   aws elbv2 describe-load-balancers --region "$REGION" --names ofplens >/dev/null 2>&1 || break
