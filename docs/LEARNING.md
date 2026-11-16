@@ -625,6 +625,13 @@ one chart, and the platform decides what's underneath.
 - **Health checks:** the ALB checks every pod itself (`/api/health` for the API, `/healthz` for
   nginx, set as Service annotations) and only sends traffic to healthy ones. That's on top of
   Kubernetes' own readiness probes.
+- **Admission webhooks and install order:** the controller registers webhooks, so the API server
+  asks the controller's pod before accepting certain new objects. If that pod isn't running
+  yet, the API server rejects the object (`failed calling webhook … no endpoints available`).
+  The first apply hit this: External Secrets was installed in parallel and its Services were
+  refused. The fix is an explicit `depends_on`, and switching off a webhook that isn't needed
+  (`enableServiceMutatorWebhook`). Parallel installs are a common source of "works the second
+  time" failures.
 - **Things Terraform didn't create:** the ALB belongs to the controller. Destroy the cluster
   first and the ALB stays, billed, with nothing left to delete it. That's why
   `aws:down` uninstalls the app and waits for the ALB to disappear **before**
