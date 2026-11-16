@@ -2,9 +2,11 @@
 # up.sh also sets, per deploy:
 #   image.registry   <account>.dkr.ecr.<region>.amazonaws.com (the ECR repositories from bootstrap)
 #   image.tag        the commit and a timestamp
-#   api.publicUrl    http://<the load balancer's address>, until there is a domain (step 5)
 
 api:
+  # Sign-in callbacks go to https://ofplens.app/api/auth/<provider>/callback; https makes the
+  # session cookie Secure.
+  publicUrl: https://ofplens.app
   # The load balancer checks each pod directly (target type ip). Ready = API and database answer.
   serviceAnnotations:
     alb.ingress.kubernetes.io/healthcheck-path: /api/health
@@ -15,15 +17,20 @@ web:
 
 ingress:
   # The AWS Load Balancer Controller (infra/aws/addons.tf) turns this Ingress into an
-  # Application Load Balancer.
+  # Application Load Balancer, and ExternalDNS points this host at it in Route 53.
   className: alb
+  host: ofplens.app
   annotations:
     alb.ingress.kubernetes.io/load-balancer-name: ofplens
     alb.ingress.kubernetes.io/scheme: internet-facing
     # Send traffic straight to pod IPs (the VPC CNI gives every pod one), not via node ports.
     alb.ingress.kubernetes.io/target-type: ip
-    # HTTP only until step 5 (a domain and a certificate make it HTTPS).
-    alb.ingress.kubernetes.io/listen-ports: '[{"HTTP": 80}]'
+    # HTTPS on 443 with the ACM certificate for the host above (infra/bootstrap/domain.tf; the
+    # controller finds it by name). Port 80 only answers with a redirect to https.
+    alb.ingress.kubernetes.io/listen-ports: '[{"HTTP": 80}, {"HTTPS": 443}]'
+    alb.ingress.kubernetes.io/ssl-redirect: '443'
+    # TLS 1.2 and 1.3 only, with modern ciphers (AWS's recommended policy).
+    alb.ingress.kubernetes.io/ssl-policy: ELBSecurityPolicy-TLS13-1-2-2021-06
     # Created by the controller, not Terraform: these tags make it easy to find and to check
     # that it is gone after a teardown (infra/aws/README.md).
     alb.ingress.kubernetes.io/tags: Project=ofplens,ManagedBy=aws-load-balancer-controller

@@ -44,7 +44,8 @@ aws eks list-clusters --region eu-central-1      # "clusters": []  → nothing e
 | RDS Postgres                 | The database, reachable only from the nodes; **deleted with its data** on teardown | `database.tf` |
 | AWS Load Balancer Controller | Turns the chart's Ingress into a load balancer (Traefik's job on kind)             | `addons.tf`   |
 | External Secrets             | Copies your keys and the database URL from Secrets Manager into the cluster        | `addons.tf`   |
-| Pod Identity                 | Gives those two add-ons exactly the AWS permissions they need, with no keys        | `addons.tf`   |
+| ExternalDNS                  | Points `ofplens.app` at the load balancer in Route 53, and removes it on teardown  | `addons.tf`   |
+| Pod Identity                 | Gives those three add-ons exactly the AWS permissions they need, with no keys      | `addons.tf`   |
 
 Then `pnpm aws:up` deploys the same Helm chart as kind, with
 [values-aws.yaml](../../deploy/helm/ofplens/values-aws.yaml).
@@ -52,8 +53,10 @@ Then `pnpm aws:up` deploys the same Helm chart as kind, with
 ## Before the first time (once)
 
 **1. Apply the bootstrap again.** It gained the `ofplens/app` secret for your keys (about
-$0.40/month, kept when the cluster is destroyed) and the GitHub OIDC role for the nightly
-teardown (free).
+$0.40/month, kept when the cluster is destroyed), the GitHub OIDC role for the nightly
+teardown (free), and the certificate for `ofplens.app` (free; OFP-46, 4 more to add: the
+certificate, two validation records, and the wait for it to be issued, a few minutes). The
+domain's registration must be complete first (Route 53 → Registered domains).
 
 ```bash
 export AWS_PROFILE=ofplens
@@ -101,12 +104,18 @@ What happens (each command is printed before it runs):
 2. Your kubeconfig gets a context **`ofplens-aws`**.
 3. The two images are built for ARM and pushed to ECR with a new tag.
 4. External Secrets creates the app's Secret.
-5. Helm installs the app; the load balancer appears and its address is set as `PUBLIC_URL`.
-6. It prints **`OFP Lens … is up: http://ofplens-….elb.amazonaws.com`**.
+5. Helm installs the app; the load balancer appears (HTTPS with the certificate from
+   bootstrap).
+6. ExternalDNS points `ofplens.app` at it; the script waits for the record, then for the site.
+7. It prints **`OFP Lens … is up: https://ofplens.app`**.
 
-**Sign-in doesn't work on AWS yet.** Google needs https, and development sign-in is
-refused on anything that isn't localhost. You'll see the app and the sign-in page; signing in
-comes with a domain in step 5.
+Don't open `ofplens.app` before step 7: asking DNS for the name before the record exists makes
+your Mac (or your router) remember "no such address" for a while. If it happens anyway, wait
+a few minutes, or flush your Mac's DNS cache:
+`sudo dscacheutil -flushcache; sudo killall -HUP mDNSResponder`.
+
+**Sign-in** works once the Google and GitHub keys for `ofplens.app` are in `ofplens/app`
+([Sign-in on AWS](#sign-in-on-aws)). Development sign-in stays off on AWS.
 
 ## Look around
 
@@ -159,6 +168,24 @@ AWS keys are stored in GitHub, only the role's ARN, and the role trusts only wor
 If a run fails (for example a load balancer that won't go away), GitHub emails you. Then check
 [If something is left](#if-something-is-left). GitHub pauses scheduled workflows in a public
 repository after 60 days without commits; the Actions tab then shows a button to turn it back on.
+
+## Sign-in on AWS
+
+`https://ofplens.app` needs its own callback URLs at Google and GitHub (one-time, by you; the
+secrets never go into chat or git):
+
+- **Google** ([Cloud console](https://console.cloud.google.com/) → APIs & Services →
+  Credentials → your OAuth client): add the authorized redirect URI
+  `https://ofplens.app/api/auth/google/callback`. The same client works locally and on AWS.
+  While the consent screen is in **Testing**, only the test users you listed can sign in.
+- **GitHub** (Settings → Developer settings → OAuth Apps → **New OAuth App**): GitHub allows one
+  callback per app, so make a second one, `OFP Lens`, with homepage `https://ofplens.app` and
+  callback `https://ofplens.app/api/auth/github/callback`. Generate a client secret.
+
+Then put `GOOGLE_CLIENT_ID`, `GOOGLE_CLIENT_SECRET`, `GITHUB_CLIENT_ID` and
+`GITHUB_CLIENT_SECRET` into `ofplens/app` ([next section](#add-or-change-your-keys)). Anyone with
+a GitHub account can then sign in while the cluster is up; the per-pilot and global briefing
+limits cap what that costs in Claude usage.
 
 ## Add or change your keys
 

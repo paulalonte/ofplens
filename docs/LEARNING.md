@@ -755,3 +755,98 @@ and an explicit deny blocks reading application secrets. Teardown runs the same 
 engineers run by hand, which removes controller-created load balancers first and fails the job
 if anything billable is left."
 
+## Step 5 — Domain and HTTPS (ofplens.app)
+
+**What was built**
+
+- The domain `ofplens.app`, bought in Route 53 by you. Registering it created its **hosted
+  zone**, where its DNS records live.
+- In `infra/bootstrap` (kept): a free **ACM certificate** for `ofplens.app` and
+  `www.ofplens.app`, proved through DNS.
+- In `infra/aws` (per session): **ExternalDNS**, which writes `ofplens.app → load balancer`
+  into Route 53 and deletes it again on teardown.
+- The load balancer now listens on **443 with that certificate**, and port 80 only redirects
+  to https. `PUBLIC_URL` is `https://ofplens.app`, so sign-in with Google and GitHub works on AWS.
+
+**Concepts: DNS**
+
+- **Registrar vs DNS hosting:** buying the name (the registrar: Route 53 Domains) and
+  answering questions about it (the hosted zone: Route 53 DNS) are separate jobs. The
+  registry for `.app` (Google) is told which name servers answer for `ofplens.app`; those are
+  the four `ns-…awsdns…` servers in your hosted zone's NS record.
+- **Records:** `A` maps a name to IPv4 addresses, `CNAME` maps a name to another name, `TXT` is
+  free text (used for proofs and ownership). Route 53's **alias** record is an AWS extension:
+  an `A` record that follows an AWS resource's changing IPs (the ALB has several, and they
+  change). It also works at the **apex** (`ofplens.app` itself), where a CNAME isn't allowed.
+- **TTL and caching:** resolvers (your router, your ISP, your Mac) keep answers for the
+  record's TTL. They also cache **"no such record"** (negative caching, as long as the zone's
+  SOA says). So `up.sh` asks Route 53's *API* whether the record exists before asking *DNS*:
+  one curious look too early can make the site "not exist" for you for a while.
+
+**Concepts: certificates and HTTPS**
+
+- **What a certificate proves:** that whoever answers on `ofplens.app` was approved by a
+  certificate authority (here Amazon's) for that name. The browser checks the name, the
+  dates and the chain up to a root it trusts.
+- **DNS validation:** ACM gives a random CNAME to create in the zone. Only someone who controls
+  the zone can do it, so that's the proof. While the record stays, ACM **renews the certificate
+  automatically** (they last about 13 months). Certificates that silently expire are a classic
+  production outage, and this design avoids it.
+- **TLS terminates at the load balancer:** browser ↔ ALB is encrypted; ALB ↔ pods is plain
+  HTTP inside the VPC. That's the common setup. End-to-end encryption to the pods (or a
+  service mesh) is the stricter option when policy requires it.
+- **Redirect and HSTS:** port 80 answers with a redirect to https. `.app` and `.dev` are on
+  every browser's **HSTS preload list**, so browsers never even try http for them; the
+  redirect matters for other clients like curl.
+- **TLS policy:** `ELBSecurityPolicy-TLS13-1-2-2021-06` allows only TLS 1.2 and 1.3 with
+  modern ciphers. Old protocols (TLS 1.0/1.1) are refused.
+- **Secure cookies:** with `PUBLIC_URL` on https, the session cookie gets `Secure`, so the
+  browser sends it only over encrypted connections.
+
+**Concepts: ExternalDNS**
+
+- **Another controller in the same pattern:** watch Kubernetes objects (Ingress hosts),
+  change something in AWS (Route 53 records). Like the load balancer controller, it gets
+  permission through Pod Identity, limited to **this one zone**.
+- **Ownership:** next to each record it creates, ExternalDNS writes a `TXT` record saying
+  "owned by ofplens". With `policy: sync` it deletes only records it owns, never the
+  certificate's validation records or anything you make by hand.
+- **Why not Terraform for this record:** the ALB's address only exists after the app is
+  installed, and changes with every new cluster. A controller that follows the Ingress keeps
+  DNS right without a second Terraform run. Teardown order matters again: the record is
+  removed after the Ingress and before ExternalDNS itself.
+
+**What would break in production, and how it's handled**
+
+| Risk | Here | Production would add |
+| --- | --- | --- |
+| Certificate expires | ACM renews automatically (validation record kept) | Alarms on certificate expiry (ACM emits events) |
+| Domain lapses | Auto-renew on; registration email verified | Registrar lock, billing alerts, several owners |
+| Someone else's record overwritten | ExternalDNS TXT ownership, zone-scoped role | The same, plus separate zones per environment |
+| Dangling record after teardown | `sync` policy; `down.sh` waits for the deletion | Periodic checks for records pointing at nothing |
+| Weak TLS | TLS 1.2+ policy, redirect, HSTS preload of `.app` | WAF, security headers, TLS to the pods if required |
+| Public sign-in costs money | Briefing limits per pilot and overall | Allow-lists, stronger quotas, abuse monitoring |
+
+**Try it** (with the cluster up)
+
+```bash
+dig +short NS ofplens.app                      # the four Route 53 name servers
+dig +short ofplens.app                         # the load balancer's current IPs
+dig +short TXT ofplens.app                     # ExternalDNS's ownership record
+curl -sI http://ofplens.app | head -3          # 301 to https
+curl -sI https://ofplens.app | head -1         # HTTP/2 200
+openssl s_client -connect ofplens.app:443 -servername ofplens.app </dev/null 2>/dev/null \
+  | openssl x509 -noout -subject -issuer -dates # who issued the certificate, valid until
+kubectl --context ofplens-aws logs -n external-dns deploy/external-dns | tail
+```
+
+**Interview**
+
+"The domain is in Route 53, and a DNS-validated ACM certificate is managed in a long-lived
+Terraform stack, so it auto-renews and survives cluster rebuilds. The ALB terminates TLS 1.2+
+on 443 with the certificate discovered from the Ingress host, and redirects 80 to 443.
+ExternalDNS keeps the alias record in sync with whatever load balancer currently backs the
+Ingress, with TXT-based ownership and a role scoped to the one hosted zone. Teardown removes
+the Ingress first, so both the load balancer and the DNS record are cleaned up before the
+controllers and the cluster are destroyed."
+

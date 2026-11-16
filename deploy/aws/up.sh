@@ -3,7 +3,7 @@
 # Safe to run again: Terraform changes only what differs, and the app is upgraded.
 #
 #   export AWS_PROFILE=ofplens
-#   pnpm aws:up       → http://<load balancer>/   (costs ~$0.25/hour until pnpm aws:down)
+#   pnpm aws:up       → https://ofplens.app   (costs ~$0.25/hour until pnpm aws:down)
 #
 # Each step prints the command it runs, so you can also run them one by one.
 source "$(dirname "$0")/common.sh"
@@ -28,39 +28,34 @@ k create namespace "$NAMESPACE" --dry-run=client -o yaml | k apply -f -
 k apply -f deploy/aws/external-secret.yaml
 k wait externalsecret/ofplens-secrets -n "$NAMESPACE" --for=condition=Ready --timeout=120s
 
-# 4. The app. PUBLIC_URL must be the load balancer's address, which exists only after the first
-#    install; until then a placeholder (nobody can sign in on AWS before step 5 anyway).
-lb_host() {
-  kubectl --context "$CONTEXT" get ingress ofplens -n "$NAMESPACE" \
-    -o jsonpath='{.status.loadBalancer.ingress[0].hostname}' 2>/dev/null || true
-}
-helm_deploy() {
-  run helm upgrade --install ofplens deploy/helm/ofplens --kube-context "$CONTEXT" \
-    --namespace "$NAMESPACE" -f deploy/helm/ofplens/values-aws.yaml \
-    --set image.registry="$REGISTRY" --set image.tag="$TAG" --set api.publicUrl="$1" \
-    --wait --timeout 10m
-}
-
-HOST="$(lb_host)"
-helm_deploy "http://${HOST:-pending.invalid}"
-if [[ -z "$HOST" ]]; then
-  echo "Waiting for the load balancer's address..." >&2
-  for _ in $(seq 60); do
-    HOST="$(lb_host)"
-    [[ -n "$HOST" ]] && break
-    sleep 5
-  done
-  [[ -n "$HOST" ]] || { echo "No load balancer address after 5 minutes: kubectl describe ingress ofplens -n $NAMESPACE" >&2; exit 1; }
-  helm_deploy "http://$HOST"
-fi
+# 4. The app, at https://ofplens.app (api.publicUrl and ingress.host in values-aws.yaml).
+run helm upgrade --install ofplens deploy/helm/ofplens --kube-context "$CONTEXT" \
+  --namespace "$NAMESPACE" -f deploy/helm/ofplens/values-aws.yaml \
+  --set image.registry="$REGISTRY" --set image.tag="$TAG" --wait --timeout 10m
 
 echo
 k get pods -n "$NAMESPACE" -o wide
 echo
-# A new load balancer needs a few minutes before its DNS name resolves and targets are healthy.
-echo "Waiting for http://$HOST/api/health (a new load balancer takes a few minutes)..." >&2
-curl --fail --silent --retry 40 --retry-delay 10 --retry-all-errors "http://$HOST/api/health" >/dev/null &&
-  echo "OFP Lens $TAG is up: http://$HOST" ||
-  echo "Deployed, but http://$HOST does not answer yet; try again in a few minutes."
+
+# 5. DNS. ExternalDNS writes ofplens.app → load balancer once the load balancer exists. Wait for
+#    the record in Route 53's API before asking DNS for the name: asking too early makes DNS
+#    resolvers remember "no such record" for a while (negative caching).
+echo "Waiting for ExternalDNS to create the $DOMAIN record (a new load balancer takes a few minutes)..." >&2
+ZONE_ID=$(aws route53 list-hosted-zones-by-name --dns-name "$DOMAIN" --max-items 1 \
+  --query 'HostedZones[0].Id' --output text)
+record_exists() {
+  [[ "$(aws route53 list-resource-record-sets --hosted-zone-id "$ZONE_ID" \
+    --query "length(ResourceRecordSets[?Name=='$DOMAIN.' && Type=='A'])" --output text)" != 0 ]]
+}
+for _ in $(seq 60); do
+  record_exists && break
+  sleep 10
+done
+record_exists || { echo "No DNS record after 10 minutes: kubectl --context $CONTEXT logs -n external-dns deploy/external-dns" >&2; exit 1; }
+
+echo "Waiting for https://$DOMAIN/api/health..." >&2
+curl --fail --silent --retry 30 --retry-delay 10 --retry-all-errors "https://$DOMAIN/api/health" >/dev/null &&
+  echo "OFP Lens $TAG is up: https://$DOMAIN" ||
+  echo "Deployed, but https://$DOMAIN does not answer yet; try again in a few minutes."
 echo
 echo "It costs about \$0.25 an hour while it exists. When you are done:  pnpm aws:down"

@@ -1,13 +1,16 @@
-# Two cluster add-ons, each with exactly the AWS permissions it needs, given to its Kubernetes
+# Three cluster add-ons, each with exactly the AWS permissions it needs, given to its Kubernetes
 # service account through EKS Pod Identity: no access keys anywhere.
 #
 #   AWS Load Balancer Controller  watches Ingresses; creates and updates an Application Load
 #                                 Balancer (ALB) for each. kind's Traefik plays this role locally.
 #   External Secrets              copies secrets from Secrets Manager into Kubernetes Secrets.
+#   ExternalDNS                   points the Ingress host name (ofplens.app) at that load balancer
+#                                 in Route 53, and removes the record when the Ingress goes.
 
 locals {
   lb_controller_service_account    = "aws-load-balancer-controller"
   external_secrets_service_account = "external-secrets"
+  external_dns_service_account     = "external-dns"
 }
 
 module "lb_controller_identity" {
@@ -101,4 +104,60 @@ resource "helm_release" "external_secrets" {
   # After the load balancer controller is up: its webhooks check new resources, and a webhook
   # without a running pod rejects them ("no endpoints available for service").
   depends_on = [module.eks, module.external_secrets_identity, helm_release.lb_controller]
+}
+
+# --- ExternalDNS -----------------------------------------------------------------------------
+
+# The zone Route 53 created when the domain was registered (infra/bootstrap reads it too).
+data "aws_route53_zone" "main" {
+  name = var.domain
+}
+
+module "external_dns_identity" {
+  source  = "terraform-aws-modules/eks-pod-identity/aws"
+  version = "~> 2.10"
+
+  name = "${var.name}-external-dns"
+
+  # Change records in this one zone only, plus list zones (to find it).
+  attach_external_dns_policy    = true
+  external_dns_hosted_zone_arns = [data.aws_route53_zone.main.arn]
+
+  associations = {
+    controller = {
+      cluster_name    = module.eks.cluster_name
+      namespace       = "external-dns"
+      service_account = local.external_dns_service_account
+    }
+  }
+}
+
+resource "helm_release" "external_dns" {
+  name             = "external-dns"
+  repository       = "https://kubernetes-sigs.github.io/external-dns/"
+  chart            = "external-dns"
+  version          = "1.23.0"
+  namespace        = "external-dns"
+  create_namespace = true
+  upgrade_install  = true # see lb_controller
+
+  values = [yamlencode({
+    provider      = { name = "aws" }
+    sources       = ["ingress"]
+    domainFilters = [var.domain]
+    # sync: also DELETE records whose Ingress is gone (upsert-only would leave them behind).
+    policy = "sync"
+    # Ownership: a TXT record next to each record it makes, so it never touches records it
+    # didn't create (the certificate's validation records, anything made by hand).
+    registry   = "txt"
+    txtOwnerId = var.name
+    # Every 30 seconds instead of every minute, so a new cluster is reachable sooner.
+    interval = "30s"
+    serviceAccount = {
+      create = true
+      name   = local.external_dns_service_account
+    }
+  })]
+
+  depends_on = [module.eks, module.external_dns_identity, helm_release.lb_controller]
 }
