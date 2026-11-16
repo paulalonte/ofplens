@@ -59,12 +59,19 @@ resource "helm_release" "lb_controller" {
   chart      = "aws-load-balancer-controller"
   version    = "3.6.3"
   namespace  = "kube-system"
+  # If a release with this name already exists (say a failed install that Terraform no longer
+  # tracks), take it over with an upgrade instead of failing with "name still in use".
+  upgrade_install = true
 
   values = [yamlencode({
     clusterName  = module.eks.cluster_name
     region       = var.region
     vpcId        = module.vpc.vpc_id
     replicaCount = 1 # two by default; one is plenty for a learning cluster
+    # Off: this webhook makes the controller handle every new Service of type LoadBalancer
+    # (network load balancers). We only use Ingress, and with it on, every Service created
+    # while the controller isn't running yet is rejected (the first apply hit exactly that).
+    enableServiceMutatorWebhook = false
     serviceAccount = {
       create = true
       name   = local.lb_controller_service_account
@@ -82,6 +89,7 @@ resource "helm_release" "external_secrets" {
   version          = "2.15.0"
   namespace        = "external-secrets"
   create_namespace = true
+  upgrade_install  = true # see lb_controller
 
   values = [yamlencode({
     serviceAccount = {
@@ -90,5 +98,7 @@ resource "helm_release" "external_secrets" {
     }
   })]
 
-  depends_on = [module.eks, module.external_secrets_identity]
+  # After the load balancer controller is up: its webhooks check new resources, and a webhook
+  # without a running pod rejects them ("no endpoints available for service").
+  depends_on = [module.eks, module.external_secrets_identity, helm_release.lb_controller]
 }
