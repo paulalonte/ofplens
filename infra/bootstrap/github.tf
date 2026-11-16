@@ -7,10 +7,14 @@
 # Used by the nightly teardown (.github/workflows/nightly-teardown.yml); step 6 adds a separate
 # role for deploying.
 
-variable "github_repository" {
-  description = "owner/name of the GitHub repository whose workflows may assume the roles."
+# Who a workflow says it is, in GitHub's token ("sub"). This repository uses GitHub's immutable
+# format, owner@<owner id>/repo@<repo id>: the numeric ids never change, so deleting the repo
+# and someone recreating one with the same name can't inherit this trust. Look it up with:
+#   gh api repos/<owner>/<repo>/actions/oidc/customization/sub     (sub_claim_prefix)
+variable "github_subject_prefix" {
+  description = "The token's sub prefix for this repository (gh api …/actions/oidc/customization/sub)."
   type        = string
-  default     = "paulalonte/ofplens"
+  default     = "repo:paulalonte@11928482/ofplens@1451769280"
 }
 
 resource "aws_iam_openid_connect_provider" "github" {
@@ -38,7 +42,7 @@ data "aws_iam_policy_document" "teardown_trust" {
     condition {
       test     = "StringEquals"
       variable = "token.actions.githubusercontent.com:sub"
-      values   = ["repo:${var.github_repository}:ref:refs/heads/main"]
+      values   = ["${var.github_subject_prefix}:ref:refs/heads/main"]
     }
   }
 }
