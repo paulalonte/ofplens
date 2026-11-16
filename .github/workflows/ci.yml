@@ -164,6 +164,11 @@ jobs:
           curl --fail --silent localhost:8080/healthz
           curl --fail --silent localhost:8080/api/health
           curl --fail --silent localhost:8080/history | grep -q '<div id="root">'
+      # Browsers only run module scripts served as JavaScript; the route map's worker is .mjs.
+      - name: Module scripts are served as JavaScript
+        run: |
+          MJS=$(docker run --rm --entrypoint ls ofplens-web:local /usr/share/nginx/html/assets | grep -m1 '\.mjs$')
+          curl --fail --silent -I "localhost:8080/assets/$MJS" | grep -qi '^content-type: text/javascript'
       - name: Sign-in through the web container
         run: |
           test "$(curl --silent -o /dev/null -w '%{http_code}' localhost:8080/api/pilot)" = 401

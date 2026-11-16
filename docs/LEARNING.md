@@ -832,7 +832,7 @@ if anything billable is left."
 ```bash
 dig +short NS ofplens.app                      # the four Route 53 name servers
 dig +short ofplens.app                         # the load balancer's current IPs
-dig +short TXT ofplens.app                     # ExternalDNS's ownership record
+dig +short TXT a-ofplens.app                   # ExternalDNS's ownership record (a- = for the A record)
 curl -sI http://ofplens.app | head -3          # 301 to https
 curl -sI https://ofplens.app | head -1         # HTTP/2 200
 openssl s_client -connect ofplens.app:443 -servername ofplens.app </dev/null 2>/dev/null \
