@@ -850,3 +850,101 @@ Ingress, with TXT-based ownership and a role scoped to the one hosted zone. Tear
 the Ingress first, so both the load balancer and the DNS record are cleaned up before the
 controllers and the cluster are destroyed."
 
+## Step 6 — Deploy on merge (CI/CD)
+
+**What was built**
+
+- `.github/workflows/deploy.yml`: after CI passes on `main`, build the images on GitHub's
+  ARM runner, push them to ECR tagged with the commit, and `helm upgrade` the running app.
+- `ofplens-github-deploy`: a second GitHub OIDC role (in bootstrap), far narrower than the
+  teardown role, plus an EKS access entry that lets it edit the `ofplens` namespace only.
+- `pnpm aws:up` reuses CI's images for a clean checkout instead of building locally.
+
+**Concepts: the pipeline**
+
+- **CI vs CD:** CI (`ci.yml`) answers "is this change good?": lint, types, tests, images,
+  kind. CD (`deploy.yml`) answers "ship it": it runs **only after CI passed**
+  (`workflow_run`), on the exact commit CI tested (`head_sha`).
+- **Build once, deploy that artefact:** the image tag is the commit (`d23f05c`). The same bytes
+  go to every environment, and you can always tell which code is running:
+  `kubectl get deploy -n ofplens -o wide` shows the tag. Never `latest`: it says nothing, and
+  two nodes could pull two different images under it.
+- **Immutable tags make re-runs safe:** ECR refuses to overwrite a tag, so the workflow
+  checks first and reuses an existing image. Re-running a deploy is harmless (idempotent).
+- **Native ARM builds:** the nodes are ARM. Building ARM images on an Intel runner would need
+  emulation (QEMU, several times slower). GitHub's ARM runner builds them natively, free for
+  public repositories.
+- **Push-based vs GitOps:** here GitHub *pushes* the change into the cluster (`helm upgrade`
+  from the workflow). The GitOps alternative (Argo CD, Flux) runs *inside* the cluster and
+  *pulls*: it watches a git repository and makes the cluster match it. CI then only needs to
+  change a version in git, with no cluster credentials. Push is simpler to start; GitOps
+  scales better to many clusters and shows drift. Worth naming in interviews.
+
+**Concepts: safe deploys**
+
+- **Rolling update + readiness:** Kubernetes starts new pods, waits until their readiness
+  probe passes, and only then stops old ones (`maxUnavailable: 0`). The load balancer's own
+  health checks add a second gate. Users never see a gap.
+- **Automatic rollback:** `--rollback-on-failure --wait` makes Helm wait for the new pods. If
+  they don't become ready in time (crash, bad config, failed migration), Helm reinstalls the
+  previous release, and the run fails with the reason. Then `helm history ofplens -n ofplens`
+  lists the revisions.
+- **Migrations first:** the migrate Job is a pre-upgrade hook, so the schema changes before
+  any new API pod starts. A failed migration stops the deploy before anything is replaced. The
+  rule that keeps rollbacks possible: migrations must be **backwards compatible** (add
+  columns, don't rename or drop in the same release).
+- **Smoke test:** after Helm, the workflow calls `https://ofplens.app/api/health` through the
+  real load balancer and DNS. That's the user's view, not the cluster's.
+- **Rollback options:** `helm rollback` is the fast undo (seconds, previous images). Reverting
+  the commit is the durable undo: the next deploy ships the fixed code, and git shows what
+  happened.
+
+**Concepts: least privilege for pipelines**
+
+- **Two roles, two jobs:** the teardown role can destroy the stack, so it's broad. The deploy
+  role runs on *every merge* and can only push two image repositories, read the cluster's
+  address, and edit one namespace. It can't create or delete infrastructure, read the app's
+  keys in Secrets Manager, or touch other namespaces. If a workflow were ever compromised, the
+  damage is limited to what that role can do (blast radius).
+- **Two layers of permission:** IAM decides what the role may do in **AWS**. The EKS access
+  entry (`AmazonEKSEditPolicy`, scoped to the namespace) decides what it may do in
+  **Kubernetes**. Both have to allow an action.
+- **`workflow_run` pitfall:** `branches: [main]` matches the *branch name* of the run that
+  triggered it, which could be a fork's PR from a branch called `main`. The workflow also
+  checks that the trigger was a `push` to this repository.
+- **Queueing:** deploys share a concurrency group, so they never overlap. If several merges
+  queue up, GitHub keeps only the newest waiting run, which is the commit you want anyway.
+
+**What would break in production, and how it's handled**
+
+| Risk | Here | Production would add |
+| --- | --- | --- |
+| Untested code deployed | Deploy waits for CI on the same commit | Required reviews and branch protection |
+| Bad release takes the site down | Readiness gates, rolling update, automatic rollback | Canary or blue/green, error-rate alarms |
+| Unknown version running | Image tag = commit, run summary | Release notes, deployment tracking (GitHub Environments) |
+| Pipeline credentials leaked | OIDC, no keys; narrow role; namespace-scoped access | Required approvals for production, separate accounts |
+| Migration breaks the old version on rollback | Pre-upgrade hook stops a failed migration | Expand/contract migrations, tested rollbacks |
+| Two deploys at once | Concurrency group | The same |
+
+**Try it** (with a cluster up)
+
+```bash
+git commit --allow-empty -m "Deploy test" && git push      # via a PR, as usual; merge it
+gh run watch                                               # CI, then Deploy
+kubectl --context ofplens-aws get pods -n ofplens -w       # new pods in, old pods out
+helm history ofplens -n ofplens --kube-context ofplens-aws # one revision per deploy
+kubectl --context ofplens-aws get deploy -n ofplens -o wide   # IMAGES: …:<commit>
+```
+
+**Interview**
+
+"Every merge to main triggers a deploy workflow, but only after CI passes on that exact commit.
+It authenticates to AWS with GitHub OIDC, using a role that can only push to two ECR
+repositories and read the cluster endpoint; inside Kubernetes its access entry is
+edit-only and scoped to the app's namespace. Images are built natively on ARM runners and
+tagged with the commit SHA, so they're immutable and traceable. The release is a Helm upgrade
+with wait and automatic rollback, so new pods must pass readiness before old ones go, and a
+failing release reverts itself. Migrations run as a pre-upgrade hook. A smoke test checks the
+public endpoint afterwards. It's push-based; for many clusters I'd move to GitOps with Argo CD
+so the cluster pulls its desired state and CI needs no cluster credentials."
+

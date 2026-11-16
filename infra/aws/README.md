@@ -72,13 +72,15 @@ is never printed or pasted):
 
 ```bash
 terraform output -raw github_teardown_role_arn | gh secret set AWS_TEARDOWN_ROLE_ARN
+terraform output -raw github_deploy_role_arn | gh secret set AWS_DEPLOY_ROLE_ARN    # OFP-47
 cd ../..
 gh workflow run nightly-teardown.yml        # a test run now, with nothing to destroy
 gh run watch                                # pick the run; it should end green
+gh workflow run deploy.yml                  # builds and pushes this commit's images, no cluster to deploy to
 ```
 
-The test run proves GitHub can sign in to AWS and reach the state; its log ends with an empty
-leftover check.
+The teardown test proves GitHub can sign in to AWS and reach the state; its log ends with an
+empty leftover check. The deploy test ends with "No running app: images … are pushed".
 
 **3. Tools:** Docker Desktop running, plus `kubectl` and `helm` (you have them from kind).
 
@@ -150,6 +152,32 @@ Leftover check:
 
 All three must be empty. The database is gone **with its data**: the next session starts with
 an empty history.
+
+## Deploy on merge
+
+[.github/workflows/deploy.yml](../../.github/workflows/deploy.yml) runs after CI passes on
+`main` (every merge):
+
+1. builds the api and web images on GitHub's ARM runner and pushes them to ECR, tagged with the
+   commit (`d23f05c`). A re-run reuses them: tags can't be overwritten.
+2. if the cluster is up **and** the app is installed, `helm upgrade` to those images: a rolling
+   update of `ofplens.app`, followed by a health check. With no cluster it stops after step 1.
+
+`pnpm aws:up` on a clean checkout of `main` then finds those images and skips the local build.
+
+It signs in with its own role, `ofplens-github-deploy`, which is much narrower than the
+teardown role: push to the two image repositories, find the cluster, and inside Kubernetes
+edit the `ofplens` namespace only. It can't create or delete infrastructure.
+
+| You want…                       | Do                                                                                   |
+| ------------------------------- | ------------------------------------------------------------------------------------ |
+| to deploy without a new merge   | `gh workflow run deploy.yml` (deploys the newest commit on `main`)                   |
+| to see what was deployed        | `gh run list --workflow deploy.yml`; each run's summary names the commit             |
+| to undo a bad deploy right away | `helm rollback ofplens -n ofplens --kube-context ofplens-aws` (the previous release) |
+| to undo it for good             | revert the commit on GitHub and merge: the next deploy ships the fixed version       |
+
+A deploy whose new pods never become ready rolls itself back (`--rollback-on-failure`), so
+the site keeps serving the previous version and the run fails with the reason.
 
 ## Nightly teardown
 

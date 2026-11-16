@@ -161,7 +161,9 @@ jobs:
         run: docker compose --profile app up --no-build --wait --wait-timeout 120
       - name: Health through the web container
         run: |
-          curl --fail --silent localhost:8080/healthz
+          # Compose can report the web container ready a moment before nginx accepts connections
+          # (seen as curl exit 56, connection reset): retry the first request briefly.
+          curl --fail --silent --retry 10 --retry-delay 1 --retry-all-errors localhost:8080/healthz
           curl --fail --silent localhost:8080/api/health
           curl --fail --silent localhost:8080/history | grep -q '<div id="root">'
       # Browsers only run module scripts served as JavaScript; the route map's worker is .mjs.

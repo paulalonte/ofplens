@@ -205,6 +205,10 @@ with Google or GitHub works there.
 
 ## Step 6 — Deploy on merge (CI/CD)
 
+**Progress:** built (OFP-47). The OIDC provider already existed from the nightly teardown
+(OFP-45); deploys get their own, narrower role. Run book: [infra/aws/README.md](../infra/aws/README.md),
+"Deploy on merge".
+
 **Claude builds**
 
 - A GitHub OIDC role in Terraform: GitHub Actions gets short-lived AWS access for this
@@ -212,8 +216,9 @@ with Google or GitHub works there.
 - A workflow on each merge to `main`: build the images, tag them with the commit, push them to
   ECR, and `helm upgrade` the cluster when it is up (skipped when it is not).
 
-**You do:** add the role's ARN as a repository variable (it is not a secret), and approve the
-first deploy.
+**You do:** apply the bootstrap, store the role's ARN as the repository secret
+`AWS_DEPLOY_ROLE_ARN` (a secret so the account id stays out of this public repository's logs),
+and watch the first deploy.
 
 **Done when:** a merge to `main` reaches the running app with no manual step.
 

@@ -1,0 +1,115 @@
+name: Deploy
+
+# Every merge to main, once CI has passed on it:
+#   1. build the api and web images for ARM (the cluster's t4g nodes), tagged with the commit
+#   2. push them to ECR, so they are ready for the next `pnpm aws:up` even with no cluster up
+#   3. if the cluster exists, `helm upgrade` it to those images (a rolling update of ofplens.app)
+# infra/aws/README.md, "Deploy on merge", explains the setup, manual runs and rollbacks.
+on:
+  workflow_run:
+    workflows: [CI]
+    types: [completed]
+    branches: [main]
+  # By hand: Actions → Deploy → Run workflow (deploys the newest commit on main).
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  # Lets the job ask GitHub for an OIDC token, which AWS exchanges for the deploy role.
+  id-token: write
+
+# Deploys run one after the other. If several merges queue up, GitHub keeps only the newest
+# waiting run (the older ones would deploy outdated commits anyway). Deliberately not the
+# teardown's group: a queued deploy would then cancel a waiting nightly teardown.
+concurrency:
+  group: deploy
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    name: Build, push, deploy
+    # Only for CI runs that passed on a push to main of this repository. The extra checks
+    # matter: `branches: [main]` alone also matches a pull request from a fork whose branch
+    # happens to be called main.
+    if: >-
+      github.event_name == 'workflow_dispatch' ||
+      (github.event.workflow_run.conclusion == 'success' &&
+       github.event.workflow_run.event == 'push' &&
+       github.event.workflow_run.head_repository.full_name == github.repository)
+    # GitHub's free ARM runner: builds ARM images natively (no slow emulation).
+    runs-on: ubuntu-24.04-arm
+    timeout-minutes: 30
+    env:
+      AWS_REGION: eu-central-1
+      CLUSTER: ofplens
+      DOMAIN: ofplens.app
+
+    steps:
+      # The exact commit CI tested (for a manual run: the newest commit on main).
+      - uses: actions/checkout@v7
+        with:
+          ref: ${{ github.event.workflow_run.head_sha || github.sha }}
+
+      - uses: aws-actions/configure-aws-credentials@v6
+        with:
+          role-to-assume: ${{ secrets.AWS_DEPLOY_ROLE_ARN }}
+          role-session-name: deploy
+          aws-region: ${{ env.AWS_REGION }}
+          mask-aws-account-id: true
+
+      - name: Image tag and registry
+        run: |
+          echo "TAG=$(git rev-parse --short=7 HEAD)" >> "$GITHUB_ENV"
+          ACCOUNT=$(aws sts get-caller-identity --query Account --output text)
+          echo "REGISTRY=$ACCOUNT.dkr.ecr.$AWS_REGION.amazonaws.com" >> "$GITHUB_ENV"
+
+      - name: Log in to ECR
+        run: aws ecr get-login-password | docker login --username AWS --password-stdin "$REGISTRY"
+
+      # Tags are immutable in ECR: a re-run for the same commit reuses the images it pushed.
+      - name: Build and push the images (skipped if this commit's images exist)
+        run: |
+          for part in api web; do
+            if aws ecr describe-images --repository-name "ofplens-$part" \
+                 --image-ids imageTag="$TAG" >/dev/null 2>&1; then
+              echo "ofplens-$part:$TAG is already in ECR"
+            else
+              docker build --target "$part" -t "$REGISTRY/ofplens-$part:$TAG" .
+              docker push "$REGISTRY/ofplens-$part:$TAG"
+            fi
+          done
+
+      - uses: azure/setup-helm@v5
+        with:
+          version: v4.3.2
+
+      # Deploy only to a running cluster where `pnpm aws:up` has installed the app (it sets up
+      # the namespace and the app's secret, which this role isn't allowed to).
+      - name: Is the app running?
+        id: cluster
+        run: |
+          if aws eks describe-cluster --name "$CLUSTER" >/dev/null 2>&1 &&
+             aws eks update-kubeconfig --name "$CLUSTER" --alias ofplens-aws >/dev/null &&
+             helm status ofplens --kube-context ofplens-aws --namespace ofplens >/dev/null 2>&1; then
+            echo "up=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "up=false" >> "$GITHUB_OUTPUT"
+            echo "No running app: images $TAG are pushed for the next \`pnpm aws:up\`; nothing to deploy to." >> "$GITHUB_STEP_SUMMARY"
+          fi
+
+      # --rollback-on-failure: if the new pods don't become ready, Helm returns the release to
+      # the previous version by itself, and the site keeps serving the old one.
+      - name: helm upgrade
+        if: steps.cluster.outputs.up == 'true'
+        run: |
+          helm upgrade ofplens deploy/helm/ofplens --kube-context ofplens-aws --namespace ofplens \
+            -f deploy/helm/ofplens/values-aws.yaml \
+            --set image.registry="$REGISTRY" --set image.tag="$TAG" \
+            --rollback-on-failure --wait --timeout 10m
+
+      - name: Smoke test
+        if: steps.cluster.outputs.up == 'true'
+        run: |
+          curl --fail --silent --show-error --retry 10 --retry-delay 6 --retry-all-errors \
+            "https://$DOMAIN/api/health"
+          echo "Deployed $TAG to https://$DOMAIN" >> "$GITHUB_STEP_SUMMARY"
