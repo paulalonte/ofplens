@@ -543,6 +543,24 @@ check and per prompt version, so prompt or model changes are measured, not guess
   git-ignored tfvars. CI: `terraform fmt -check` and `validate`, no AWS access.
   Run book: [infra/README.md](../infra/README.md).
 
+### OFP-44 · The cluster on AWS: VPC, EKS, RDS, load balancer, External Secrets
+- Deployment step 4b ([DEPLOYMENT.md](DEPLOYMENT.md)).
+- **Done when:** `pnpm aws:up` creates the cluster and serves the app on the load balancer's
+  address, and `pnpm aws:down` removes everything except the bootstrap, with no load balancer
+  left behind.
+- *As built:* `infra/aws` with the community VPC (2 AZs, public + database subnets, no NAT), EKS
+  (1.37, two t4g.medium ARM nodes, managed add-ons) and Pod Identity modules; RDS Postgres 16
+  `db.t4g.micro`, nodes-only security group, disposable; the AWS Load Balancer Controller and
+  External Secrets as Helm releases with least-privilege Pod Identity roles. `ofplens/app` secret
+  in bootstrap (kept), `ofplens/database` with the cluster. `deploy/aws` scripts and
+  ExternalSecret; `values-aws.yaml` (ALB in IP mode, per-service health checks). Sign-in on AWS
+  waits for a domain (step 5). Run book: [infra/aws/README.md](../infra/aws/README.md).
+
+### OFP-45 · Nightly teardown with GitHub OIDC
+- Deployment safety net, moved before the first cluster apply.
+- **Done when:** a scheduled GitHub Actions job destroys `infra/aws` every night unless marked
+  to stay, signed in to AWS through GitHub OIDC with no stored keys.
+
 ---
 
 ## Later phases (not ticketed yet)

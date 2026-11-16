@@ -81,6 +81,10 @@ metadata:
   labels:
     {{- include "ofplens.labels" . | nindent 4 }}
     app.kubernetes.io/component: web
+  {{- with .Values.web.serviceAnnotations }}
+  annotations:
+    {{- toYaml . | nindent 4 }}
+  {{- end }}
 spec:
   selector:
     {{- include "ofplens.selector" (list . "web") | nindent 4 }}

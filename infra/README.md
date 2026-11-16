@@ -3,10 +3,12 @@
 Everything OFP Lens needs on AWS, as code. Deployment plan: [docs/DEPLOYMENT.md](../docs/DEPLOYMENT.md),
 step 4. What each part teaches: [docs/LEARNING.md](../docs/LEARNING.md), step 4.
 
-| Stack                     | What                                                                | Lifetime                          | Cost                 |
-| ------------------------- | ------------------------------------------------------------------- | --------------------------------- | -------------------- |
-| [`bootstrap/`](bootstrap) | Budget alarm, S3 bucket for Terraform state, ECR image repositories | Applied once, kept                | Under $1/month       |
-| `aws/` (next)             | VPC, EKS, RDS, load balancer controller, External Secrets           | Created and destroyed as you like | Only while it exists |
+| Stack                     | What                                                                                     | Lifetime                          | Cost                        |
+| ------------------------- | ---------------------------------------------------------------------------------------- | --------------------------------- | --------------------------- |
+| [`bootstrap/`](bootstrap) | Budget alarm, S3 bucket for Terraform state, ECR image repositories, the app-keys secret | Applied once, kept                | About $1/month              |
+| [`aws/`](aws)             | VPC, EKS, RDS, load balancer controller, External Secrets                                | Created and destroyed per session | ~$0.25/hour while it exists |
+
+**The cluster has its own guide, with costs first: [aws/README.md](aws/README.md).**
 
 **You run every `plan` and `apply` yourself**, signed in with your SSO profile. Nothing here
 holds credentials, and CI only checks formatting and validity.
@@ -47,6 +49,7 @@ terraform apply       # shows the plan again; type yes
 Read the plan before typing `yes`: every `+` is something created on AWS. You should see the
 budget, the S3 bucket with its settings (versioning, encryption, public access block,
 ownership, lifecycle, policy), and two ECR repositories with their lifecycle policies.
+(Since OFP-44 the bootstrap also has the `ofplens/app` secret, so a first apply shows 14.)
 
 **3. Move the state into the bucket:**
 

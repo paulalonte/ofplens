@@ -145,8 +145,10 @@ locally, or in the Kubernetes Secret.
 ## Step 4 — AWS foundation with Terraform
 
 **Progress:** step 0's AWS setup is done (Identity Center user, SSO profile `ofplens`,
-eu-central-1). **4a, the bootstrap stack, is built (OFP-43)**: see [infra/README.md](../infra/README.md)
-to apply it. 4b, the cluster stack `infra/aws`, is next.
+eu-central-1). **4a, the bootstrap stack, is built and applied (OFP-43)**:
+[infra/README.md](../infra/README.md). **4b, the cluster stack, is built (OFP-44)**: its run book,
+with costs first, is [infra/aws/README.md](../infra/aws/README.md). The nightly teardown (OFP-45)
+comes before the first cluster apply.
 
 **You do first:** step 0's AWS items, then log in on your Mac:
 
@@ -164,18 +166,20 @@ aws sts get-caller-identity
     gateway (it would cost ~$35/month on its own)
   - an EKS cluster with two small `t4g` (Graviton) nodes
   - RDS Postgres (`db.t4g.micro`), reachable only from the cluster
-  - IAM roles for service accounts (IRSA), so pods get AWS permissions without keys
+  - EKS Pod Identity, so the controllers get AWS permissions without keys (the newer
+    alternative to IRSA)
   - the AWS Load Balancer Controller (turns the Ingress into an Application Load Balancer)
   - External Secrets, which copies the secrets from AWS Secrets Manager into Kubernetes
 
 **You do:**
 
-1. `terraform init`, then `terraform plan`; read what it will create and what it costs.
-2. `terraform apply` (Claude asks you first; this is the step that starts the bill).
-3. In the AWS console, paste the production Claude key into its Secrets Manager entry.
+1. Apply the bootstrap again (it gained the `ofplens/app` secret).
+2. In the AWS console, paste the production Claude key into `ofplens/app` (optional).
    Create a separate key for production in the Anthropic console, with a monthly spend limit.
-4. `helm install` with `values-aws.yaml`; open the load balancer's address.
-5. When you're done for the day: `terraform destroy` in `infra/aws`.
+3. `pnpm aws:up`: reads the plan, asks for `yes` (this starts the bill), pushes the images,
+   installs the chart with `values-aws.yaml`, prints the load balancer's address.
+4. When you're done for the day: `pnpm aws:down` (uninstalls the app so the load balancer goes,
+   then `terraform destroy`).
 
 **You learn:** Terraform state, plan and apply, modules; VPCs and security groups; EKS; IAM
 roles for pods; how a Kubernetes Ingress becomes an AWS load balancer.

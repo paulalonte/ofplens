@@ -183,8 +183,12 @@ jobs:
     steps:
       - uses: actions/checkout@v7
 
-      - name: Lint the chart
-        run: helm lint deploy/helm/ofplens -f deploy/helm/ofplens/values-kind.yaml --set image.tag=ci
+      - name: Lint the chart (kind and AWS values)
+        run: |
+          helm lint deploy/helm/ofplens -f deploy/helm/ofplens/values-kind.yaml --set image.tag=ci
+          helm lint deploy/helm/ofplens -f deploy/helm/ofplens/values-aws.yaml --set image.tag=ci \
+            --set image.registry=123456789012.dkr.ecr.eu-central-1.amazonaws.com \
+            --set api.publicUrl=http://ofplens.example.com
 
       # The same 3-node cluster and the same script as on your Mac (pnpm kind:up).
       - uses: helm/kind-action@v1.15.2
