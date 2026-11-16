@@ -702,13 +702,21 @@ controller-created resources before `terraform destroy`, so nothing is orphaned.
 **Concepts**
 
 - **Workload identity federation (GitHub OIDC):** every workflow run can ask GitHub for a
-  signed token that says *who* it is: `repo:paulalonte/ofplens:ref:refs/heads/main`. AWS
+  signed token that says *who* it is, its `sub`:
+  `repo:paulalonte@11928482/ofplens@1451769280:ref:refs/heads/main`. AWS
   trusts GitHub as an identity provider (`aws_iam_openid_connect_provider`) and swaps that
   token for one hour of credentials for a role (`AssumeRoleWithWebIdentity`). It's the same
   idea as your SSO login and as Pod Identity: **nothing long-lived to leak**.
 - **The trust policy is the security boundary:** `aud` must be `sts.amazonaws.com` and `sub`
   must be this repo's `main` branch. A pull request from a fork gets a different `sub`
   (`…:pull_request`) and is refused, so a stranger's PR can't run code with your AWS role.
+- **Immutable subjects:** the numbers are the owner's and the repository's permanent ids. With
+  plain names (`repo:owner/name`), deleting a repo (or renaming an account) lets someone
+  recreate the same name and inherit the trust. GitHub now uses the id form for this
+  repository, and the first test run proved it: AWS answered *Not authorized to perform
+  sts:AssumeRoleWithWebIdentity*, the classic sign of a trust policy whose `sub` doesn't match
+  the token. Check the real format with
+  `gh api repos/<owner>/<repo>/actions/oidc/customization/sub` instead of guessing.
 - **`permissions: id-token: write`:** a workflow only gets an OIDC token when it asks for one.
   Other workflows (CI) don't, so they couldn't assume the role even if they tried.
 - **Guard rails on a broad role:** destroying a whole stack touches EC2, EKS, RDS, IAM and
