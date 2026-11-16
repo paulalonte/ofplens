@@ -560,6 +560,13 @@ check and per prompt version, so prompt or model changes are measured, not guess
 - Deployment safety net, moved before the first cluster apply.
 - **Done when:** a scheduled GitHub Actions job destroys `infra/aws` every night unless marked
   to stay, signed in to AWS through GitHub OIDC with no stored keys.
+- *As built:* `infra/bootstrap/github.tf`: the GitHub OIDC provider and `ofplens-github-teardown`
+  (trusts only `main` of this repository; PowerUserAccess + IAM read + deleting IAM tagged
+  `Stack=aws`; denied reading `ofplens/app`). An EKS access entry for it in `infra/aws`.
+  `nightly-teardown.yml` at 01:00 UTC and on demand, skipped when the variable
+  `KEEP_CLUSTER=true`; runs `deploy/aws/down.sh`, which now fails if anything is left. Also
+  switched off two EKS module defaults that cost money per session (a KMS key, control plane
+  logs).
 
 ---
 

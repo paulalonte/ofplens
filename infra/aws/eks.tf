@@ -25,6 +25,29 @@ module "eks" {
   # needs no OIDC provider in IAM.
   enable_irsa = false
 
+  # Two module defaults switched off for a disposable cluster:
+  # - its own KMS key for Kubernetes Secrets ($1/month each, and a deleted key lingers 30
+  #   days, so one per session adds up). EKS already encrypts Secrets with an AWS-owned key.
+  # - control plane logs in CloudWatch (billed per GB; the audit log is chatty).
+  create_kms_key              = false
+  encryption_config           = null
+  enabled_log_types           = []
+  create_cloudwatch_log_group = false
+
+  # The nightly teardown (GitHub Actions, OFP-45) must uninstall Helm releases before
+  # destroying, so its role is a cluster admin too. The role is created by infra/bootstrap.
+  access_entries = {
+    github_teardown = {
+      principal_arn = data.aws_iam_role.github_teardown.arn
+      policy_associations = {
+        admin = {
+          policy_arn   = "arn:aws:eks::aws:cluster-access-policy/AmazonEKSClusterAdminPolicy"
+          access_scope = { type = "cluster" }
+        }
+      }
+    }
+  }
+
   # AWS-managed add-ons, kept compatible with the Kubernetes version by EKS.
   addons = {
     vpc-cni = {
@@ -50,4 +73,8 @@ module "eks" {
       desired_size = var.node_count
     }
   }
+}
+
+data "aws_iam_role" "github_teardown" {
+  name = "ofplens-github-teardown"
 }

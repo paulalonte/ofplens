@@ -693,3 +693,50 @@ live in Secrets Manager and are synced into the namespace by External Secrets, s
 chart is identical to the one used on a local kind cluster. It's a non-production,
 cost-optimised setup: no NAT gateway, a disposable database, and a teardown that removes
 controller-created resources before `terraform destroy`, so nothing is orphaned."
+
+### Step 4b, part 2 — the nightly teardown (GitHub OIDC)
+
+**What was built:** a GitHub Actions workflow that runs `deploy/aws/down.sh` every night, and in
+`infra/bootstrap` the AWS side that lets it sign in without any stored key.
+
+**Concepts**
+
+- **Workload identity federation (GitHub OIDC):** every workflow run can ask GitHub for a
+  signed token that says *who* it is: `repo:paulalonte/ofplens:ref:refs/heads/main`. AWS
+  trusts GitHub as an identity provider (`aws_iam_openid_connect_provider`) and swaps that
+  token for one hour of credentials for a role (`AssumeRoleWithWebIdentity`). It's the same
+  idea as your SSO login and as Pod Identity: **nothing long-lived to leak**.
+- **The trust policy is the security boundary:** `aud` must be `sts.amazonaws.com` and `sub`
+  must be this repo's `main` branch. A pull request from a fork gets a different `sub`
+  (`…:pull_request`) and is refused, so a stranger's PR can't run code with your AWS role.
+- **`permissions: id-token: write`:** a workflow only gets an OIDC token when it asks for one.
+  Other workflows (CI) don't, so they couldn't assume the role even if they tried.
+- **Guard rails on a broad role:** destroying a whole stack touches EC2, EKS, RDS, IAM and
+  more, so the role is broad (PowerUserAccess). It's narrowed where it matters: IAM deletes
+  only on resources tagged `Stack=aws`, and an explicit **Deny** on reading your app keys.
+  In IAM an explicit Deny always beats an Allow.
+- **Public repo hygiene:** workflow logs of a public repository are public. The role ARN is a
+  GitHub *secret* (masked in logs) and `mask-aws-account-id` hides the account id.
+- **Hidden per-session costs:** the EKS module creates a KMS key and CloudWatch control-plane
+  logs by default. Fine for a long-lived cluster; for one recreated daily, every session left a
+  $1/month key (deleted keys wait 30 days) and paid log ingestion. Both are switched off. Read
+  a module's defaults, not just the inputs you set.
+
+**Try it**
+
+```bash
+gh workflow run nightly-teardown.yml && gh run watch       # sign-in + empty leftover check
+gh variable set KEEP_CLUSTER --body true                   # skip tonight
+aws iam get-role --role-name ofplens-github-teardown --query Role.AssumeRolePolicyDocument
+```
+
+**Interview**
+
+"Non-production clusters are torn down nightly by a scheduled GitHub Actions workflow. It
+authenticates with GitHub OIDC: the IAM role's trust policy pins the audience and the subject
+to the main branch of one repository, so no static credentials exist and forks can't assume
+it. The role is broad enough to destroy the stack, but IAM deletions are restricted by tag,
+and an explicit deny blocks reading application secrets. Teardown runs the same script
+engineers run by hand, which removes controller-created load balancers first and fails the job
+if anything billable is left."
+
