@@ -41,10 +41,17 @@ else
   run terraform -chdir="$TF_DIR" destroy
 fi
 
-# 3. What is left that costs money? All three should say nothing / not found.
+# 3. What is left that costs money? All three should be empty.
+kubectl config delete-context "$CONTEXT" >/dev/null 2>&1 || true
+CLUSTERS=$(aws eks list-clusters --region "$REGION" --query 'clusters' --output text)
+LBS=$(aws elbv2 describe-load-balancers --region "$REGION" --query 'LoadBalancers[].LoadBalancerName' --output text)
+DBS=$(aws rds describe-db-instances --region "$REGION" --query 'DBInstances[].DBInstanceIdentifier' --output text)
 echo
 echo "Leftover check:"
-echo "  EKS clusters:   $(aws eks list-clusters --region "$REGION" --query 'clusters' --output text)"
-echo "  Load balancers: $(aws elbv2 describe-load-balancers --region "$REGION" --query 'LoadBalancers[].LoadBalancerName' --output text)"
-echo "  Databases:      $(aws rds describe-db-instances --region "$REGION" --query 'DBInstances[].DBInstanceIdentifier' --output text)"
-kubectl config delete-context "$CONTEXT" >/dev/null 2>&1 || true
+echo "  EKS clusters:   $CLUSTERS"
+echo "  Load balancers: $LBS"
+echo "  Databases:      $DBS"
+if [[ -n "$CLUSTERS$LBS$DBS" ]]; then
+  echo "Something is still running (and billed). See infra/aws/README.md, 'If something is left'." >&2
+  exit 1
+fi

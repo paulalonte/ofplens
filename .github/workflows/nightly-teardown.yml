@@ -1,0 +1,53 @@
+name: Nightly teardown
+
+# Destroys the AWS cluster (infra/aws) every night, in case it was left running: the same
+# `pnpm aws:down` you run by hand. Keeps infra/bootstrap. infra/aws/README.md explains how to
+# keep the cluster for a night, and how to run this by hand (Actions → Nightly teardown → Run).
+on:
+  schedule:
+    # 01:00 UTC: 02:00 in Germany in winter, 03:00 in summer. GitHub may start it a little late.
+    - cron: '0 1 * * *'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  # Lets the job ask GitHub for an OIDC token, which AWS exchanges for the teardown role.
+  id-token: write
+
+# Never two teardowns at once (Terraform's state lock would stop the second anyway).
+concurrency:
+  group: aws-cluster
+  cancel-in-progress: false
+
+jobs:
+  teardown:
+    name: Destroy infra/aws
+    # Repository variable KEEP_CLUSTER=true skips it (Settings → Secrets and variables → Actions).
+    if: vars.KEEP_CLUSTER != 'true'
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+
+    steps:
+      - uses: actions/checkout@v7
+
+      # No stored keys: GitHub's OIDC token is exchanged for the role from infra/bootstrap,
+      # which trusts only workflows on main of this repository. The role ARN is a secret so the
+      # account id stays out of this public repository's logs.
+      - uses: aws-actions/configure-aws-credentials@v6
+        with:
+          role-to-assume: ${{ secrets.AWS_TEARDOWN_ROLE_ARN }}
+          role-session-name: nightly-teardown
+          aws-region: eu-central-1
+          mask-aws-account-id: true
+
+      - uses: hashicorp/setup-terraform@v4
+        with:
+          terraform_version: ~1.17.0
+          # The wrapper rewrites terraform's output; the script reads it plainly.
+          terraform_wrapper: false
+
+      # kubectl and helm come with the runner image.
+      - name: Tear down (deploy/aws/down.sh)
+        run: deploy/aws/down.sh
+        env:
+          AUTO_APPROVE: '1'

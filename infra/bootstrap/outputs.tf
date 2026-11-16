@@ -16,3 +16,8 @@ output "app_secret_name" {
   description = "Secrets Manager secret with the app's keys; paste values in the console."
   value       = aws_secretsmanager_secret.app.name
 }
+
+output "github_teardown_role_arn" {
+  description = "Store as the GitHub secret AWS_TEARDOWN_ROLE_ARN (infra/aws/README.md)."
+  value       = aws_iam_role.github_teardown.arn
+}

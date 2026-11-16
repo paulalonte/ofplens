@@ -147,8 +147,8 @@ locally, or in the Kubernetes Secret.
 **Progress:** step 0's AWS setup is done (Identity Center user, SSO profile `ofplens`,
 eu-central-1). **4a, the bootstrap stack, is built and applied (OFP-43)**:
 [infra/README.md](../infra/README.md). **4b, the cluster stack, is built (OFP-44)**: its run book,
-with costs first, is [infra/aws/README.md](../infra/aws/README.md). The nightly teardown (OFP-45)
-comes before the first cluster apply.
+with costs first, is [infra/aws/README.md](../infra/aws/README.md). The nightly teardown (OFP-45,
+GitHub OIDC) runs `aws:down` every night; it's set up before the first cluster apply.
 
 **You do first:** step 0's AWS items, then log in on your Mac:
 
