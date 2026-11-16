@@ -59,6 +59,9 @@ resource "helm_release" "lb_controller" {
   chart      = "aws-load-balancer-controller"
   version    = "3.6.3"
   namespace  = "kube-system"
+  # If a release with this name already exists (say a failed install that Terraform no longer
+  # tracks), take it over with an upgrade instead of failing with "name still in use".
+  upgrade_install = true
 
   values = [yamlencode({
     clusterName  = module.eks.cluster_name
@@ -86,6 +89,7 @@ resource "helm_release" "external_secrets" {
   version          = "2.15.0"
   namespace        = "external-secrets"
   create_namespace = true
+  upgrade_install  = true # see lb_controller
 
   values = [yamlencode({
     serviceAccount = {
