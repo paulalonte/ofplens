@@ -41,7 +41,16 @@ k create namespace "$NAMESPACE" --dry-run=client -o yaml | k apply -f -
 k apply -f deploy/aws/external-secret.yaml
 k wait externalsecret/ofplens-secrets -n "$NAMESPACE" --for=condition=Ready --timeout=120s
 
-# 4. The app, at https://ofplens.app (api.publicUrl and ingress.host in values-aws.yaml).
+# 4. A DNS record left over from an earlier session (pointing at a load balancer that no longer
+#    exists) would stop ExternalDNS from creating the right one: it never overwrites a record it
+#    doesn't own. Remove it first.
+STALE="$(dns_target)"
+if [[ -n "$STALE" && "$STALE" != "$(lb_host)" ]]; then
+  echo "Removing a stale $DOMAIN record (it points at $STALE, a load balancer from an earlier session)." >&2
+  remove_dns_records
+fi
+
+# 5. The app, at https://ofplens.app (api.publicUrl and ingress.host in values-aws.yaml).
 run helm upgrade --install ofplens deploy/helm/ofplens --kube-context "$CONTEXT" \
   --namespace "$NAMESPACE" -f deploy/helm/ofplens/values-aws.yaml \
   --set image.registry="$REGISTRY" --set image.tag="$TAG" --wait --timeout 10m
@@ -50,21 +59,20 @@ echo
 k get pods -n "$NAMESPACE" -o wide
 echo
 
-# 5. DNS. ExternalDNS writes ofplens.app → load balancer once the load balancer exists. Wait for
-#    the record in Route 53's API before asking DNS for the name: asking too early makes DNS
-#    resolvers remember "no such record" for a while (negative caching).
-echo "Waiting for ExternalDNS to create the $DOMAIN record (a new load balancer takes a few minutes)..." >&2
-ZONE_ID=$(aws route53 list-hosted-zones-by-name --dns-name "$DOMAIN" --max-items 1 \
-  --query 'HostedZones[0].Id' --output text)
-record_exists() {
-  [[ "$(aws route53 list-resource-record-sets --hosted-zone-id "$ZONE_ID" \
-    --query "length(ResourceRecordSets[?Name=='$DOMAIN.' && Type=='A'])" --output text)" != 0 ]]
-}
+# 6. DNS. ExternalDNS points ofplens.app at the load balancer once it exists. Wait until Route 53
+#    (its API, not DNS: asking DNS too early makes resolvers remember "no such record" for a
+#    while) has a record pointing at *this* load balancer.
+echo "Waiting for the load balancer and the $DOMAIN record (a new load balancer takes a few minutes)..." >&2
 for _ in $(seq 60); do
-  record_exists && break
+  LB="$(lb_host)"
+  [[ -n "$LB" && "$(dns_target)" == "$LB" ]] && break
   sleep 10
 done
-record_exists || { echo "No DNS record after 10 minutes: kubectl --context $CONTEXT logs -n external-dns deploy/external-dns" >&2; exit 1; }
+if [[ -z "$LB" || "$(dns_target)" != "$LB" ]]; then
+  echo "After 10 minutes $DOMAIN points at '$(dns_target)', not the load balancer '$LB'." >&2
+  echo "  kubectl --context $CONTEXT logs -n external-dns deploy/external-dns --tail=20" >&2
+  exit 1
+fi
 
 echo "Waiting for https://$DOMAIN/api/health..." >&2
 curl --fail --silent --retry 30 --retry-delay 10 --retry-all-errors "https://$DOMAIN/api/health" >/dev/null &&

@@ -252,12 +252,13 @@ To see everything the project still costs: **Billing → Cost Explorer**, filter
 
 ## When things go wrong
 
-| Symptom                                             | Likely cause and fix                                                                                                          |
-| --------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------- |
-| `Not signed in to AWS (or the session expired)`     | `aws sso login`, then run the command again                                                                                   |
-| Token expired in the middle of `apply` or `destroy` | `aws sso login` and run it again. Terraform continues where it stopped                                                        |
-| `Error acquiring the state lock`                    | Another run is still going (or was killed). Wait; only if you're sure nothing runs: `terraform force-unlock <id>`             |
-| `kubectl wait externalsecret…` times out            | `kubectl --context ofplens-aws describe externalsecret ofplens-secrets -n ofplens`: the event says which secret or permission |
-| Pods `ImagePullBackOff`                             | `kubectl describe pod`: wrong tag, or an image built for Intel (the nodes are ARM)                                            |
-| Address answers `502`/`503` for a few minutes       | Normal right after install: the load balancer's health checks haven't passed yet                                              |
-| `Kubernetes cluster unreachable` during `destroy`   | The cluster was deleted outside Terraform. Ask before going further: the fix depends on what's left                           |
+| Symptom                                                               | Likely cause and fix                                                                                                                         |
+| --------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------- |
+| `Not signed in to AWS (or the session expired)`                       | `aws sso login`, then run the command again                                                                                                  |
+| Token expired in the middle of `apply` or `destroy`                   | `aws sso login` and run it again. Terraform continues where it stopped                                                                       |
+| `Error acquiring the state lock`                                      | Another run is still going (or was killed). Wait; only if you're sure nothing runs: `terraform force-unlock <id>`                            |
+| `kubectl wait externalsecret…` times out                              | `kubectl --context ofplens-aws describe externalsecret ofplens-secrets -n ofplens`: the event says which secret or permission                |
+| Pods `ImagePullBackOff`                                               | `kubectl describe pod`: wrong tag, or an image built for Intel (the nodes are ARM)                                                           |
+| Address answers `502`/`503` for a few minutes                         | Normal right after install: the load balancer's health checks haven't passed yet                                                             |
+| `up.sh` stops: `ofplens.app points at '…', not the load balancer '…'` | ExternalDNS couldn't create the record. Its log says why: `kubectl --context ofplens-aws logs -n external-dns deploy/external-dns --tail=20` |
+| `Kubernetes cluster unreachable` during `destroy`                     | The cluster was deleted outside Terraform. Ask before going further: the fix depends on what's left                                          |

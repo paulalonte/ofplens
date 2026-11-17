@@ -811,6 +811,15 @@ if anything billable is left."
 - **Ownership:** next to each record it creates, ExternalDNS writes a `TXT` record saying
   "owned by ofplens". With `policy: sync` it deletes only records it owns, never the
   certificate's validation records or anything you make by hand.
+- **The leftover record (16 Nov 2026):** a teardown left `ofplens.app` pointing at the old,
+  deleted load balancer, without its ownership TXT records. Next session ExternalDNS logged
+  "All records are already up to date" and did nothing: it never overwrites a record it doesn't
+  own. Route 53 answered nothing (an alias to a load balancer that's gone resolves to nothing),
+  while `up.sh`'s check only asked "is there an A record?" and passed. Fixes: `up.sh` removes
+  a record pointing at any load balancer other than the current one before installing, and
+  waits until the record points at *this* load balancer; `down.sh` deletes the record itself
+  if ExternalDNS didn't. Lesson: check the *value* you need, not only that something exists,
+  and compare what DNS answers (`dig @<authoritative server>`) with what the API says.
 - **Why not Terraform for this record:** the ALB's address only exists after the app is
   installed, and changes with every new cluster. A controller that follows the Ingress keeps
   DNS right without a second Terraform run. Teardown order matters again: the record is
