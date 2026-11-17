@@ -1,5 +1,5 @@
 import type { FlightPlanSummary } from '@ofplens/ofp';
-import type { RouteHazardView } from '@ofplens/weather';
+import type { OutsideLevelsHazardView, RouteHazardView } from '@ofplens/weather';
 import {
   Component,
   lazy,
@@ -21,14 +21,21 @@ interface Props {
   plan: FlightPlanSummary;
   /** Hazards along the route (saved plans); none on sample pages. */
   hazards?: readonly RouteHazardView[];
+  /** Areas the route crosses only above or below their levels, drawn dashed. */
+  outsideLevels?: readonly OutsideLevelsHazardView[];
 }
+
+const NONE: never[] = [];
 
 /**
  * The route on a map, with the hazard areas that touch it and the affected stretches in the
  * hazard's colour. The map library only loads once the card scrolls into view.
  */
-export function RouteMapCard({ plan, hazards = [] }: Props) {
-  const data = useMemo(() => buildRouteMapData(plan, hazards, describeHazard), [plan, hazards]);
+export function RouteMapCard({ plan, hazards = NONE, outsideLevels = NONE }: Props) {
+  const data = useMemo(
+    () => buildRouteMapData(plan, hazards, describeHazard, outsideLevels),
+    [plan, hazards, outsideLevels],
+  );
   const [ref, visible] = useVisible<HTMLDivElement>();
   const dark = useDarkMode();
   const [failed, setFailed] = useState(false);
@@ -73,6 +80,15 @@ export function RouteMapCard({ plan, hazards = [] }: Props) {
               {HAZARD_LABEL[kind]}
             </li>
           ))}
+          {data.hasOutside && (
+            <li className="flex items-center gap-1.5 text-slate-600 dark:text-slate-400">
+              <span
+                aria-hidden
+                className="inline-block h-3 w-3 rounded-sm border border-dashed border-current"
+              />
+              Dashed: outside your levels
+            </li>
+          )}
         </ul>
       )}
       <p className="mt-2 text-xs text-slate-500 dark:text-slate-400">

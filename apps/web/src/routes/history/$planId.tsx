@@ -81,6 +81,7 @@ function PlanPage() {
         hazards={<HazardsCard planId={planId} />}
         navlogMarks={hazardMarks(hazards)}
         routeHazards={hazards.hazards}
+        outsideLevels={hazards.outsideLevels}
       />
     </div>
   );

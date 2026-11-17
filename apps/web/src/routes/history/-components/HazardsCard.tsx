@@ -7,7 +7,7 @@ import type {
 } from '@ofplens/weather';
 import { useHazardRefreshState, usePlanHazards, useRefreshHazards } from '../../../api/hazards';
 import { useAutoRefreshWeather } from '../../../api/weather';
-import { HAZARD_LABEL, hazardLevels } from '../../../components/briefing/hazardStyle';
+import { HAZARD_LABEL, hazardLevels, PASSES_LABEL } from '../../../components/briefing/hazardStyle';
 import { Card } from '../../../components/Card';
 
 const SOURCE_LABEL: Record<HazardSource, string> = {
@@ -119,12 +119,6 @@ function NoneFound({ hazards }: { hazards: FlightPlanHazardsResponse }) {
     </p>
   );
 }
-
-const PASSES_LABEL: Record<Passes, string> = {
-  above: 'Above it',
-  below: 'Below it',
-  above_and_below: 'Above and below it',
-};
 
 function HazardItem({
   hazard,

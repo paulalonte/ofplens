@@ -74,6 +74,7 @@ describe('buildRouteMapData', () => {
         color: '#dc2626',
         title: 'Thunderstorms',
         detail: 'Up to FL380 · until 18:00Z · BEBKU → MAREM',
+        outside: false,
       },
       {
         id: 'gairmet:x',
@@ -81,8 +82,10 @@ describe('buildRouteMapData', () => {
         color: '#d97706',
         title: 'Turbulence · severe',
         detail: 'FL300–FL400 · until 18:00Z · TOD → NETES',
+        outside: false,
       },
     ]);
+    expect(data.hasOutside).toBe(false);
     // BEBKU → PIKIB → MAREM, in the thunderstorm's colour.
     const stretch = data.affected.features[0]!;
     expect(stretch.properties.color).toBe('#dc2626');
@@ -91,6 +94,29 @@ describe('buildRouteMapData', () => {
     expect(stretch.geometry.coordinates.at(-1)).toEqual([ident(8).lon, ident(8).lat]);
     expect(stretch.geometry.coordinates).toContainEqual([ident(7).lon, ident(7).lat]);
     expect(data.kinds).toEqual(['thunderstorm', 'turbulence']);
+  });
+
+  it('draws areas crossed outside their levels apart, with no route stretch', () => {
+    const low = {
+      ...hazard({ id: 'isigmet:LOW', hazard: 'turbulence', severity: 'severe', topFt: 11000 }),
+      passes: 'above' as const,
+    };
+    const data = buildRouteMapData(eddbEddm, [], describeHazard, [low])!;
+
+    expect(data.hazards.features.map((f) => f.properties)).toEqual([
+      {
+        id: 'isigmet:LOW',
+        kind: 'turbulence',
+        color: '#d97706',
+        title: 'Turbulence · severe',
+        detail:
+          'Outside your levels: you pass above it · Up to FL110 · until 18:00Z · BEBKU → MAREM',
+        outside: true,
+      },
+    ]);
+    expect(data.affected.features).toEqual([]);
+    expect(data.hasOutside).toBe(true);
+    expect(data.kinds).toEqual(['turbulence']);
   });
 
   describe('across the antimeridian', () => {

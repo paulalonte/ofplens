@@ -610,8 +610,8 @@ check and per prompt version, so prompt or model changes are measured, not guess
 - *As built:* `matchRouteAdvisories()` in `@ofplens/weather` returns `onRoute` and
   `outsideLevels` (with `passes`: above, below, above_and_below); `matchRouteHazards()` is its
   `onRoute`. Stored in `advisories` with a nullable `passes` column (null = on the route), served
-  as `outsideLevels` next to `hazards`. The navlog marks, the map and the briefing agent still
-  use only the hazards on the route.
+  as `outsideLevels` next to `hazards`. The map draws them dashed and faint, with no coloured
+  route stretch; the navlog marks and the briefing agent still use only the hazards on the route.
 
 ---
 

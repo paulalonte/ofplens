@@ -1,5 +1,5 @@
 import type { FlightPlanSummary, WeightUnit } from '@ofplens/ofp';
-import type { RouteHazardView } from '@ofplens/weather';
+import type { OutsideLevelsHazardView, RouteHazardView } from '@ofplens/weather';
 import { useState, type ReactNode } from 'react';
 import { BriefingHeader } from './BriefingHeader';
 import { FlightDataCard } from './FlightDataCard';
@@ -32,6 +32,8 @@ interface Props {
   navlogMarks?: ReadonlyMap<number, readonly string[]>;
   /** Hazards along the route, drawn on the route map (saved plans). */
   routeHazards?: readonly RouteHazardView[];
+  /** Areas the route crosses only above or below their levels, for the map. */
+  outsideLevels?: readonly OutsideLevelsHazardView[];
 }
 
 export function BriefingPage({
@@ -43,6 +45,7 @@ export function BriefingPage({
   hazards,
   navlogMarks,
   routeHazards,
+  outsideLevels,
 }: Props) {
   const [displayUnit, setDisplayUnit] = useState<WeightUnit>(preferredUnit ?? plan.units);
 
@@ -64,7 +67,11 @@ export function BriefingPage({
       {aiBriefing}
       {weather ?? <WeatherCard plan={plan} />}
       {hazards}
-      <RouteMapCard plan={plan} {...(routeHazards && { hazards: routeHazards })} />
+      <RouteMapCard
+        plan={plan}
+        {...(routeHazards && { hazards: routeHazards })}
+        {...(outsideLevels && { outsideLevels })}
+      />
       <NavlogCard plan={plan} displayUnit={displayUnit} hazardMarks={navlogMarks} />
 
       <p className="text-xs text-slate-500 dark:text-slate-400">

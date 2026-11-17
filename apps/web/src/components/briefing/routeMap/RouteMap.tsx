@@ -64,13 +64,25 @@ export default function RouteMap({ data, dark, onError }: Props) {
         id: 'hazard-fill',
         type: 'fill',
         source: 'hazards',
-        paint: { 'fill-color': ['get', 'color'], 'fill-opacity': 0.22 },
+        // Faint when the route only passes above or below it.
+        paint: {
+          'fill-color': ['get', 'color'],
+          'fill-opacity': ['case', ['get', 'outside'], 0.07, 0.22],
+        },
       });
       map.addLayer({
         id: 'hazard-outline',
         type: 'line',
         source: 'hazards',
+        filter: ['!', ['get', 'outside']],
         paint: { 'line-color': ['get', 'color'], 'line-width': 1.5 },
+      });
+      map.addLayer({
+        id: 'hazard-outline-outside',
+        type: 'line',
+        source: 'hazards',
+        filter: ['get', 'outside'],
+        paint: { 'line-color': ['get', 'color'], 'line-width': 1.5, 'line-dasharray': [3, 2] },
       });
       map.addLayer({
         id: 'route',

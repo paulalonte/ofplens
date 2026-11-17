@@ -169,7 +169,7 @@ describe('Saved plan: hazards along the route', () => {
     expect(item).toHaveAccessibleName('Turbulence');
     expect(within(item!).getByText('Severe')).toBeInTheDocument();
     expect(within(item!).getByText('LUROS → VESUB')).toBeInTheDocument();
-    expect(within(item!).getByText('Above it')).toBeInTheDocument();
+    expect(within(item!).getByText('above it')).toBeInTheDocument();
     // Not on the route: no marks in the navlog.
     expect(navlogRow('LUROS')).not.toHaveTextContent('⚠');
   });
