@@ -591,6 +591,12 @@ check and per prompt version, so prompt or model changes are measured, not guess
   `helm upgrade --rollback-on-failure --wait` and a health check when the app is installed.
   `aws:up` reuses CI's images on a clean checkout.
 
+### OFP-48 · Favicon
+- **Done when:** the browser tab shows an OFP Lens icon, locally and from the web image.
+- *As built:* one SVG in `apps/web/public/favicon.svg` (a lens over a heading chevron, on a
+  dark tile so it reads in light and dark tabs), linked from `index.html`. Vite copies `public/`
+  into the build, so the nginx image serves it with no config change.
+
 ---
 
 ## Later phases (not ticketed yet)
