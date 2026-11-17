@@ -7,17 +7,81 @@ the weather printed at dispatch and the full navigation log, in kg or lb.
 > **For flight simulation only** (built for X-Plane 12). Not for real-world navigation.
 > OFP Lens is not affiliated with SimBrief, Navigraph or Laminar Research.
 
-**Status:** MVP in progress. The roadmap is in [docs/PLAN.md](docs/PLAN.md); work is tracked
-ticket by ticket in [docs/TICKETS.md](docs/TICKETS.md).
+**Status:** phases 0 to 7 of the roadmap are done (the app, live weather, the AI briefing,
+route hazards and its evals), and it runs on AWS at [ofplens.app](https://ofplens.app) while a
+learning cluster is up. The roadmap is in [docs/PLAN.md](docs/PLAN.md); work is tracked ticket
+by ticket in [docs/TICKETS.md](docs/TICKETS.md).
 
-| Works today                                                                                                                | Coming next                            |
-| -------------------------------------------------------------------------------------------------------------------------- | -------------------------------------- |
-| Briefing page: header, times, fuel, payload, OFP weather, navigation log                                                   | Deployment to AWS (3b)                 |
-| Settings: SimBrief username and kg/lb preference, saved in Postgres                                                        | Route hazards and briefing evals (6–7) |
-| One-click **Load latest plan**: fetched from SimBrief and saved to your history                                            | MCP server for Claude (phase 8)        |
-| **History** of every plan you loaded; open or delete any of them                                                           |                                        |
-| **Weather at dispatch vs now** per airport, with VFR–LIFR badges and a "changed since dispatch" flag (aviationweather.gov) |                                        |
-| **AI weather briefing** (Claude), on request: headline, risk, conditions per airport with the cited METAR, pilot notes     |                                        |
+**Works today**
+
+- **Sign in** with Google or GitHub; each pilot sees only their own plans and settings
+- **Briefing page:** header, times (Zulu and local) with a countdown to pushback, fuel,
+  payload, flight data, OFP weather and the navigation log, in kg or lb
+- One-click **Load latest plan**, fetched from SimBrief and saved to your **history**
+- **Weather at dispatch vs now** per airport, with VFR–LIFR badges, and the takeoff and landing
+  runway conditions from the latest METAR (aviationweather.gov)
+- **Hazards along the route:** SIGMETs and G-AIRMETs matched to the route by area, level and
+  time, marked in the navlog, drawn on a **route map**, with the areas you only pass above or
+  below listed apart
+- **AI weather briefing** (Claude), on request: headline, risk, conditions per airport with the
+  cited METAR, enroute hazards and pilot notes, checked by evals (`pnpm eval`)
+- **Deployment:** container images, a Helm chart, Terraform for AWS (EKS, RDS, HTTPS) and deploy
+  on merge ([docs/DEPLOYMENT.md](docs/DEPLOYMENT.md))
+
+**Coming next**
+
+- Operations on AWS: metrics, logs, alerts and database backups (deployment step 7)
+- An MCP server, so Claude Desktop and Claude Code can use the same tools (phase 8)
+
+## Screenshots
+
+A Citation X from Madrid (LEMD) to Barcelona (LEBL), with live weather and SIGMETs.
+
+### Flight data: times, fuel and payload
+
+The plan at a glance: Zulu and local times with a countdown to pushback, fuel and weights.
+
+![Plan header with times, fuel and payload, more than 10 minutes to pushback](docs/images/flightdata-more10mins.png)
+
+### Flight data: less than 10 minutes to pushback
+
+The countdown turns amber once pushback is less than 10 minutes away.
+
+![The same cards with the pushback countdown highlighted](docs/images/flightdata-less10mins.png)
+
+### Flight data and takeoff & landing
+
+Cruise, distances and wind, then the runway conditions from the latest METAR next to what
+SimBrief planned with at dispatch.
+
+![Flight data and takeoff and landing cards](docs/images/flightdata-and-takeofflanding.png)
+
+### AI weather briefing
+
+On request, Claude summarises the weather and hazards: a headline, a risk level, conditions per
+airport with the METAR it used, and pilot notes. The numbers come from code, not the model.
+
+![AI weather briefing with headline, risk, airports and pilot notes](docs/images/aiweather-briefing.png)
+
+### Hazards along the route
+
+SIGMETs and G-AIRMETs matched to the route by area, level and time. Areas the route only
+passes above or below are listed apart under "Outside your levels".
+
+![Hazards card with a SIGMET on the route and one outside the route's levels](docs/images/hazards-details.png)
+
+### Route map with hazards
+
+The route along great circles, with hazard areas in their colour. The stretch inside a hazard
+is highlighted; areas outside your levels are dashed.
+
+![Route map with a mountain wave SIGMET on the route and a dashed turbulence area](docs/images/map-with-hazards.png)
+
+### Navigation log with hazard marks
+
+Every fix with altitude, wind, temperature, ETA and fuel; fixes inside a hazard are marked.
+
+![Navigation log with the fixes inside the mountain wave SIGMET marked MTW](docs/images/navigation-with-hazard.png)
 
 ## What you need
 
