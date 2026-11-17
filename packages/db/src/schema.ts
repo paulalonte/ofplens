@@ -380,6 +380,11 @@ export const advisories = pgTable(
       .notNull(),
     /** First affected fix, for ordering. */
     firstWaypointSeq: integer('first_waypoint_seq').notNull(),
+    /**
+     * Null: on the route (at its levels). Otherwise the route crosses the area only outside
+     * its levels, and passes above, below, or above_and_below it.
+     */
+    passes: text('passes', { enum: ['above', 'below', 'above_and_below'] }),
     fir: text('fir'),
     firName: text('fir_name'),
     rawText: text('raw_text'),

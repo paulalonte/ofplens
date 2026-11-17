@@ -1,7 +1,13 @@
 import { z } from 'zod';
 import { HAZARD_KINDS, HAZARD_SOURCES, type HazardSource } from './advisory';
 import type { HazardClient } from './client';
-import { matchRouteHazards, type RouteHazard, type RoutePoint } from './route';
+import {
+  matchRouteAdvisories,
+  PASSES,
+  type OutsideLevelsHazard,
+  type RouteHazard,
+  type RoutePoint,
+} from './route';
 
 const iso = z.iso.datetime({ offset: true });
 
@@ -33,6 +39,10 @@ export const RouteHazardView = z.object({
 });
 export type RouteHazardView = z.infer<typeof RouteHazardView>;
 
+/** An advisory the route crosses by area and time, but above or below its levels. */
+export const OutsideLevelsHazardView = RouteHazardView.extend({ passes: z.enum(PASSES) });
+export type OutsideLevelsHazardView = z.infer<typeof OutsideLevelsHazardView>;
+
 /** GET /api/flight-plans/:id/hazards and POST …/hazards/refresh. */
 export const FlightPlanHazardsResponse = z.object({
   /** When the feeds were last checked for this plan; null before the first check. */
@@ -44,6 +54,8 @@ export const FlightPlanHazardsResponse = z.object({
   /** How many advisories (worldwide, from the feeds that answered) were checked against the route. */
   advisoriesChecked: z.number().int().nonnegative(),
   hazards: z.array(RouteHazardView),
+  /** Crossed outside their levels: for awareness, not hazards on the route. */
+  outsideLevels: z.array(OutsideLevelsHazardView),
 });
 export type FlightPlanHazardsResponse = z.infer<typeof FlightPlanHazardsResponse>;
 
@@ -54,6 +66,7 @@ export interface PlanHazards {
   unavailable: HazardSource[];
   advisoriesChecked: number;
   hazards: RouteHazard[];
+  outsideLevels: OutsideLevelsHazard[];
 }
 
 /** Storage for a plan's route hazards; implemented in @ofplens/db. */
@@ -70,7 +83,14 @@ export interface PlanHazardStore {
 
 export function toPlanHazardsResponse(checked: PlanHazards | null): FlightPlanHazardsResponse {
   if (!checked) {
-    return { checkedAt: null, takeoffAt: null, unavailable: [], advisoriesChecked: 0, hazards: [] };
+    return {
+      checkedAt: null,
+      takeoffAt: null,
+      unavailable: [],
+      advisoriesChecked: 0,
+      hazards: [],
+      outsideLevels: [],
+    };
   }
   return {
     checkedAt: checked.checkedAt,
@@ -78,6 +98,11 @@ export function toPlanHazardsResponse(checked: PlanHazards | null): FlightPlanHa
     unavailable: checked.unavailable,
     advisoriesChecked: checked.advisoriesChecked,
     hazards: checked.hazards.map(({ advisory, segments }) => ({ ...advisory, segments })),
+    outsideLevels: checked.outsideLevels.map(({ advisory, segments, passes }) => ({
+      ...advisory,
+      segments,
+      passes,
+    })),
   };
 }
 
@@ -108,12 +133,16 @@ export async function refreshPlanHazards(
   const { advisories, unavailable } = await client.fetchAdvisories();
   const planned = new Date(route.plannedTakeoffAt);
   const takeoffAt = planned.getTime() < now.getTime() ? now : planned;
+  const { onRoute, outsideLevels } = matchRouteAdvisories(route.waypoints, advisories, {
+    takeoffAt,
+  });
   const checked: PlanHazards = {
     checkedAt: now.toISOString(),
     takeoffAt: takeoffAt.toISOString(),
     unavailable,
     advisoriesChecked: advisories.length,
-    hazards: matchRouteHazards(route.waypoints, advisories, { takeoffAt }),
+    hazards: onRoute,
+    outsideLevels,
   };
   await store.replace(flightPlanId, checked);
   return toPlanHazardsResponse(checked);

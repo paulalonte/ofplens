@@ -72,6 +72,7 @@ const quietHazards: Handler = () =>
     unavailable: [],
     advisoriesChecked: 0,
     hazards: [],
+    outsideLevels: [],
   });
 
 const NO_BRIEFING = /^GET \/api\/flight-plans\/[^/]+\/briefings\/latest$/;

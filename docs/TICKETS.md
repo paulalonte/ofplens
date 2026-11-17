@@ -603,6 +603,16 @@ check and per prompt version, so prompt or model changes are measured, not guess
 - *As built:* `routes/-components/Brand.tsx` shows `/favicon.svg` at 22 px with `alt=""`, so
   the home link is still named "OFP Lens" for screen readers and tests.
 
+### OFP-50 · Hazards crossed outside the route's levels
+- **Done when:** a SIGMET or G-AIRMET whose area the route crosses while it is valid, but only
+  above or below its levels, is listed apart in the hazards card ("Outside your levels", with
+  how the route passes it), and is still not counted as on the route.
+- *As built:* `matchRouteAdvisories()` in `@ofplens/weather` returns `onRoute` and
+  `outsideLevels` (with `passes`: above, below, above_and_below); `matchRouteHazards()` is its
+  `onRoute`. Stored in `advisories` with a nullable `passes` column (null = on the route), served
+  as `outsideLevels` next to `hazards`. The navlog marks, the map and the briefing agent still
+  use only the hazards on the route.
+
 ---
 
 ## Later phases (not ticketed yet)

@@ -67,6 +67,7 @@ const response = (overrides: Partial<FlightPlanHazardsResponse> = {}) => ({
   unavailable: [],
   advisoriesChecked: 160,
   hazards: [thunderstorm, turbulence],
+  outsideLevels: [],
   ...overrides,
 });
 
@@ -137,6 +138,40 @@ describe('Saved plan: hazards along the route', () => {
         .getAllByRole('listitem')
         .map((li) => li.textContent),
     ).toEqual(['Thunderstorms', 'Turbulence']);
+  });
+
+  it("lists the areas crossed outside the route's levels apart, without navlog marks", async () => {
+    const lowTurbulence = {
+      ...turbulence,
+      id: 'isigmet:LECM:9:x',
+      source: 'isigmet' as const,
+      code: 'TURB',
+      severity: 'severe' as const,
+      baseFt: 0,
+      topFt: 11000,
+      fir: 'LECM',
+      firName: 'LECM MADRID FIR/UIR',
+      validFrom: hoursFromNow(-1),
+      segments: [{ fromSeq: 9, toSeq: 10, fromIdent: 'LUROS', toIdent: 'VESUB' }],
+      passes: 'above' as const,
+    };
+    mockApi({
+      ...base,
+      [`GET ${HAZARDS}`]: () =>
+        jsonResponse(response({ hazards: [], outsideLevels: [lowTurbulence] })),
+    });
+    await renderApp(`/history/${ID}`);
+
+    const c = await card();
+    expect(c).toHaveTextContent(/None on your route\./);
+    const section = within(c).getByRole('region', { name: 'Outside your levels' });
+    const [item] = within(section).getAllByRole('listitem');
+    expect(item).toHaveAccessibleName('Turbulence');
+    expect(within(item!).getByText('Severe')).toBeInTheDocument();
+    expect(within(item!).getByText('LUROS → VESUB')).toBeInTheDocument();
+    expect(within(item!).getByText('Above it')).toBeInTheDocument();
+    // Not on the route: no marks in the navlog.
+    expect(navlogRow('LUROS')).not.toHaveTextContent('⚠');
   });
 
   it('says when none is on the route, with how many were checked', async () => {
