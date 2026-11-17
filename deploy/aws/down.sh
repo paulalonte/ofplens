@@ -23,15 +23,17 @@ if cluster_exists; then
 fi
 
 # ExternalDNS deletes the DNS record when the Ingress goes. Give it the time to do so before
-# Terraform removes ExternalDNS itself (otherwise ofplens.app would point at nothing).
-ZONE_ID=$(aws route53 list-hosted-zones-by-name --dns-name "$DOMAIN" --max-items 1 \
-  --query 'HostedZones[0].Id' --output text)
+# Terraform removes ExternalDNS itself; if the record is still there afterwards, delete it here,
+# so the next session doesn't start with a record pointing at nothing.
 echo "Checking that the $DOMAIN record is gone..." >&2
-for _ in $(seq 18); do
-  [[ "$(aws route53 list-resource-record-sets --hosted-zone-id "$ZONE_ID" \
-    --query "length(ResourceRecordSets[?Name=='$DOMAIN.' && Type=='A'])" --output text)" == 0 ]] && break
+for _ in $(seq 12); do
+  [[ -z "$(dns_target)" ]] && break
   sleep 10
 done
+if [[ -n "$(dns_target)" ]]; then
+  echo "ExternalDNS left the $DOMAIN record behind; deleting it." >&2
+  remove_dns_records
+fi
 
 echo "Checking that the load balancer is gone..." >&2
 for _ in $(seq 60); do
