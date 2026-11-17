@@ -613,6 +613,11 @@ check and per prompt version, so prompt or model changes are measured, not guess
   as `outsideLevels` next to `hazards`. The map draws them dashed and faint, with no coloured
   route stretch; the navlog marks and the briefing agent still use only the hazards on the route.
 
+### OFP-51 · Screenshots in the README
+- **Done when:** the README shows the main screens of a real plan, with nothing personal in them.
+- *As built:* seven screenshots of a LEMD → LEBL plan in `docs/images/` (flight data, takeoff &
+  landing, AI briefing, hazards, route map, navlog), each under a "Screenshots" heading.
+
 ---
 
 ## Later phases (not ticketed yet)
