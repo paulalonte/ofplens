@@ -1,8 +1,13 @@
 import { formatZulu, formatZuluDate } from '@ofplens/ofp';
-import type { FlightPlanHazardsResponse, HazardSource, RouteHazardView } from '@ofplens/weather';
+import type {
+  FlightPlanHazardsResponse,
+  HazardSource,
+  Passes,
+  RouteHazardView,
+} from '@ofplens/weather';
 import { useHazardRefreshState, usePlanHazards, useRefreshHazards } from '../../../api/hazards';
 import { useAutoRefreshWeather } from '../../../api/weather';
-import { HAZARD_LABEL, hazardLevels } from '../../../components/briefing/hazardStyle';
+import { HAZARD_LABEL, hazardLevels, PASSES_LABEL } from '../../../components/briefing/hazardStyle';
 import { Card } from '../../../components/Card';
 
 const SOURCE_LABEL: Record<HazardSource, string> = {
@@ -69,6 +74,28 @@ export function HazardsCard({ planId }: { planId: string }) {
         hazards.checkedAt && <NoneFound hazards={hazards} />
       )}
 
+      {hazards.outsideLevels.length > 0 && (
+        <section aria-labelledby="outside-levels" className="mt-5">
+          <h3 id="outside-levels" className="text-sm font-semibold">
+            Outside your levels
+          </h3>
+          <p className="mt-1 mb-2 text-xs text-slate-600 dark:text-slate-400">
+            Your route crosses these areas while they are valid, but above or below their levels, so
+            they are not counted as on your route. Worth knowing if you climb, descend or divert.
+          </p>
+          <ul className="divide-y divide-slate-100 opacity-80 dark:divide-slate-800">
+            {hazards.outsideLevels.map((hazard) => (
+              <HazardItem
+                key={hazard.id}
+                hazard={hazard}
+                passes={hazard.passes}
+                checkedAt={hazards.checkedAt}
+              />
+            ))}
+          </ul>
+        </section>
+      )}
+
       <p className="mt-4 text-xs text-slate-500 dark:text-slate-400">
         SIGMETs and G-AIRMETs from aviationweather.gov, matched to your route by area, level and
         time
@@ -93,7 +120,16 @@ function NoneFound({ hazards }: { hazards: FlightPlanHazardsResponse }) {
   );
 }
 
-function HazardItem({ hazard, checkedAt }: { hazard: RouteHazardView; checkedAt: string | null }) {
+function HazardItem({
+  hazard,
+  checkedAt,
+  passes,
+}: {
+  hazard: RouteHazardView;
+  checkedAt: string | null;
+  /** For one outside the route's levels: how the route passes it. */
+  passes?: Passes;
+}) {
   const detail = hazard.detail && (QUALIFIERS[hazard.detail] ?? hazard.detail.toLowerCase());
   return (
     <li aria-label={HAZARD_LABEL[hazard.hazard]} className="space-y-1.5 py-3 first:pt-0 last:pb-0">
@@ -112,6 +148,12 @@ function HazardItem({ hazard, checkedAt }: { hazard: RouteHazardView; checkedAt:
         </dd>
         <dt className="text-slate-600 dark:text-slate-400">Levels</dt>
         <dd className="font-mono">{hazardLevels(hazard)}</dd>
+        {passes && (
+          <>
+            <dt className="text-slate-600 dark:text-slate-400">You pass</dt>
+            <dd>{PASSES_LABEL[passes]}</dd>
+          </>
+        )}
         <dt className="text-slate-600 dark:text-slate-400">Valid</dt>
         <dd className="font-mono">{validity(hazard, checkedAt)}</dd>
       </dl>

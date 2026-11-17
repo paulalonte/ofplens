@@ -1,4 +1,11 @@
-import type { HazardKind, HazardSource, PlanHazards, PlanHazardStore } from '@ofplens/weather';
+import type {
+  Advisory,
+  HazardKind,
+  HazardSource,
+  PlanHazards,
+  PlanHazardStore,
+  RouteSegment,
+} from '@ofplens/weather';
 import { asc, eq } from 'drizzle-orm';
 import type { Database } from './client';
 import { advisories, flightPlans, waypoints } from './schema';
@@ -55,25 +62,14 @@ export function createHazardRepository(db: Database): HazardRepository {
           takeoffAt: plan.takeoffAt.toISOString(),
           unavailable: plan.unavailable as HazardSource[],
           advisoriesChecked: plan.advisoriesChecked,
-          hazards: rows.map((row) => ({
-            advisory: {
-              id: row.advisoryId,
-              source: row.source,
-              hazard: row.hazard as HazardKind,
-              code: row.code,
-              severity: row.severity,
-              detail: row.detail,
-              validFrom: row.validFrom.toISOString(),
-              validTo: row.validTo.toISOString(),
-              baseFt: row.baseFt,
-              topFt: row.topFt,
-              polygons: row.polygons,
-              fir: row.fir,
-              firName: row.firName,
-              rawText: row.rawText,
-            },
-            segments: row.segments,
-          })),
+          hazards: rows
+            .filter((row) => row.passes === null)
+            .map((row) => ({ advisory: toAdvisory(row), segments: row.segments })),
+          outsideLevels: rows.flatMap((row) =>
+            row.passes === null
+              ? []
+              : [{ advisory: toAdvisory(row), segments: row.segments, passes: row.passes }],
+          ),
         },
       };
     },
@@ -81,29 +77,13 @@ export function createHazardRepository(db: Database): HazardRepository {
     replace: (flightPlanId, checked: PlanHazards) =>
       db.transaction(async (tx) => {
         await tx.delete(advisories).where(eq(advisories.flightPlanId, flightPlanId));
-        if (checked.hazards.length > 0) {
-          await tx.insert(advisories).values(
-            checked.hazards.map(({ advisory: a, segments }) => ({
-              flightPlanId,
-              advisoryId: a.id,
-              source: a.source,
-              hazard: a.hazard,
-              code: a.code,
-              severity: a.severity,
-              detail: a.detail,
-              validFrom: new Date(a.validFrom),
-              validTo: new Date(a.validTo),
-              baseFt: a.baseFt,
-              topFt: a.topFt,
-              polygons: a.polygons,
-              segments,
-              firstWaypointSeq: segments[0]!.fromSeq,
-              fir: a.fir,
-              firName: a.firName,
-              rawText: a.rawText,
-            })),
-          );
-        }
+        const rows = [
+          ...checked.hazards.map((h) => toRow(flightPlanId, h.advisory, h.segments, null)),
+          ...checked.outsideLevels.map((h) =>
+            toRow(flightPlanId, h.advisory, h.segments, h.passes),
+          ),
+        ];
+        if (rows.length > 0) await tx.insert(advisories).values(rows);
         await tx
           .update(flightPlans)
           .set({
@@ -114,5 +94,52 @@ export function createHazardRepository(db: Database): HazardRepository {
           })
           .where(eq(flightPlans.id, flightPlanId));
       }),
+  };
+}
+
+function toAdvisory(row: typeof advisories.$inferSelect): Advisory {
+  return {
+    id: row.advisoryId,
+    source: row.source,
+    hazard: row.hazard as HazardKind,
+    code: row.code,
+    severity: row.severity,
+    detail: row.detail,
+    validFrom: row.validFrom.toISOString(),
+    validTo: row.validTo.toISOString(),
+    baseFt: row.baseFt,
+    topFt: row.topFt,
+    polygons: row.polygons,
+    fir: row.fir,
+    firName: row.firName,
+    rawText: row.rawText,
+  };
+}
+
+function toRow(
+  flightPlanId: string,
+  a: Advisory,
+  segments: RouteSegment[],
+  passes: (typeof advisories.$inferInsert)['passes'],
+): typeof advisories.$inferInsert {
+  return {
+    flightPlanId,
+    advisoryId: a.id,
+    source: a.source,
+    hazard: a.hazard,
+    code: a.code,
+    severity: a.severity,
+    detail: a.detail,
+    validFrom: new Date(a.validFrom),
+    validTo: new Date(a.validTo),
+    baseFt: a.baseFt,
+    topFt: a.topFt,
+    polygons: a.polygons,
+    segments,
+    firstWaypointSeq: segments[0]!.fromSeq,
+    passes,
+    fir: a.fir,
+    firName: a.firName,
+    rawText: a.rawText,
   };
 }

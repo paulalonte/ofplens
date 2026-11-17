@@ -1,5 +1,10 @@
 import { formatFlightLevel, formatZulu } from '@ofplens/ofp';
-import type { HazardKind, RouteHazardView } from '@ofplens/weather';
+import type {
+  HazardKind,
+  OutsideLevelsHazardView,
+  Passes,
+  RouteHazardView,
+} from '@ofplens/weather';
 
 /** Hazard types in words, for the hazards card, the map and its legend. */
 export const HAZARD_LABEL: Record<HazardKind, string> = {
@@ -35,10 +40,22 @@ export function hazardLevels({ baseFt, topFt }: Pick<RouteHazardView, 'baseFt' |
 }
 
 /** For the map's popup: "Turbulence · severe" and "FL300–FL400 · until 17:00Z · LCU → KATES". */
-export function describeHazard(hazard: RouteHazardView): { title: string; detail: string } {
+/** How the route passes an area outside its levels: "You pass above it". */
+export const PASSES_LABEL: Record<Passes, string> = {
+  above: 'above it',
+  below: 'below it',
+  above_and_below: 'above and below it',
+};
+
+export function describeHazard(hazard: RouteHazardView | OutsideLevelsHazardView): {
+  title: string;
+  detail: string;
+} {
+  const passes = 'passes' in hazard ? PASSES_LABEL[hazard.passes] : null;
   return {
     title: [HAZARD_LABEL[hazard.hazard], hazard.severity].filter(Boolean).join(' · '),
     detail: [
+      ...(passes ? [`Outside your levels: you pass ${passes}`] : []),
       hazardLevels(hazard),
       `until ${formatZulu(hazard.validTo)}`,
       hazard.segments.map((s) => `${s.fromIdent} → ${s.toIdent}`).join(', '),

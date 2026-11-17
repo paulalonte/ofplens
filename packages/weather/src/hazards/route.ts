@@ -43,6 +43,25 @@ export const DEFAULT_MARGIN_MS = 30 * 60_000;
  */
 export const LOW_VISIBILITY_TOP_FT = 10_000;
 
+/** How the route passes an advisory it crosses outside its levels. */
+export const PASSES = ['above', 'below', 'above_and_below'] as const;
+export type Passes = (typeof PASSES)[number];
+
+/**
+ * An advisory whose area the route crosses while it is valid, but never between its levels:
+ * the route passes over it, under it, or both (over on one stretch, under on another).
+ */
+export interface OutsideLevelsHazard extends RouteHazard {
+  passes: Passes;
+}
+
+export interface RouteAdvisories {
+  /** At the route's levels: the hazards on the route. */
+  onRoute: RouteHazard[];
+  /** Crossed by area and time, but above or below: shown for awareness, not as on the route. */
+  outsideLevels: OutsideLevelsHazard[];
+}
+
 /**
  * Which advisories touch the route, and between which fixes. A leg (one fix to the next)
  * counts when it crosses or lies in one of the advisory's areas, its planned altitudes overlap
@@ -53,11 +72,25 @@ export const LOW_VISIBILITY_TOP_FT = 10_000;
 export function matchRouteHazards(
   route: readonly RoutePoint[],
   advisories: readonly Advisory[],
-  { takeoffAt, marginMs = DEFAULT_MARGIN_MS }: MatchOptions,
+  options: MatchOptions,
 ): RouteHazard[] {
-  if (route.length < 2) return [];
+  return matchRouteAdvisories(route, advisories, options).onRoute;
+}
+
+/**
+ * The hazards on the route (as matchRouteHazards), and also the advisories the route crosses
+ * by area and time only outside their levels, with the stretches it crosses them on. An
+ * advisory is in one list at most: on the route if any leg is also within its levels.
+ */
+export function matchRouteAdvisories(
+  route: readonly RoutePoint[],
+  advisories: readonly Advisory[],
+  { takeoffAt, marginMs = DEFAULT_MARGIN_MS }: MatchOptions,
+): RouteAdvisories {
+  if (route.length < 2) return { onRoute: [], outsideLevels: [] };
   const legs = buildLegs(route, takeoffAt.getTime());
-  const result: RouteHazard[] = [];
+  const onRoute: RouteHazard[] = [];
+  const outsideLevels: OutsideLevelsHazard[] = [];
 
   for (const advisory of advisories) {
     if (advisory.polygons.length === 0) continue;
@@ -69,23 +102,38 @@ export function matchRouteHazards(
       advisory.topFt ??
       (advisory.hazard === 'low_visibility' ? LOW_VISIBILITY_TOP_FT : Number.POSITIVE_INFINITY);
 
-    const hits = legs.map(
+    // Area and time first; levels decide which list it goes to.
+    const crossed = legs.map(
       (leg) =>
-        leg.lowFt <= top &&
-        leg.highFt >= base &&
         leg.startMs <= validTo &&
         leg.endMs >= validFrom &&
         areas.some((area) => legCrosses(leg, area)),
     );
-    const segments = toSegments(legs, hits);
-    if (segments.length > 0) result.push({ advisory, segments });
+    if (!crossed.includes(true)) continue;
+    const within = legs.map((leg, i) => crossed[i]! && leg.lowFt <= top && leg.highFt >= base);
+
+    if (within.includes(true)) {
+      onRoute.push({ advisory, segments: toSegments(legs, within) });
+    } else {
+      const crossedLegs = legs.filter((_, i) => crossed[i]);
+      const above = crossedLegs.some((leg) => leg.lowFt > top);
+      const below = crossedLegs.some((leg) => leg.highFt < base);
+      outsideLevels.push({
+        advisory,
+        segments: toSegments(legs, crossed),
+        passes: above && below ? 'above_and_below' : above ? 'above' : 'below',
+      });
+    }
   }
 
-  return result.sort(
+  return { onRoute: inRouteOrder(onRoute), outsideLevels: inRouteOrder(outsideLevels) };
+}
+
+const inRouteOrder = <T extends RouteHazard>(hazards: T[]): T[] =>
+  hazards.sort(
     (a, b) =>
       a.segments[0]!.fromSeq - b.segments[0]!.fromSeq || a.advisory.id.localeCompare(b.advisory.id),
   );
-}
 
 interface Leg {
   from: RoutePoint;

@@ -2,7 +2,7 @@ import { parseOfp } from '@ofplens/ofp';
 import { loadFixture } from '@ofplens/ofp/testing';
 import { describe, expect, it } from 'vitest';
 import type { Advisory, Ring } from './advisory';
-import { matchRouteHazards, type RoutePoint } from './route';
+import { matchRouteAdvisories, matchRouteHazards, type RoutePoint } from './route';
 
 const plan = (name: string) => {
   const summary = parseOfp(loadFixture(name));
@@ -117,6 +117,65 @@ describe('matchRouteHazards: altitude', () => {
     expect(segmentsOf(eddbEddm, { ...fog, polygons: [box(48.2, 11.4, 48.7, 11.9)] })).toEqual([
       ['LANDU-EDDM'],
     ]);
+  });
+});
+
+describe('matchRouteAdvisories: outside the levels', () => {
+  const outside = (...advisories: Advisory[]) => {
+    const { onRoute, outsideLevels } = matchRouteAdvisories(eddbEddm.route, advisories, {
+      takeoffAt: eddbEddm.takeoffAt,
+    });
+    return {
+      onRoute: onRoute.map((h) => h.advisory.id),
+      outsideLevels: outsideLevels.map((h) => [
+        h.advisory.id,
+        h.passes,
+        h.segments.map((s) => `${s.fromIdent}-${s.toIdent}`),
+      ]),
+    };
+  };
+  const turb = (id: string, baseFt: number | null, topFt: number | null, polygons: Ring[]) =>
+    advisory({ id, hazard: 'turbulence', code: 'TURB', baseFt, topFt, polygons });
+
+  it('keeps an area crossed above its top apart, with where and how', () => {
+    // FL280 at PIKIB; turbulence from the surface to FL110.
+    expect(outside(turb('low', null, 11000, [AROUND_PIKIB]))).toEqual({
+      onRoute: [],
+      outsideLevels: [['low', 'above', ['BEBKU-MAREM']]],
+    });
+  });
+
+  it('says below for an area above the flight', () => {
+    expect(outside(turb('high', 30000, 40000, [AROUND_PIKIB])).outsideLevels).toEqual([
+      ['high', 'below', ['BEBKU-MAREM']],
+    ]);
+  });
+
+  it('says above and below when the route passes one area over and another under', () => {
+    // FL200–FL240: below the flight's FL280 over PIKIB, and above it around Munich, where it
+    // is down to 15,300 ft (LANDU → MIQ → EDDM).
+    const areas = [AROUND_PIKIB, box(48.2, 11.4, 48.7, 11.9)];
+    expect(outside(turb('both', 20000, 24000, areas)).outsideLevels).toEqual([
+      ['both', 'above_and_below', ['BEBKU-MAREM', 'LANDU-EDDM']],
+    ]);
+  });
+
+  it('lists an advisory on the route only once, as on the route', () => {
+    // The approach is inside it (and the cruise above): on the route.
+    const areas = [AROUND_PIKIB, box(48.2, 11.4, 48.7, 11.9)];
+    expect(outside(turb('approach', null, 8000, areas))).toEqual({
+      onRoute: ['approach'],
+      outsideLevels: [],
+    });
+  });
+
+  it('leaves out areas off the route or not valid while it is flown', () => {
+    expect(
+      outside(turb('elsewhere', null, 11000, [box(40, 0, 41, 1)]), {
+        ...turb('later', null, 11000, [AROUND_PIKIB]),
+        validFrom: '2026-11-29T00:00:00.000Z',
+      }),
+    ).toEqual({ onRoute: [], outsideLevels: [] });
   });
 });
 

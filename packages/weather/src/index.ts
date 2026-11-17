@@ -53,14 +53,20 @@ export { createCachedHazardClient } from './hazards/cache';
 export {
   DEFAULT_MARGIN_MS,
   LOW_VISIBILITY_TOP_FT,
+  matchRouteAdvisories,
   matchRouteHazards,
+  PASSES,
   type MatchOptions,
+  type OutsideLevelsHazard,
+  type Passes,
+  type RouteAdvisories,
   type RouteHazard,
   type RoutePoint,
   type RouteSegment,
 } from './hazards/route';
 export {
   FlightPlanHazardsResponse,
+  OutsideLevelsHazardView,
   readPlanHazards,
   refreshPlanHazards,
   RouteHazardView,

@@ -3,6 +3,7 @@ import {
   greatCirclePath,
   unwrap,
   type HazardKind,
+  type OutsideLevelsHazardView,
   type Position,
   type RouteHazardView,
 } from '@ofplens/weather';
@@ -30,6 +31,8 @@ export interface HazardProps {
   title: string;
   /** "FL300–FL400 · until 17:00Z · LCU → KATES". */
   detail: string;
+  /** Crossed only above or below its levels: drawn dashed and faint. */
+  outside: boolean;
 }
 
 export interface RouteMapData {
@@ -38,7 +41,10 @@ export interface RouteMapData {
   fixes: FeatureCollection<Point, { ident: string; airport: boolean }>;
   /** The stretches of the route inside a hazard, in its colour. */
   affected: FeatureCollection<LineString, { color: string }>;
+  /** Hazards on the route, then those crossed outside their levels. */
   hazards: FeatureCollection<Polygon, HazardProps>;
+  /** Whether any area is outside the route's levels (the legend explains the dashes). */
+  hasOutside: boolean;
   /** [[west, south], [east, north]] of the route, longitudes unwrapped. */
   bounds: [Position, Position];
   /** The hazard types shown, in a stable order, for the legend. */
@@ -46,7 +52,8 @@ export interface RouteMapData {
 }
 
 /**
- * Everything the route map draws, from the plan and its hazards. Longitudes are unwrapped
+ * Everything the route map draws, from the plan and its hazards (and those it crosses outside
+ * their levels, which get no route stretch of their own). Longitudes are unwrapped
  * along the route (continuing past ±180), and each hazard area is moved by whole turns to sit
  * next to it, so transpacific routes and their hazards draw without jumping across the map.
  */
@@ -54,6 +61,7 @@ export function buildRouteMapData(
   plan: FlightPlanSummary,
   hazards: readonly RouteHazardView[],
   describe: (hazard: RouteHazardView) => Pick<HazardProps, 'title' | 'detail'>,
+  outsideLevels: readonly OutsideLevelsHazardView[] = [],
 ): RouteMapData | null {
   const waypoints = plan.waypoints;
   if (waypoints.length < 2) return null;
@@ -106,7 +114,10 @@ export function buildRouteMapData(
     affected: { type: 'FeatureCollection', features: affected },
     hazards: {
       type: 'FeatureCollection',
-      features: hazards.flatMap((hazard) =>
+      features: [
+        ...hazards.map((hazard) => ({ hazard, outside: false })),
+        ...outsideLevels.map((hazard) => ({ hazard, outside: true })),
+      ].flatMap(({ hazard, outside }) =>
         hazard.polygons.map((ring) => ({
           type: 'Feature' as const,
           geometry: { type: 'Polygon' as const, coordinates: [nextTo(ring, middleLon)] },
@@ -115,16 +126,18 @@ export function buildRouteMapData(
             kind: hazard.hazard,
             color: HAZARD_COLOR[hazard.hazard],
             ...describe(hazard),
+            outside,
           },
         })),
       ),
     },
+    hasOutside: outsideLevels.some((h) => h.polygons.length > 0),
     bounds: [
       [Math.min(...routeLons), Math.min(...routeLats)],
       [Math.max(...routeLons), Math.max(...routeLats)],
     ],
     kinds: (Object.keys(HAZARD_LABEL) as HazardKind[]).filter((kind) =>
-      hazards.some((h) => h.hazard === kind),
+      [...hazards, ...outsideLevels].some((h) => h.hazard === kind),
     ),
   };
 }

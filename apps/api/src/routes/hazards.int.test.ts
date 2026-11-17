@@ -164,6 +164,7 @@ describe('GET /api/flight-plans/:id/hazards', () => {
       unavailable: [],
       advisoriesChecked: 0,
       hazards: [],
+      outsideLevels: [],
     });
   });
 
@@ -192,8 +193,8 @@ describe('POST /api/flight-plans/:id/hazards/refresh', () => {
       // The captured feeds (125 + 4 + 31) and the two made up here.
       advisoriesChecked: 162,
     });
-    // Only the thunderstorm: the turbulence is above FL280, and nothing else of the real
-    // 11 Nov feeds is valid on 9 Nov.
+    // On the route, only the thunderstorm: the turbulence is above FL280, and nothing else of
+    // the real 11 Nov feeds is valid on 9 Nov.
     expect(body.hazards).toHaveLength(1);
     expect(body.hazards[0]).toMatchObject({
       id: `isigmet:EDUU:A1:${unix('2026-11-09T12:00:00Z')}`,
@@ -204,12 +205,21 @@ describe('POST /api/flight-plans/:id/hazards/refresh', () => {
       segments: [{ fromIdent: 'BEBKU', toIdent: 'MAREM', fromSeq: 6, toSeq: 8 }],
     });
     expect(body.hazards[0]?.polygons[0]).toHaveLength(5);
+    // The turbulence over the same fixes, kept apart: the flight passes below it.
+    expect(body.outsideLevels).toHaveLength(1);
+    expect(body.outsideLevels[0]).toMatchObject({
+      id: `isigmet:EDUU:A2:${unix('2026-11-09T12:00:00Z')}`,
+      hazard: 'turbulence',
+      baseFt: 32000,
+      passes: 'below',
+      segments: [{ fromIdent: 'BEBKU', toIdent: 'MAREM', fromSeq: 6, toSeq: 8 }],
+    });
     expect(fake.fetch).toHaveBeenCalledTimes(3);
 
     // Stored: GET answers the same without asking the feeds again.
     expect((await read(a, id)).json()).toEqual(body);
     expect(fake.fetch).toHaveBeenCalledTimes(3);
-    expect(await countRows(conn.db, 'advisories')).toBe(1);
+    expect(await countRows(conn.db, 'advisories')).toBe(2);
   });
 
   it('replaces the last check: an advisory gone from the feeds is gone from the plan', async () => {
@@ -224,6 +234,7 @@ describe('POST /api/flight-plans/:id/hazards/refresh', () => {
     const body = (await refresh(a, id)).json<FlightPlanHazardsResponse>();
 
     expect(body.hazards).toEqual([]);
+    expect(body.outsideLevels).toEqual([]);
     expect(await countRows(conn.db, 'advisories')).toBe(0);
   });
 
