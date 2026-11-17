@@ -9,6 +9,7 @@ import { sessionQuery, useSession, useSignOut } from '../api/auth';
 import { HealthStatus } from '../components/HealthStatus';
 import { safePath } from '../lib/safePath';
 import type { RouterContext } from '../router';
+import { Brand } from './-components/Brand';
 import { NotFound } from './-components/NotFound';
 
 export const Route = createRootRouteWithContext<RouterContext>()({
@@ -45,8 +46,8 @@ function RootLayout() {
         <div className="mx-auto flex max-w-5xl flex-wrap items-center justify-between gap-x-4 gap-y-2 px-4 py-3">
           {pilot ? (
             <nav aria-label="Main" className="flex items-center gap-5">
-              <Link to="/" className="font-semibold tracking-tight">
-                OFP Lens
+              <Link to="/">
+                <Brand />
               </Link>
               <Link to="/history" className={navLink} activeProps={activeNavLink}>
                 History
@@ -56,7 +57,7 @@ function RootLayout() {
               </Link>
             </nav>
           ) : (
-            <span className="font-semibold tracking-tight">OFP Lens</span>
+            <Brand />
           )}
           <div className="flex items-center gap-4">
             <HealthStatus />

@@ -597,6 +597,12 @@ check and per prompt version, so prompt or model changes are measured, not guess
   dark tile so it reads in light and dark tabs), linked from `index.html`. Vite copies `public/`
   into the build, so the nginx image serves it with no config change.
 
+### OFP-49 · Logo in the header
+- **Done when:** the header shows the logo beside "OFP Lens", signed in (as part of the home
+  link) and on the sign-in page.
+- *As built:* `routes/-components/Brand.tsx` shows `/favicon.svg` at 22 px with `alt=""`, so
+  the home link is still named "OFP Lens" for screen readers and tests.
+
 ---
 
 ## Later phases (not ticketed yet)
