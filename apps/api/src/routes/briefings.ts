@@ -77,7 +77,9 @@ export const briefingRoutes: FastifyPluginCallbackZod<BriefingRouteOptions> = (
         throw new AppError(
           503,
           'BRIEFINGS_NOT_CONFIGURED',
-          'AI briefings are not set up on this server: add ANTHROPIC_API_KEY to .env and restart.',
+          // Shown to pilots, so it says nothing about where the key goes: the API logs that
+          // at startup, for whoever runs the server (server.ts).
+          'This server has no Claude API key, so AI briefings are turned off. Everything else works as usual.',
         );
       }
       const started = await briefings.start(

@@ -115,7 +115,7 @@ function StartError({ error }: { error: Error }) {
     code === 'BRIEFING_DAILY_LIMIT'
       ? 'Daily briefing limit reached'
       : code === 'BRIEFINGS_NOT_CONFIGURED'
-        ? 'AI briefings are not set up'
+        ? 'AI briefings are turned off'
         : code === 'BRIEFING_IN_PROGRESS'
           ? 'Already generating'
           : 'Could not start the briefing';
