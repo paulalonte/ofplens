@@ -37,15 +37,15 @@ aws eks list-clusters --region eu-central-1      # "clusters": []  → nothing e
 
 ## What gets created
 
-| Part                         | What it is                                                                         | File          |
-| ---------------------------- | ---------------------------------------------------------------------------------- | ------------- |
-| VPC                          | Your private network in two availability zones; no NAT gateway (saves ~$35/month)  | `network.tf`  |
-| EKS                          | Kubernetes; AWS runs the control plane, two ARM worker nodes run your pods         | `eks.tf`      |
-| RDS Postgres                 | The database, reachable only from the nodes; **deleted with its data** on teardown | `database.tf` |
-| AWS Load Balancer Controller | Turns the chart's Ingress into a load balancer (Traefik's job on kind)             | `addons.tf`   |
-| External Secrets             | Copies your keys and the database URL from Secrets Manager into the cluster        | `addons.tf`   |
-| ExternalDNS                  | Points `ofplens.app` at the load balancer in Route 53, and removes it on teardown  | `addons.tf`   |
-| Pod Identity                 | Gives those three add-ons exactly the AWS permissions they need, with no keys      | `addons.tf`   |
+| Part                         | What it is                                                                               | File          |
+| ---------------------------- | ---------------------------------------------------------------------------------------- | ------------- |
+| VPC                          | Your private network in two availability zones; no NAT gateway (saves ~$35/month)        | `network.tf`  |
+| EKS                          | Kubernetes; AWS runs the control plane, two ARM worker nodes run your pods               | `eks.tf`      |
+| RDS Postgres                 | The database, reachable only from the nodes; snapshotted on teardown, restored on create | `database.tf` |
+| AWS Load Balancer Controller | Turns the chart's Ingress into a load balancer (Traefik's job on kind)                   | `addons.tf`   |
+| External Secrets             | Copies your keys and the database URL from Secrets Manager into the cluster              | `addons.tf`   |
+| ExternalDNS                  | Points `ofplens.app` at the load balancer in Route 53, and removes it on teardown        | `addons.tf`   |
+| Pod Identity                 | Gives those three add-ons exactly the AWS permissions they need, with no keys            | `addons.tf`   |
 
 Then `pnpm aws:up` deploys the same Helm chart as kind, with
 [values-aws.yaml](../../deploy/helm/ofplens/values-aws.yaml).
@@ -150,8 +150,36 @@ Leftover check:
   Databases:
 ```
 
-All three must be empty. The database is gone **with its data**: the next session starts with
-an empty history.
+The first three must be empty. Before deleting the database, Terraform takes a **final
+snapshot** of it, so the flight history comes back with the next `pnpm aws:up`
+([below](#your-data-between-sessions)).
+
+## Your data between sessions
+
+The database server is deleted every session; its data isn't:
+
+1. `pnpm aws:down`: `terraform destroy` takes a final snapshot (`ofplens-final-<random>`, a few
+   extra minutes), then deletes the database. The script keeps the newest **three** snapshots
+   and deletes older ones.
+2. `pnpm aws:up`: if no database exists, Terraform creates it from the newest snapshot. The
+   plan shows `snapshot_identifier = "ofplens-final-…"`. The app's migrations then run as usual,
+   so a snapshot from an older version is brought up to date.
+
+Snapshots cost about $0.095 per GB-month for the data in them, not the 20 GB disk: a few cents.
+
+| You want…                         | Do                                                                                                                                                |
+| --------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------- |
+| to see the snapshots              | `aws rds describe-db-snapshots --db-instance-identifier ofplens --query 'DBSnapshots[].[DBSnapshotIdentifier,SnapshotCreateTime]' --output table` |
+| an empty database for one session | `FRESH_DB=1 pnpm aws:up` (the snapshots are kept)                                                                                                 |
+| an older snapshot                 | with no database running: `terraform -chdir=infra/aws apply -var db_snapshot=<name>`, then `pnpm aws:up`                                          |
+| to delete the history for good    | `aws rds delete-db-snapshot --db-snapshot-identifier <name>`, for each one                                                                        |
+
+The snapshot is used **only when the database is created**. A newer snapshot never replaces a
+running database (`ignore_changes` in `database.tf`).
+
+A cluster created before this change has `skip_final_snapshot = true` in its state, and
+`terraform destroy` follows the state: run `pnpm aws:up` once more before `aws:down` to update
+it, or that session's data is not kept.
 
 ## Deploy on merge
 
@@ -192,6 +220,8 @@ AWS keys are stored in GitHub, only the role's ARN, and the role trusts only wor
 | to keep the cluster for one night | `gh variable set KEEP_CLUSTER --body true`                             |
 | the nightly teardown back         | `gh variable delete KEEP_CLUSTER` (do it the next morning)             |
 | to see last night's run           | `gh run list --workflow nightly-teardown.yml`, then `gh run view <id>` |
+
+The nightly teardown takes the same final snapshot, so a session it ends keeps its data too.
 
 If a run fails (for example a load balancer that won't go away), GitHub emails you. Then check
 [If something is left](#if-something-is-left). GitHub pauses scheduled workflows in a public

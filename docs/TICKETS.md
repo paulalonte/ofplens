@@ -618,6 +618,13 @@ check and per prompt version, so prompt or model changes are measured, not guess
 - *As built:* seven screenshots of a LEMD → LEBL plan in `docs/images/` (flight data, takeoff &
   landing, AI briefing, hazards, route map, navlog), each under a "Screenshots" heading.
 
+### OFP-52 · Keep the database between AWS sessions
+- **Done when:** `pnpm aws:down` keeps the flight history and the next `pnpm aws:up` brings it
+  back (deployment step 7, first part).
+- *As built:* `terraform destroy` takes a final RDS snapshot (a new name per session); `aws:up`
+  creates the database from the newest one (`var.db_snapshot`, ignored once it exists), or
+  empty with `FRESH_DB=1`; `aws:down` keeps the newest three. Documented in infra/aws/README.md.
+
 ---
 
 ## Later phases (not ticketed yet)

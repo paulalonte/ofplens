@@ -231,7 +231,7 @@ and watch the first deploy.
 - A nightly job that destroys the cluster unless you marked it to stay up, so a forgotten
   cluster costs one night, not a month.
 - A database snapshot before each destroy, restored on the next create, so the flight history
-  survives (snapshot storage costs cents).
+  survives (snapshot storage costs cents). Done in OFP-52.
 - Logs you can search (CloudWatch), and cluster metrics (`kubectl top`).
 - A short runbook: start, stop, deploy, roll back, restore the database, rotate the Claude key.
 

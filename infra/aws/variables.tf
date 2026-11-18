@@ -34,6 +34,12 @@ variable "db_instance_class" {
   default     = "db.t4g.micro"
 }
 
+variable "db_snapshot" {
+  description = "RDS snapshot to create the database from (pnpm aws:up passes the newest); null starts empty. Used only when the database is created."
+  type        = string
+  default     = null
+}
+
 variable "app_secret_name" {
   description = "Secrets Manager secret with the app's keys, created by infra/bootstrap."
   type        = string

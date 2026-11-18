@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
-# Deletes the AWS cluster and everything in infra/aws (the database and its data included).
-# Keeps infra/bootstrap: the budget, the state bucket, the image repositories, your app keys.
+# Deletes the AWS cluster and everything in infra/aws. The database's data is kept: Terraform
+# takes a final snapshot before deleting it, and the next `pnpm aws:up` restores it. Keeps
+# infra/bootstrap: the budget, the state bucket, the image repositories, your app keys.
 #
 #   export AWS_PROFILE=ofplens
 #   pnpm aws:down
@@ -46,15 +47,23 @@ if aws elbv2 describe-load-balancers --region "$REGION" --names ofplens >/dev/nu
   exit 1
 fi
 
-# 2. Everything Terraform created: the add-ons, the cluster, the database, the network.
-#    Takes 10-15 minutes.
+# 2. Everything Terraform created: the add-ons, the cluster, the database (after its final
+#    snapshot), the network. Takes 10-15 minutes.
 if [[ "${AUTO_APPROVE:-}" == 1 ]]; then
   run terraform -chdir="$TF_DIR" destroy -input=false -auto-approve
 else
   run terraform -chdir="$TF_DIR" destroy
 fi
 
-# 3. What is left that costs money? All three should be empty.
+# 3. Keep the newest three snapshots and delete older ones: one bad session (say, a broken
+#    migration) can't take the only good copy with it, and old copies don't pile up.
+KEEP=3
+OLD=$(db_snapshots | awk -v keep="$KEEP" '{ line[NR] = $0 } END { for (i = 1; i <= NR - keep; i++) print line[i] }')
+for snapshot in $OLD; do
+  run aws rds delete-db-snapshot --region "$REGION" --db-snapshot-identifier "$snapshot" >/dev/null
+done
+
+# 4. What is left that costs money? The first three should be empty.
 kubectl config delete-context "$CONTEXT" >/dev/null 2>&1 || true
 CLUSTERS=$(aws eks list-clusters --region "$REGION" --query 'clusters' --output text)
 LBS=$(aws elbv2 describe-load-balancers --region "$REGION" --query 'LoadBalancers[].LoadBalancerName' --output text)
@@ -64,6 +73,7 @@ echo "Leftover check:"
 echo "  EKS clusters:   $CLUSTERS"
 echo "  Load balancers: $LBS"
 echo "  Databases:      $DBS"
+echo "  Kept snapshots: $(db_snapshots | tr '\n' ' ')(cents a month; the next aws:up restores the newest)"
 if [[ -n "$CLUSTERS$LBS$DBS" ]]; then
   echo "Something is still running (and billed). See infra/aws/README.md, 'If something is left'." >&2
   exit 1
