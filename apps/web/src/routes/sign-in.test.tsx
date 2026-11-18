@@ -87,6 +87,10 @@ describe('signed in', () => {
     const user = userEvent.setup();
 
     const header = screen.getByRole('banner');
+    const account = within(header).getByRole('button', { name: 'Account: Test Pilot' });
+    expect(account).toHaveAttribute('aria-expanded', 'false');
+    await user.click(account);
+    expect(account).toHaveAttribute('aria-expanded', 'true');
     expect(within(header).getByText('Test Pilot')).toBeInTheDocument();
     await user.click(within(header).getByRole('button', { name: 'Sign out' }));
 

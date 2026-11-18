@@ -631,6 +631,13 @@ check and per prompt version, so prompt or model changes are measured, not guess
 - *As built:* new 503 message and card title; a startup warning names `.env` locally and the
   `ofplens/app` secret on AWS.
 
+### OFP-54 · Account menu in the header (one row on a phone)
+- **Done when:** at phone width the header is one row: logo, History and Settings on the
+  left; the API status and the pilot's picture on the right. The picture opens a menu with
+  the name and "Sign out" (room for more later).
+- *As built:* `AccountMenu` (disclosure button: Escape and outside clicks close it) shows the
+  Google/GitHub picture saved at sign-in, or initials; the API status is just its dot below `sm`.
+
 ---
 
 ## Later phases (not ticketed yet)

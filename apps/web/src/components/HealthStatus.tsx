@@ -28,10 +28,11 @@ export function HealthStatus() {
     label = 'API ok, DB down';
   }
 
+  // On a phone only the dot shows (the words stay for screen readers, and as a tooltip).
   return (
-    <p role="status" className="inline-flex items-center gap-2 text-sm">
+    <p role="status" title={label} className="inline-flex items-center gap-2 text-sm">
       <span aria-hidden className={`size-2.5 rounded-full ${toneClasses[tone]}`} />
-      {label}
+      <span className="sr-only sm:not-sr-only">{label}</span>
     </p>
   );
 }

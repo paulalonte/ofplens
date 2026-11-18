@@ -229,6 +229,7 @@ test('two pilots each see only their own plans, and signing out ends the session
   await expect(ana.getByRole('heading', { level: 1 })).toHaveText('N70P');
 
   // Signing out: back to sign-in, and the plan's address leads there too.
+  await ana.getByRole('button', { name: /^Account: / }).click();
   await ana.getByRole('button', { name: 'Sign out' }).click();
   await expect(ana.getByRole('heading', { name: 'Sign in' })).toBeVisible();
   await ana.goto(anasPlan);

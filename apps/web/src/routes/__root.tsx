@@ -1,14 +1,9 @@
-import {
-  createRootRouteWithContext,
-  Link,
-  Outlet,
-  redirect,
-  useNavigate,
-} from '@tanstack/react-router';
-import { sessionQuery, useSession, useSignOut } from '../api/auth';
+import { createRootRouteWithContext, Link, Outlet, redirect } from '@tanstack/react-router';
+import { sessionQuery, useSession } from '../api/auth';
 import { HealthStatus } from '../components/HealthStatus';
 import { safePath } from '../lib/safePath';
 import type { RouterContext } from '../router';
+import { AccountMenu } from './-components/AccountMenu';
 import { Brand } from './-components/Brand';
 import { NotFound } from './-components/NotFound';
 
@@ -36,16 +31,19 @@ const navLink =
   'text-sm text-slate-600 hover:text-slate-900 dark:text-slate-400 dark:hover:text-slate-100';
 const activeNavLink = { className: 'font-semibold text-slate-900 dark:text-slate-100' };
 
-/** Header with navigation, API status and the pilot, the page, and the simulation-only footer. */
+/**
+ * Header with navigation on the left, the API status and the pilot's account menu on the
+ * right (one row, also on a phone), the page, and the simulation-only footer.
+ */
 function RootLayout() {
   const { pilot } = useSession();
 
   return (
     <div className="flex min-h-dvh flex-col bg-slate-50 text-slate-900 dark:bg-slate-950 dark:text-slate-100">
       <header className="border-b border-slate-200 dark:border-slate-800">
-        <div className="mx-auto flex max-w-5xl flex-wrap items-center justify-between gap-x-4 gap-y-2 px-4 py-3">
+        <div className="mx-auto flex max-w-5xl items-center justify-between gap-4 px-4 py-3">
           {pilot ? (
-            <nav aria-label="Main" className="flex items-center gap-5">
+            <nav aria-label="Main" className="flex min-w-0 items-center gap-4 sm:gap-5">
               <Link to="/">
                 <Brand />
               </Link>
@@ -59,9 +57,14 @@ function RootLayout() {
           ) : (
             <Brand />
           )}
-          <div className="flex items-center gap-4">
+          <div className="flex shrink-0 items-center gap-3 sm:gap-4">
             <HealthStatus />
-            {pilot && <PilotMenu name={pilot.displayName ?? pilot.email ?? 'Pilot'} />}
+            {pilot && (
+              <AccountMenu
+                name={pilot.displayName ?? pilot.email ?? 'Pilot'}
+                avatarUrl={pilot.avatarUrl}
+              />
+            )}
           </div>
         </div>
       </header>
@@ -73,29 +76,6 @@ function RootLayout() {
       <footer className="border-t border-slate-200 py-3 text-center text-xs text-slate-500 dark:border-slate-800">
         For flight simulation use only. Not for real-world navigation.
       </footer>
-    </div>
-  );
-}
-
-function PilotMenu({ name }: { name: string }) {
-  const signOut = useSignOut();
-  const navigate = useNavigate();
-
-  return (
-    <div className="flex items-center gap-3 text-sm">
-      <span className="max-w-40 truncate text-slate-600 dark:text-slate-400" title={name}>
-        {name}
-      </span>
-      <button
-        type="button"
-        disabled={signOut.isPending}
-        onClick={() =>
-          signOut.mutate(undefined, { onSettled: () => void navigate({ to: '/sign-in' }) })
-        }
-        className="rounded-md border border-slate-300 px-2.5 py-1 font-medium hover:bg-slate-100 disabled:opacity-50 dark:border-slate-700 dark:hover:bg-slate-800"
-      >
-        Sign out
-      </button>
     </div>
   );
 }
