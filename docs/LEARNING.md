@@ -1025,3 +1025,46 @@ migrated forward before the app starts. We keep three snapshots for retention. F
 I'd keep the database out of the disposable stack entirely, with deletion protection, automated
 backups for point-in-time recovery, cross-region copies, and regular restore drills, because a
 backup you haven't restored isn't a backup."
+
+### Step 7, part 1b: reaching a private database (jump pod + port-forward)
+
+**What it is:** `infra/aws/README.md`, "Look at the database", opens Drizzle Studio on the RDS
+database through a temporary `db-tunnel` pod and `kubectl port-forward`, then closes it.
+
+**Concepts**
+
+- **Private by default:** RDS has no public address, and its security group admits only the
+  worker nodes. That's the right default: a database on the internet is scanned for weak
+  passwords within minutes. The price is that *you* can't reach it directly either.
+- **Jump host / bastion:** something inside the private network that you *can* reach, which
+  forwards you on. Classic form: a small EC2 instance with SSH. Here it's a pod running `socat`
+  (it copies bytes between two TCP connections), because the cluster is the thing we can
+  already reach.
+- **`kubectl port-forward`:** opens a local port and carries its traffic, through the Kubernetes
+  API server and the kubelet, to a port on a pod. No load balancer, no public IP, no security
+  group change: access is controlled by your Kubernetes permissions (your AWS login), and it
+  exists only while the command runs.
+- **Ephemeral access:** open the path when you need it, close it after. Nothing stays open by
+  accident, and there's nothing permanent to secure, patch or pay for.
+- **Secrets stay out of the terminal:** the URL is read from Secrets Manager and passed to one
+  command, never printed, never exported (an exported production `DATABASE_URL` is how people
+  run migrations or tests against production by mistake).
+
+**In production**
+
+| Here | Production |
+| --- | --- |
+| `socat` pod + `kubectl port-forward` | AWS Systems Manager Session Manager port forwarding to RDS, or a bastion with SSO login; no SSH keys |
+| The app's own database user | A read-only user for people, separate from the app's |
+| Anyone with cluster access can open it | Just-in-time access (approval, time limit), every session logged and audited |
+| Browse the live database | Usually a replica or a restored snapshot; production edits go through migrations or reviewed scripts |
+
+**Interview**
+
+"The database is in private subnets with no public endpoint; its security group only allows the
+EKS nodes. When I need to inspect it, I start a short-lived socat pod as a jump host and
+`kubectl port-forward` to it, so access rides on my Kubernetes RBAC and IAM identity and lasts
+only as long as the session. The connection string comes from Secrets Manager straight into one
+command, never printed or exported. In production I'd use SSM Session Manager or a just-in-time
+bastion, a read-only database role for humans, and audit logging."
+

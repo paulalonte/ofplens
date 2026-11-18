@@ -638,6 +638,12 @@ check and per prompt version, so prompt or model changes are measured, not guess
 - *As built:* `AccountMenu` (disclosure button: Escape and outside clicks close it) shows the
   Google/GitHub picture saved at sign-in, or initials; the API status is just its dot below `sm`.
 
+### OFP-55 · How to look at the AWS database
+- **Done when:** the docs show how to open Drizzle Studio on RDS through the cluster and close
+  the tunnel again, and explain the pattern.
+- *As built:* "Look at the database" in infra/aws/README.md (socat pod, port-forward, Studio with
+  the URL from Secrets Manager, cleanup and checks); step 7 part 1b in docs/LEARNING.md.
+
 ---
 
 ## Later phases (not ticketed yet)
