@@ -181,6 +181,70 @@ A cluster created before this change has `skip_final_snapshot = true` in its sta
 `terraform destroy` follows the state: run `pnpm aws:up` once more before `aws:down` to update
 it, or that session's data is not kept.
 
+## Look at the database (Drizzle Studio)
+
+The database is private: only the cluster's nodes can reach it, not your Mac or the internet.
+To browse it, open a temporary tunnel through the cluster, then close it again:
+
+```
+Your Mac :15432 ──kubectl port-forward──▶ db-tunnel pod (socat) ──▶ RDS :5432
+```
+
+Run these from the repo root, with `export AWS_PROFILE=ofplens` and the cluster up.
+
+**Open**
+
+1. A small pod that passes connections through to RDS:
+
+   ```bash
+   kubectl --context ofplens-aws run db-tunnel -n ofplens --image=alpine/socat --restart=Never -- tcp-listen:5432,fork,reuseaddr "tcp-connect:$(aws rds describe-db-instances --region eu-central-1 --db-instance-identifier ofplens --query 'DBInstances[0].Endpoint.Address' --output text):5432"
+   ```
+
+2. Your Mac's port 15432 to that pod. Leave it running in its own terminal tab:
+
+   ```bash
+   kubectl --context ofplens-aws port-forward -n ofplens pod/db-tunnel 15432:5432
+   ```
+
+3. Drizzle Studio against RDS, in another tab. The URL comes from Secrets Manager with the host
+   swapped for the tunnel. The password is never printed, and `DATABASE_URL` is set for this
+   one command only:
+
+   ```bash
+   DATABASE_URL="$(aws secretsmanager get-secret-value --region eu-central-1 --secret-id ofplens/database --query SecretString --output text | python3 -c 'import json,sys,re; print(re.sub(r"@[^/]+/", "@localhost:15432/", json.load(sys.stdin)["DATABASE_URL"]))')" pnpm db:studio
+   ```
+
+   Then open https://local.drizzle.studio. Any Postgres client (TablePlus, `psql`) works through
+   the same tunnel on `localhost:15432`.
+
+**Close** (as soon as you're done)
+
+1. Ctrl+C in Studio's tab and in the port-forward's tab.
+2. Delete the pod:
+
+   ```bash
+   kubectl --context ofplens-aws delete pod db-tunnel -n ofplens
+   ```
+
+3. Check that nothing is left. The first command should list only `ofplens-api-…` and
+   `ofplens-web-…`; the second should print nothing:
+
+   ```bash
+   kubectl --context ofplens-aws get pods -n ofplens
+   lsof -i :15432
+   ```
+
+**Careful**
+
+- This is the live database behind ofplens.app. Browsing is safe; edits and deletes in Studio
+  are real.
+- Never `export` that `DATABASE_URL`: a later `pnpm db:migrate` or test in the same shell would
+  run against RDS. The one-command form above avoids that.
+- Forgotten? The port-forward ends with its terminal, and the nightly teardown deletes the pod
+  with the cluster. Still, close it straight away.
+- The same port-forward works from k9s (`Shift+F` on the pod) or Freelens/OpenLens (the pod's
+  Forward button), once the `db-tunnel` pod exists.
+
 ## Deploy on merge
 
 [.github/workflows/deploy.yml](../../.github/workflows/deploy.yml) runs after CI passes on
