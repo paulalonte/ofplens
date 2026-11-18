@@ -1,8 +1,11 @@
 # Postgres as a managed service (RDS), outside the cluster: AWS handles the machine, the disk,
 # patches and (if switched on) backups. Reachable only from the worker nodes, on port 5432.
 #
-# Disposable while learning: no final snapshot and no backups, so `terraform destroy` deletes
-# the data with it. Production would keep both, plus deletion protection (docs/LEARNING.md).
+# The instance is disposable, the data isn't: `terraform destroy` takes a final snapshot, and
+# the next `pnpm aws:up` restores the newest one (var.db_snapshot), so the flight history
+# survives between sessions. deploy/aws/down.sh keeps the newest three snapshots. No automated
+# daily backups and no deletion protection while learning; production would have both
+# (docs/LEARNING.md, step 7).
 
 resource "random_password" "db" {
   length = 32
@@ -26,6 +29,12 @@ resource "aws_vpc_security_group_ingress_rule" "db_from_nodes" {
   description                  = "Postgres from the worker nodes"
 }
 
+# A new name for each session's final snapshot: the name is fixed when the database is created
+# (destroy can't compute one), and must not repeat, or the next destroy would fail.
+resource "random_id" "final_snapshot" {
+  byte_length = 4
+}
+
 resource "aws_db_instance" "main" {
   identifier     = var.name
   engine         = "postgres"
@@ -36,6 +45,10 @@ resource "aws_db_instance" "main" {
   storage_type      = "gp3"
   storage_encrypted = true
 
+  # Restoring a snapshot keeps its database and user names (the same as these), and its data.
+  # The password is set afterwards, so each session still gets a new one.
+  snapshot_identifier = var.db_snapshot
+
   db_name  = "ofplens"
   username = "ofplens"
   password = random_password.db.result
@@ -45,11 +58,19 @@ resource "aws_db_instance" "main" {
   publicly_accessible    = false
   multi_az               = false
 
-  # Disposable: see the comment at the top.
-  backup_retention_period = 0
-  skip_final_snapshot     = true
-  deletion_protection     = false
-  apply_immediately       = true
+  # See the comment at the top.
+  skip_final_snapshot       = false
+  final_snapshot_identifier = "${var.name}-final-${random_id.final_snapshot.hex}"
+  copy_tags_to_snapshot     = true
+  backup_retention_period   = 0
+  deletion_protection       = false
+  apply_immediately         = true
+
+  lifecycle {
+    # The snapshot matters only when the database is created. Without this, a newer snapshot
+    # (or none) on a later apply would replace the running database, data and all.
+    ignore_changes = [snapshot_identifier]
+  }
 }
 
 # The connection URL for the app, in Secrets Manager; External Secrets copies it into the

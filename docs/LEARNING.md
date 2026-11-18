@@ -957,3 +957,71 @@ failing release reverts itself. Migrations run as a pre-upgrade hook. A smoke te
 public endpoint afterwards. It's push-based; for many clusters I'd move to GitOps with Argo CD
 so the cluster pulls its desired state and CI needs no cluster credentials."
 
+---
+
+## Step 7 — Operations, part 1: keeping the data (database snapshots)
+
+**What was built**
+
+- `terraform destroy` takes a **final snapshot** of RDS (`skip_final_snapshot = false`), named
+  per session with a `random_id`, before deleting the instance.
+- `pnpm aws:up` creates the database from the newest snapshot (`var.db_snapshot` →
+  `snapshot_identifier`), or empty with `FRESH_DB=1`. `ignore_changes` makes sure a snapshot is
+  only ever used to *create* the database, never to replace a running one.
+- `pnpm aws:down` keeps the newest three snapshots (retention) and lists them at the end.
+
+**Concepts**
+
+- **Cattle vs pets, and where state lives:** the cluster, the nodes and even the database
+  *server* are cattle: delete and recreate at will. The *data* is the one pet. The trick of
+  disposable infrastructure is to put every bit of state somewhere that outlives the compute:
+  here a snapshot, in production a database that is never torn down.
+- **Snapshot vs automated backups:** a manual (or final) snapshot is a full copy you keep until
+  you delete it, even after the instance is gone. Automated backups (`backup_retention_period`
+  1–35 days) are daily snapshots plus the transaction log, which gives **point-in-time
+  recovery** (restore to any second in the window), but they are deleted with the instance by
+  default. Production uses both.
+- **RPO and RTO:** *Recovery Point Objective* is how much data you can lose (here: none between
+  sessions, since the snapshot is taken at the end; with daily snapshots only, up to a day).
+  *Recovery Time Objective* is how long recovery takes (here: the 5–10 minutes RDS needs to
+  restore). Every backup design is a trade-off between these two and cost.
+- **A restore is a new instance:** RDS never restores "into" an existing database; it creates a
+  new one from the snapshot. That's why it fits create-time only, and why production restores
+  go to a new instance first, get checked, and then traffic is switched.
+- **Schema drift after a restore:** a snapshot from last week has last week's schema. The
+  migrate hook runs before the app starts, so the restored data is brought forward. This only
+  works because migrations are forward-only and run automatically.
+- **Retention:** keeping every snapshot costs money and keeps data you may be obliged to delete
+  (GDPR); keeping only one means a bad session (a broken migration) overwrites the only good
+  copy. Keep N, delete older: here three.
+
+**Production pitfalls this avoids (and what production adds)**
+
+| Risk | Here | Production |
+| --- | --- | --- |
+| Teardown deletes the data | Final snapshot, restored next time | Database outside the disposable stack, `deletion_protection`, `prevent_destroy` |
+| Snapshot used against a live DB | `ignore_changes = [snapshot_identifier]` | The same; restores go to a new instance |
+| Losing data between snapshots | Sessions are short; snapshot at the end | Automated backups + point-in-time recovery |
+| A region or account is lost | Not covered | Snapshot copies to another region or a separate backup account (AWS Backup, vault lock) |
+| Backups that don't restore | Restored every session (tested by use) | Scheduled restore drills; a backup isn't a backup until it's been restored |
+| Name clash on the next destroy | `random_id` per session | The same, or a timestamped name |
+
+**Try it** (costs one session)
+
+```bash
+pnpm aws:up                     # first time: "No database snapshot yet"
+# import a plan on https://ofplens.app
+pnpm aws:down                   # watch "final snapshot" in the destroy; "Kept snapshots: ofplens-final-…"
+pnpm aws:up                     # "restored from ofplens-final-…": the plan is still in your history
+```
+
+**Interview**
+
+"The environment is disposable: everything is in Terraform and gets destroyed every night. The
+data isn't. RDS takes a final snapshot on destroy, and the next create restores the newest
+snapshot, with lifecycle `ignore_changes` so a newer snapshot can never trigger a replacement of
+a running database. Schema migrations run as a pre-install hook, so an older snapshot gets
+migrated forward before the app starts. We keep three snapshots for retention. For production
+I'd keep the database out of the disposable stack entirely, with deletion protection, automated
+backups for point-in-time recovery, cross-region copies, and regular restore drills, because a
+backup you haven't restored isn't a backup."

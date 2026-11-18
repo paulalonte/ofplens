@@ -15,25 +15,25 @@ history in Postgres. **For flight simulation (X-Plane 12) only.** The plan is in
 
 ## Commands
 
-| Command                                | What it does                                                                                                                |
-| -------------------------------------- | --------------------------------------------------------------------------------------------------------------------------- |
-| `pnpm dev`                             | Start Postgres, apply migrations, then web (http://localhost:5173) and API (:3000)                                          |
-| `pnpm dev:apps`                        | Only web and API (Postgres already up and migrated)                                                                         |
-| `pnpm db:up` / `pnpm db:down`          | Start (and wait for) / stop the Postgres container                                                                          |
-| `pnpm app:up` / `pnpm app:down`        | The whole app from its container images (http://localhost:8080); `pnpm app:logs` follows it                                 |
-| `pnpm kind:up` / `pnpm kind:down`      | The app on a local 3-node Kubernetes cluster (kind + Helm), http://localhost:8088                                           |
-| `pnpm aws:up` / `pnpm aws:down`        | Create the AWS cluster and deploy (costs ~$0.25/h) / remove it all; the user runs these (infra/aws/README.md)               |
-| `pnpm db:generate` / `pnpm db:migrate` | Create a migration from the Drizzle schema / apply it                                                                       |
-| `pnpm db:studio`                       | Browse the dev database in Drizzle Studio                                                                                   |
-| `pnpm test`                            | All Vitest tests: `web` (jsdom), `node` (api, packages), `integration` (`*.int.test.ts`, real Postgres: needs `pnpm db:up`) |
-| `pnpm test --project web`              | Only the web tests (no `--` with pnpm; it is passed on literally)                                                           |
-| `pnpm e2e`                             | Playwright end to end (`e2e/`): real web + API, fresh `ofplens_e2e` DB, development sign-in, fake SimBrief, weather, Claude |
-| `pnpm lint` / `pnpm typecheck`         | ESLint (type-aware) / `tsc --noEmit` in every workspace                                                                     |
-| `pnpm format` / `pnpm format:check`    | Prettier                                                                                                                    |
-| `pnpm fixture:capture <name>`          | Save your latest SimBrief OFP (pilot ID redacted) to `fixtures/ofp/`                                                        |
-| `pnpm fixture:weather`                 | Save current METARs/TAFs for 24 airports to `fixtures/weather/`                                                             |
-| `pnpm fixture:hazards`                 | Save current SIGMETs and G-AIRMETs (three feeds) to `fixtures/hazards/`                                                     |
-| `pnpm briefing:try <planId\|fixture>`  | One real, paid AI briefing (key from `.env`), or `--fixtures` for all; prints briefing, tokens, cost, guardrail failures    |
+| Command                                | What it does                                                                                                                         |
+| -------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------ |
+| `pnpm dev`                             | Start Postgres, apply migrations, then web (http://localhost:5173) and API (:3000)                                                   |
+| `pnpm dev:apps`                        | Only web and API (Postgres already up and migrated)                                                                                  |
+| `pnpm db:up` / `pnpm db:down`          | Start (and wait for) / stop the Postgres container                                                                                   |
+| `pnpm app:up` / `pnpm app:down`        | The whole app from its container images (http://localhost:8080); `pnpm app:logs` follows it                                          |
+| `pnpm kind:up` / `pnpm kind:down`      | The app on a local 3-node Kubernetes cluster (kind + Helm), http://localhost:8088                                                    |
+| `pnpm aws:up` / `pnpm aws:down`        | Create the AWS cluster and deploy (costs ~$0.25/h) / remove it all, keeping a DB snapshot; the user runs these (infra/aws/README.md) |
+| `pnpm db:generate` / `pnpm db:migrate` | Create a migration from the Drizzle schema / apply it                                                                                |
+| `pnpm db:studio`                       | Browse the dev database in Drizzle Studio                                                                                            |
+| `pnpm test`                            | All Vitest tests: `web` (jsdom), `node` (api, packages), `integration` (`*.int.test.ts`, real Postgres: needs `pnpm db:up`)          |
+| `pnpm test --project web`              | Only the web tests (no `--` with pnpm; it is passed on literally)                                                                    |
+| `pnpm e2e`                             | Playwright end to end (`e2e/`): real web + API, fresh `ofplens_e2e` DB, development sign-in, fake SimBrief, weather, Claude          |
+| `pnpm lint` / `pnpm typecheck`         | ESLint (type-aware) / `tsc --noEmit` in every workspace                                                                              |
+| `pnpm format` / `pnpm format:check`    | Prettier                                                                                                                             |
+| `pnpm fixture:capture <name>`          | Save your latest SimBrief OFP (pilot ID redacted) to `fixtures/ofp/`                                                                 |
+| `pnpm fixture:weather`                 | Save current METARs/TAFs for 24 airports to `fixtures/weather/`                                                                      |
+| `pnpm fixture:hazards`                 | Save current SIGMETs and G-AIRMETs (three feeds) to `fixtures/hazards/`                                                              |
+| `pnpm briefing:try <planId\|fixture>`  | One real, paid AI briefing (key from `.env`), or `--fixtures` for all; prints briefing, tokens, cost, guardrail failures             |
 
 Before saying a change is done, run `pnpm format:check && pnpm lint && pnpm typecheck && pnpm test`
 (the same steps CI runs, plus `pnpm --filter @ofplens/web build`).

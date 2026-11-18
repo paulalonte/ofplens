@@ -4,6 +4,7 @@ cd "$(dirname "${BASH_SOURCE[0]}")/../.."
 
 REGION=eu-central-1
 CLUSTER=ofplens
+DB=ofplens # the RDS instance (var.name in infra/aws)
 NAMESPACE=ofplens
 CONTEXT=ofplens-aws
 TF_DIR=infra/aws
@@ -29,6 +30,18 @@ run terraform -chdir="$TF_DIR" init -input=false -backend-config="bucket=$STATE_
 
 cluster_exists() {
   aws eks describe-cluster --region "$REGION" --name "$CLUSTER" >/dev/null 2>&1
+}
+
+db_exists() {
+  aws rds describe-db-instances --region "$REGION" --db-instance-identifier "$DB" >/dev/null 2>&1
+}
+
+# The database's snapshots (the final one of each session), oldest first, one per line.
+db_snapshots() {
+  aws rds describe-db-snapshots --region "$REGION" --db-instance-identifier "$DB" \
+    --snapshot-type manual --output text \
+    --query 'sort_by(DBSnapshots[?Status==`available`], &SnapshotCreateTime)[].DBSnapshotIdentifier' |
+    tr '\t' '\n' | sed '/^$/d; /^None$/d'
 }
 
 use_cluster() {

@@ -6,11 +6,25 @@
 #   pnpm aws:up       → https://ofplens.app   (costs ~$0.25/hour until pnpm aws:down)
 #
 # Each step prints the command it runs, so you can also run them one by one.
+#
+# The database comes back from the newest snapshot that `pnpm aws:down` took, with your flight
+# history. FRESH_DB=1 pnpm aws:up starts with an empty one instead (the snapshots are kept).
 source "$(dirname "$0")/common.sh"
 
 # 1. The infrastructure. Shows the plan and asks before changing anything (type yes).
 #    The first run takes 15-20 minutes (the cluster and the database).
-run terraform -chdir="$TF_DIR" apply
+TF_VARS=()
+if db_exists; then
+  : # Already running: the snapshot only matters when the database is created.
+elif [[ "${FRESH_DB:-}" == 1 ]]; then
+  echo "FRESH_DB=1: the database starts empty." >&2
+elif SNAPSHOT="$(db_snapshots | tail -n 1)" && [[ -n "$SNAPSHOT" ]]; then
+  echo "The database will be restored from $SNAPSHOT (the last session's data)." >&2
+  TF_VARS=(-var "db_snapshot=$SNAPSHOT")
+else
+  echo "No database snapshot yet: the database starts empty." >&2
+fi
+run terraform -chdir="$TF_DIR" apply ${TF_VARS[@]+"${TF_VARS[@]}"}
 
 use_cluster
 
