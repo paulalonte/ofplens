@@ -214,12 +214,16 @@ describe('Saved plan: AI briefing', () => {
     expect(within(region).getByText(BRIEFING.headline)).toBeInTheDocument();
   });
 
-  it('says when briefings are not set up on the server', async () => {
+  it('says when briefings are turned off on the server', async () => {
     const user = userEvent.setup();
     mockApi({
       ...base,
       [POST]: () =>
-        apiError(503, 'BRIEFINGS_NOT_CONFIGURED', 'AI briefings are not set up on this server.'),
+        apiError(
+          503,
+          'BRIEFINGS_NOT_CONFIGURED',
+          'This server has no Claude API key, so AI briefings are turned off.',
+        ),
     });
     await renderApp(`/history/${ID}`);
     const region = await card();
@@ -227,7 +231,7 @@ describe('Saved plan: AI briefing', () => {
     await user.click(within(region).getByRole('button', { name: 'Generate briefing' }));
 
     expect(await within(region).findByRole('alert')).toHaveTextContent(
-      'AI briefings are not set up',
+      'AI briefings are turned off',
     );
   });
 

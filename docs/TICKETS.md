@@ -625,6 +625,12 @@ check and per prompt version, so prompt or model changes are measured, not guess
   creates the database from the newest one (`var.db_snapshot`, ignored once it exists), or
   empty with `FRESH_DB=1`; `aws:down` keeps the newest three. Documented in infra/aws/README.md.
 
+### OFP-53 · Say "AI briefings are turned off" without pointing pilots at .env
+- **Done when:** a server without `ANTHROPIC_API_KEY` tells pilots briefings are off (no setup
+  instructions), and the API's startup log tells whoever runs it where the key goes.
+- *As built:* new 503 message and card title; a startup warning names `.env` locally and the
+  `ofplens/app` secret on AWS.
+
 ---
 
 ## Later phases (not ticketed yet)

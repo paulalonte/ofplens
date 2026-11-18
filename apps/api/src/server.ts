@@ -56,6 +56,14 @@ if (authProviders.length === 0 && !env.DEV_SIGN_IN) {
   );
 }
 
+if (!env.ANTHROPIC_API_KEY) {
+  app.log.warn(
+    isLocalUrl(env.PUBLIC_URL)
+      ? 'No ANTHROPIC_API_KEY: AI briefings are off. Add it to .env and restart.'
+      : 'No ANTHROPIC_API_KEY: AI briefings are off. On AWS, add it to the ofplens/app secret (infra/aws/README.md, "Add or change your keys").',
+  );
+}
+
 for (const signal of ['SIGINT', 'SIGTERM'] as const) {
   process.once(signal, () => {
     app.log.info(`${signal} received, shutting down`);
