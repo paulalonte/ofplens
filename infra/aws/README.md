@@ -45,6 +45,7 @@ aws eks list-clusters --region eu-central-1      # "clusters": []  → nothing e
 | AWS Load Balancer Controller | Turns the chart's Ingress into a load balancer (Traefik's job on kind)                   | `addons.tf`   |
 | External Secrets             | Copies your keys and the database URL from Secrets Manager into the cluster              | `addons.tf`   |
 | ExternalDNS                  | Points `ofplens.app` at the load balancer in Route 53, and removes it on teardown        | `addons.tf`   |
+| metrics-server               | Live CPU and memory of nodes and pods, for `kubectl top` and k9s                         | `eks.tf`      |
 | Pod Identity                 | Gives those three add-ons exactly the AWS permissions they need, with no keys            | `addons.tf`   |
 
 Then `pnpm aws:up` deploys the same Helm chart as kind, with
@@ -126,7 +127,9 @@ kubectl --context ofplens-aws get nodes -o wide          # two ARM nodes, in two
 kubectl --context ofplens-aws get pods -A                # app, controllers, AWS add-ons
 kubectl --context ofplens-aws get ingress -n ofplens     # the load balancer's address
 kubectl --context ofplens-aws get externalsecret -n ofplens   # SecretSynced = keys copied
-k9s --context ofplens-aws
+kubectl --context ofplens-aws top nodes                  # CPU and memory per node (metrics-server)
+kubectl --context ofplens-aws top pods -A --sort-by=memory
+k9s --context ofplens-aws                                # :pods shows CPU and MEM columns too
 ```
 
 In the AWS console (region **eu-central-1**): **EKS** → Clusters → `ofplens`; **EC2** →

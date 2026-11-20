@@ -232,7 +232,8 @@ and watch the first deploy.
   cluster costs one night, not a month.
 - A database snapshot before each destroy, restored on the next create, so the flight history
   survives (snapshot storage costs cents). Done in OFP-52.
-- Logs you can search (CloudWatch), and cluster metrics (`kubectl top`).
+- Live CPU and memory (`kubectl top`, metrics-server: OFP-56), and metrics and logs you can
+  search and graph afterwards in Grafana Cloud's free tier (OFP-57).
 - A short runbook: start, stop, deploy, roll back, restore the database, rotate the Claude key.
 
 **You do:** practise the runbook once: destroy, create, restore, roll back.
