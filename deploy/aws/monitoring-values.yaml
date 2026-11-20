@@ -1,0 +1,116 @@
+# Values for Grafana's k8s-monitoring chart on AWS (installed by infra/aws/monitoring.tf).
+# One Alloy collector gathers the cluster's metrics, events and pod logs and pushes them to
+# Grafana Cloud. Nothing is opened inbound: the cluster only sends.
+#
+# Where to send, as whom, and the token all come from the Kubernetes Secret grafana-cloud, which
+# External Secrets copies from Secrets Manager (ofplens/grafana, filled in by you:
+# infra/aws/README.md, "Monitoring"). So this public file holds no stack address, user id or token.
+#
+# Chart reference: https://github.com/grafana/k8s-monitoring-helm (version pinned in monitoring.tf).
+
+cluster:
+  name: ofplens
+
+destinations:
+  # Metrics → Grafana Cloud's Prometheus (Mimir).
+  metrics:
+    type: prometheus
+    urlFrom: convert.nonsensitive(remote.kubernetes.secret.metrics.data["metrics-url"])
+    auth:
+      type: basic
+      usernameKey: metrics-username
+      passwordKey: token
+    secret:
+      create: false
+      name: grafana-cloud
+      namespace: monitoring
+  # Logs and Kubernetes events → Grafana Cloud's Loki.
+  logs:
+    type: loki
+    urlFrom: convert.nonsensitive(remote.kubernetes.secret.logs.data["logs-url"])
+    auth:
+      type: basic
+      usernameKey: logs-username
+      passwordKey: token
+    secret:
+      create: false
+      name: grafana-cloud
+      namespace: monitoring
+
+# --- What to collect -------------------------------------------------------------------------
+
+# Nodes, pods and containers: CPU, memory, restarts, desired vs ready replicas. Uses the chart's
+# default allow lists (the metrics its Kubernetes dashboards need), which keeps a small cluster
+# well inside the free tier's series limit.
+clusterMetrics:
+  enabled: true
+
+# Kubernetes events (scheduled, pulled, OOMKilled, BackOff…), stored as logs.
+clusterEvents:
+  enabled: true
+
+# Every pod's stdout/stderr (the API's JSON log lines included), read through the Kubernetes
+# API by the one collector. Big clusters read the log files on each node instead (a DaemonSet
+# with host mounts); with two nodes this needs fewer pods and no host access.
+podLogsViaKubernetesApi:
+  enabled: true
+
+# Scrapes any pod annotated k8s.grafana.com/scrape: "true" (the API's /metrics, OFP-58).
+annotationAutodiscovery:
+  enabled: true
+
+# Exporters clusterMetrics reads: object state (kube-state-metrics, one pod) and node
+# hardware/OS (node-exporter, one pod per node).
+telemetryServices:
+  kube-state-metrics:
+    deploy: true
+  node-exporter:
+    deploy: true
+
+# --- The collector ---------------------------------------------------------------------------
+
+# One Alloy pod (a Deployment). No remoteConfig: its configuration comes only from this file,
+# not from Grafana Cloud's Fleet Management.
+collectors:
+  alloy:
+    presets: [deployment]
+    alloy:
+      resources:
+        requests:
+          cpu: 100m
+          memory: 256Mi
+        limits:
+          memory: 1Gi
+
+# --- The secret ------------------------------------------------------------------------------
+
+# Copies ofplens/grafana from Secrets Manager into the Secret grafana-cloud, like
+# deploy/aws/external-secret.yaml does for the app. Its keys: metrics-url, metrics-username,
+# logs-url, logs-username, token.
+extraObjects:
+  - apiVersion: external-secrets.io/v1
+    kind: SecretStore
+    metadata:
+      name: aws-secrets-manager
+      namespace: monitoring
+    spec:
+      provider:
+        aws:
+          service: SecretsManager
+          region: eu-central-1
+  - apiVersion: external-secrets.io/v1
+    kind: ExternalSecret
+    metadata:
+      name: grafana-cloud
+      namespace: monitoring
+    spec:
+      refreshInterval: 1h
+      secretStoreRef:
+        name: aws-secrets-manager
+        kind: SecretStore
+      target:
+        name: grafana-cloud
+        creationPolicy: Owner
+      dataFrom:
+        - extract:
+            key: ofplens/grafana

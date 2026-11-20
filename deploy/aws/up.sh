@@ -9,6 +9,8 @@
 #
 # The database comes back from the newest snapshot that `pnpm aws:down` took, with your flight
 # history. FRESH_DB=1 pnpm aws:up starts with an empty one instead (the snapshots are kept).
+# NO_MONITORING=1 pnpm aws:up leaves out the Grafana monitoring (infra/aws/monitoring.tf), or
+# removes it if it's running; the next run without it puts it back.
 source "$(dirname "$0")/common.sh"
 
 # 1. The infrastructure. Shows the plan and asks before changing anything (type yes).
@@ -23,6 +25,10 @@ elif SNAPSHOT="$(db_snapshots | tail -n 1)" && [[ -n "$SNAPSHOT" ]]; then
   TF_VARS=(-var "db_snapshot=$SNAPSHOT")
 else
   echo "No database snapshot yet: the database starts empty." >&2
+fi
+if [[ "${NO_MONITORING:-}" == 1 ]]; then
+  echo "NO_MONITORING=1: no Grafana monitoring this session." >&2
+  TF_VARS+=(-var "monitoring=false")
 fi
 run terraform -chdir="$TF_DIR" apply ${TF_VARS[@]+"${TF_VARS[@]}"}
 

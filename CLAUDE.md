@@ -53,7 +53,7 @@ packages/db    Drizzle client, schema, migrations
 packages/weather  aviationweather.gov client (METAR/TAF, SIGMET/G-AIRMET hazards), METAR decoder, flight category, plan weather
 infra/         Terraform: bootstrap/ (budget, state bucket, ECR, app secret, OIDC roles, ofplens.app certificate; kept), aws/ (VPC, EKS, RDS; per session). The user runs plan/apply
 Dockerfile     Container images: `--target api` (bundled API + migrate command), `--target web` (nginx)
-deploy/        web/ (nginx config), helm/ofplens (the Helm chart), kind/ (local cluster, Postgres, up/down), aws/ (up/down, ExternalSecret)
+deploy/        web/ (nginx config), helm/ofplens (the Helm chart), kind/ (local cluster, Postgres, up/down), aws/ (up/down, ExternalSecret, monitoring values)
 packages/agent    Briefing agent: tools as plain functions (reused by the API and, later, MCP), Briefing schema
 fixtures/ofp   Real SimBrief OFP JSON samples (OFP-05)
 fixtures/weather  Real aviationweather.gov METAR/TAF responses (`pnpm fixture:weather`)

@@ -650,6 +650,15 @@ check and per prompt version, so prompt or model changes are measured, not guess
 - *As built:* the `metrics-server` EKS community add-on in `infra/aws/eks.tf` (no IAM, no
   chart to pin; the EKS module's node security group already allows the ports it needs).
 
+### OFP-57 · Metrics and logs in Grafana Cloud
+- **Done when:** on AWS, Grafana Cloud shows the cluster's nodes and pods (Kubernetes app) and
+  the API's log lines, with the token only in Secrets Manager (deployment step 7, part 2b).
+- *As built:* the k8s-monitoring chart 4.6.1 (`infra/aws/monitoring.tf`, values in
+  `deploy/aws/monitoring-values.yaml`): one Alloy Deployment for cluster metrics, events, pod
+  logs (through the Kubernetes API) and annotation autodiscovery; kube-state-metrics and
+  node-exporter. Addresses, user ids and token come from `ofplens/grafana` (bootstrap, filled in
+  by hand) through External Secrets. No Fleet Management. `NO_MONITORING=1 pnpm aws:up` skips it.
+
 ---
 
 ## Later phases (not ticketed yet)
