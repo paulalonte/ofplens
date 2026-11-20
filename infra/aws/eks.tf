@@ -74,6 +74,11 @@ module "eks" {
     }
     kube-proxy = {}
     coredns    = {}
+    # CPU and memory of every node and pod, a few seconds old, kept in memory only: what
+    # `kubectl top`, k9s's CPU/MEM columns and a HorizontalPodAutoscaler read. Not a monitoring
+    # system (no history); that's Grafana (OFP-57). A community add-on: AWS packages and
+    # versions it, the project itself is upstream Kubernetes. Needs running nodes.
+    metrics-server = {}
   }
 
   eks_managed_node_groups = {

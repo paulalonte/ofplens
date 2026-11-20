@@ -644,6 +644,12 @@ check and per prompt version, so prompt or model changes are measured, not guess
 - *As built:* "Look at the database" in infra/aws/README.md (socat pod, port-forward, Studio with
   the URL from Secrets Manager, cleanup and checks); step 7 part 1b in docs/LEARNING.md.
 
+### OFP-56 · Live CPU and memory (metrics-server)
+- **Done when:** on AWS, `kubectl top nodes` and `kubectl top pods` answer, and k9s shows CPU
+  and memory for pods (deployment step 7, part 2a).
+- *As built:* the `metrics-server` EKS community add-on in `infra/aws/eks.tf` (no IAM, no
+  chart to pin; the EKS module's node security group already allows the ports it needs).
+
 ---
 
 ## Later phases (not ticketed yet)

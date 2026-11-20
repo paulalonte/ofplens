@@ -1068,3 +1068,59 @@ only as long as the session. The connection string comes from Secrets Manager st
 command, never printed or exported. In production I'd use SSM Session Manager or a just-in-time
 bastion, a read-only database role for humans, and audit logging."
 
+
+---
+
+## Step 7 — Operations, part 2a: live CPU and memory (metrics-server)
+
+**What was built**
+
+- The `metrics-server` **EKS add-on** in `infra/aws/eks.tf`. `kubectl top nodes`,
+  `kubectl top pods` and k9s's CPU/MEM columns now answer instead of "Metrics API not
+  available".
+
+**Concepts**
+
+- **Where the numbers come from:** every node's kubelet already measures its containers
+  (through cAdvisor, built in). metrics-server asks each kubelet every 15 seconds, keeps only
+  the **latest** value in memory, and serves it through the Kubernetes API as `metrics.k8s.io`.
+  `kubectl top` is just a client of that API.
+- **The aggregation layer:** `metrics.k8s.io` isn't built into the API server. metrics-server
+  registers itself as an **APIService**, and the API server forwards those requests to it. That's
+  why the control plane must reach the metrics-server pod (port 10251 on EKS), a rule the EKS
+  module's node security group already has. Check it with
+  `kubectl get apiservice v1beta1.metrics.k8s.io` (`AVAILABLE True`).
+- **Live numbers vs monitoring:** metrics-server has **no history**: no graph of last night, no
+  alerts, gone after a restart. It's there for `kubectl top` and for **autoscaling**: a
+  HorizontalPodAutoscaler reads the same API to decide how many pods to run. For history,
+  dashboards and alerts you need a monitoring system (Prometheus, Grafana: part 2b).
+- **Usage vs requests:** `kubectl top` shows what a pod **uses**. The scheduler places pods by
+  what they **request** (`resources.requests` in the chart). Compare the two: a pod using far
+  less than it requests wastes node capacity; one using more than its memory **limit** is
+  killed (OOMKilled). Right-sizing requests from real usage is everyday platform work.
+- **EKS add-ons, AWS-managed vs community:** `vpc-cni` or `coredns` are AWS's own. `metrics-server`
+  is a **community** add-on: AWS builds, versions and tests it against your Kubernetes
+  version, but it's upstream software, and support goes to the upstream project. Compared with
+  a Helm release, you pin nothing and EKS picks a compatible version; you also configure
+  less.
+
+**Try it** (in a session)
+
+```bash
+kubectl --context ofplens-aws get apiservice v1beta1.metrics.k8s.io   # AVAILABLE True
+kubectl --context ofplens-aws top nodes
+kubectl --context ofplens-aws top pods -n ofplens
+kubectl --context ofplens-aws get deploy ofplens-api -n ofplens \
+  -o jsonpath='{.spec.template.spec.containers[0].resources}'         # compare with requests
+```
+
+In k9s, `:pods` now has CPU and MEM columns, plus `%CPU/R` and `%MEM/R` (usage as a share of the
+request) and `/L` (of the limit).
+
+**Interview**
+
+"metrics-server scrapes the kubelets and serves the latest CPU and memory through the
+aggregated `metrics.k8s.io` API. It powers `kubectl top` and the HorizontalPodAutoscaler, but
+it keeps no history, so it's not monitoring. On EKS I install it as a community add-on, so AWS
+keeps it compatible with the cluster version. I use its numbers to check real usage against the
+pods' resource requests and limits."
