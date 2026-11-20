@@ -46,6 +46,18 @@ variable "app_secret_name" {
   default     = "ofplens/app"
 }
 
+variable "grafana_secret_name" {
+  description = "Secrets Manager secret with the Grafana Cloud addresses and token, created by infra/bootstrap."
+  type        = string
+  default     = "ofplens/grafana"
+}
+
+variable "monitoring" {
+  description = "Install the Grafana k8s-monitoring chart (monitoring.tf). false: no monitoring this session."
+  type        = bool
+  default     = true
+}
+
 variable "domain" {
   description = "The app's domain (infra/bootstrap reads its zone and holds its certificate)."
   type        = string

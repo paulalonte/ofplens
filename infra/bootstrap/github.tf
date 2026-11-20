@@ -92,13 +92,13 @@ data "aws_iam_policy_document" "teardown_extra" {
     }
   }
 
-  # The workflow never needs your Claude or sign-in keys, so it can't read them even if it
-  # were compromised (Terraform only describes the secret, it doesn't read its value).
+  # The workflow never needs your Claude, sign-in or Grafana keys, so it can't read them even
+  # if it were compromised (Terraform only describes the secrets, it doesn't read their values).
   statement {
     sid       = "NeverReadAppKeys"
     effect    = "Deny"
     actions   = ["secretsmanager:GetSecretValue"]
-    resources = [aws_secretsmanager_secret.app.arn]
+    resources = [aws_secretsmanager_secret.app.arn, aws_secretsmanager_secret.grafana.arn]
   }
 }
 

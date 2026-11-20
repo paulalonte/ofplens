@@ -20,3 +20,21 @@ resource "aws_secretsmanager_secret_version" "app_initial" {
     ignore_changes = [secret_string]
   }
 }
+
+# The Grafana Cloud stack's push addresses, user ids and an access token, for the monitoring
+# collector (infra/aws/monitoring.tf). Same pattern as ofplens/app: empty here, filled in by you
+# in the console (infra/aws/README.md, "Monitoring"). Keys: metrics-url, metrics-username,
+# logs-url, logs-username, token.
+resource "aws_secretsmanager_secret" "grafana" {
+  name        = "ofplens/grafana"
+  description = "Grafana Cloud for the cluster's monitoring: metrics-url, metrics-username, logs-url, logs-username, token"
+}
+
+resource "aws_secretsmanager_secret_version" "grafana_initial" {
+  secret_id     = aws_secretsmanager_secret.grafana.id
+  secret_string = jsonencode({})
+
+  lifecycle {
+    ignore_changes = [secret_string]
+  }
+}

@@ -38,10 +38,15 @@ module "external_secrets_identity" {
 
   name = "${var.name}-external-secrets"
 
-  # Read only, and only these two secrets: the app keys (bootstrap) and the database URL.
-  attach_external_secrets_policy        = true
-  external_secrets_secrets_manager_arns = [data.aws_secretsmanager_secret.app.arn, aws_secretsmanager_secret.database.arn]
-  external_secrets_create_permission    = false
+  # Read only, and only these secrets: the app keys and the Grafana Cloud token (bootstrap), and
+  # the database URL.
+  attach_external_secrets_policy = true
+  external_secrets_secrets_manager_arns = [
+    data.aws_secretsmanager_secret.app.arn,
+    data.aws_secretsmanager_secret.grafana.arn,
+    aws_secretsmanager_secret.database.arn,
+  ]
+  external_secrets_create_permission = false
 
   associations = {
     controller = {

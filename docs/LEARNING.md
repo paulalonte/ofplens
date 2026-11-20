@@ -1124,3 +1124,99 @@ aggregated `metrics.k8s.io` API. It powers `kubectl top` and the HorizontalPodAu
 it keeps no history, so it's not monitoring. On EKS I install it as a community add-on, so AWS
 keeps it compatible with the cluster version. I use its numbers to check real usage against the
 pods' resource requests and limits."
+
+---
+
+## Step 7 — Operations, part 2b: metrics and logs in Grafana Cloud
+
+**What was built**
+
+- Grafana's **k8s-monitoring** Helm chart, pinned to 4.6.1, installed by Terraform
+  (`infra/aws/monitoring.tf`) with values in `deploy/aws/monitoring-values.yaml`.
+- Inside the `monitoring` namespace: one **Alloy** collector, **kube-state-metrics**,
+  **node-exporter** on each node, and the **Alloy Operator** that manages the collector.
+- Where to send, as whom, and the token: the Secrets Manager secret `ofplens/grafana` (made
+  empty by the bootstrap, filled in by you) → External Secrets → the Kubernetes Secret
+  `grafana-cloud`, which Alloy reads. The public repo holds no address, id or token.
+
+```
+pods' stdout ──────────────┐
+kubelet / cAdvisor ────────┤
+kube-state-metrics ────────┤──► Alloy ──push (HTTPS, token)──► Grafana Cloud: Prometheus (metrics), Loki (logs)
+node-exporter (per node) ──┤                                        └─► Grafana: dashboards, Explore, alerts
+Kubernetes events ─────────┘
+```
+
+**Concepts**
+
+- **The three signals:** **metrics** are numbers over time (cheap, good for graphs and alerts:
+  "error rate above 5 %"); **logs** are events with detail (what exactly failed); **traces**
+  follow one request across services. Metrics tell you *that* something is wrong, logs and
+  traces tell you *why*. With one API, metrics and logs cover it; traces come with more services.
+- **Where the metrics come from:** the **kubelet/cAdvisor** knows containers' CPU and memory;
+  **kube-state-metrics** turns Kubernetes objects into metrics (desired vs ready replicas,
+  restarts, pending pods); **node-exporter** reads the machine itself (disk, network, load).
+  Each one only exposes numbers on an HTTP `/metrics` page; something has to **scrape** them.
+- **Collector / agent:** Alloy (Grafana's OpenTelemetry-compatible collector, successor of the
+  Grafana Agent) scrapes, reads logs, adds labels (`cluster`, `namespace`, `pod`) and
+  **pushes** with `remote_write`. Pushing out means nothing in the cluster is reachable from
+  the internet, and the backend can be anywhere. A self-hosted Prometheus would instead pull,
+  and you would run and store it yourself.
+- **Labels and cardinality:** a metric series is one name plus one set of labels. Every new
+  label value (a pod name, a user id) is a new series, and series are what you pay for (the
+  free tier: about 10k). That's why the chart ships **allow lists** and why you never put ids
+  or URLs with ids into labels.
+- **DaemonSet vs Deployment collectors:** big clusters run a collector on every node
+  (DaemonSet) reading log files from the host. Here one Deployment reads logs through the
+  Kubernetes API: fewer pods, no host access, enough for two nodes. node-exporter has to be a
+  DaemonSet, since it measures the machine it runs on.
+- **An operator:** the chart installs the **Alloy Operator**, a controller that watches an
+  `Alloy` custom resource and creates the actual Deployment from it. Same pattern as External
+  Secrets (`ExternalSecret` → `Secret`): describe what you want, a controller makes it so.
+- **Configuration as code, not click-ops:** Grafana's onboarding wizard offers a one-line
+  `helm install` with the token in it and **Fleet Management** (the collector downloads its
+  configuration from Grafana Cloud). Here the configuration is in git, reviewed, pinned and
+  recreated identically every session, and the token never touches a command line (shell
+  history, CI logs).
+- **Managed vs self-hosted:** running Prometheus, Loki and Grafana yourself in a cluster that's
+  destroyed every night would lose all history. A SaaS backend keeps data outside the
+  disposable stack, the same idea as the database snapshot. The collector side (Alloy,
+  Prometheus format, PromQL, LogQL) is the same either way, so the skills carry over.
+
+**Production pitfalls this avoids (and what production adds)**
+
+| Risk | Here | Production |
+| --- | --- | --- |
+| Token in shell history or chat | Secrets Manager → External Secrets; a write-only token (`metrics:write`, `logs:write`) | The same, plus rotation and one token per cluster |
+| A series explosion, a surprise bill | Chart allow lists, two nodes | Cardinality limits, usage dashboards, alerts on ingestion |
+| Monitoring dies with the cluster | Data in Grafana Cloud | The same; plus alert when a cluster *stops* sending ("absent" alerts) |
+| Secrets in logs | Pod logs as written (the API logs no keys) | Redaction stages in the collector, log levels per environment |
+| Config drift from UI changes | Values in git, pinned chart | The same, often via GitOps (Argo CD, Flux) |
+
+**Try it** (in a session, after the one-time setup in infra/aws/README.md, "Monitoring")
+
+```bash
+kubectl --context ofplens-aws get pods -n monitoring
+kubectl --context ofplens-aws get alloy -n monitoring            # the custom resource the operator turns into a Deployment
+kubectl --context ofplens-aws get externalsecret -n monitoring
+```
+
+In Grafana: **Observability → Kubernetes** (cluster `ofplens`), then **Explore** with these:
+
+```
+# PromQL: CPU of the app's containers, per pod
+sum by (pod) (rate(container_cpu_usage_seconds_total{namespace="ofplens"}[5m]))
+# LogQL: the API's error lines (pino writes "level":50 for errors)
+{namespace="ofplens", container="api"} |= `"level":50`
+```
+
+**Interview**
+
+"Each cluster runs Grafana Alloy, installed with the k8s-monitoring Helm chart through
+Terraform. It scrapes kubelet/cAdvisor, kube-state-metrics and node-exporter, reads pod logs
+and Kubernetes events, and pushes to Grafana Cloud with remote_write. Nothing in the cluster is
+exposed. The write-only token lives in Secrets Manager and reaches the pod through External
+Secrets, never on a command line, and the configuration is pinned and in git rather than
+pulled from a SaaS UI. Because the backend is outside the cluster, history survives our nightly
+teardown. I keep cardinality in check with allow lists and never put unbounded values into
+labels."

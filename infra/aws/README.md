@@ -37,16 +37,17 @@ aws eks list-clusters --region eu-central-1      # "clusters": []  → nothing e
 
 ## What gets created
 
-| Part                         | What it is                                                                               | File          |
-| ---------------------------- | ---------------------------------------------------------------------------------------- | ------------- |
-| VPC                          | Your private network in two availability zones; no NAT gateway (saves ~$35/month)        | `network.tf`  |
-| EKS                          | Kubernetes; AWS runs the control plane, two ARM worker nodes run your pods               | `eks.tf`      |
-| RDS Postgres                 | The database, reachable only from the nodes; snapshotted on teardown, restored on create | `database.tf` |
-| AWS Load Balancer Controller | Turns the chart's Ingress into a load balancer (Traefik's job on kind)                   | `addons.tf`   |
-| External Secrets             | Copies your keys and the database URL from Secrets Manager into the cluster              | `addons.tf`   |
-| ExternalDNS                  | Points `ofplens.app` at the load balancer in Route 53, and removes it on teardown        | `addons.tf`   |
-| metrics-server               | Live CPU and memory of nodes and pods, for `kubectl top` and k9s                         | `eks.tf`      |
-| Pod Identity                 | Gives those three add-ons exactly the AWS permissions they need, with no keys            | `addons.tf`   |
+| Part                         | What it is                                                                               | File            |
+| ---------------------------- | ---------------------------------------------------------------------------------------- | --------------- |
+| VPC                          | Your private network in two availability zones; no NAT gateway (saves ~$35/month)        | `network.tf`    |
+| EKS                          | Kubernetes; AWS runs the control plane, two ARM worker nodes run your pods               | `eks.tf`        |
+| RDS Postgres                 | The database, reachable only from the nodes; snapshotted on teardown, restored on create | `database.tf`   |
+| AWS Load Balancer Controller | Turns the chart's Ingress into a load balancer (Traefik's job on kind)                   | `addons.tf`     |
+| External Secrets             | Copies your keys and the database URL from Secrets Manager into the cluster              | `addons.tf`     |
+| ExternalDNS                  | Points `ofplens.app` at the load balancer in Route 53, and removes it on teardown        | `addons.tf`     |
+| metrics-server               | Live CPU and memory of nodes and pods, for `kubectl top` and k9s                         | `eks.tf`        |
+| Monitoring                   | Grafana's k8s-monitoring chart: metrics, events and pod logs to Grafana Cloud            | `monitoring.tf` |
+| Pod Identity                 | Gives those three add-ons exactly the AWS permissions they need, with no keys            | `addons.tf`     |
 
 Then `pnpm aws:up` deploys the same Helm chart as kind, with
 [values-aws.yaml](../../deploy/helm/ofplens/values-aws.yaml).
@@ -327,6 +328,67 @@ limits cap what that costs in Claude usage.
 
 Don't paste keys into chat, a file in git or a terminal command; the console is the only place
 they're typed.
+
+## Monitoring (Grafana Cloud)
+
+`pnpm aws:up` installs Grafana's **k8s-monitoring** chart ([monitoring.tf](monitoring.tf),
+values in [deploy/aws/monitoring-values.yaml](../../deploy/aws/monitoring-values.yaml)). One
+Alloy collector pushes the cluster's metrics, Kubernetes events and every pod's logs to your
+Grafana Cloud stack (free tier). The data and dashboards stay in Grafana Cloud after
+`aws:down`. Live CPU and memory without Grafana: `kubectl top` ([Look around](#look-around)).
+
+**Once, before the first session with monitoring.** The values are yours: never in chat, git
+or a terminal command.
+
+1. **Apply the bootstrap again**: it creates the empty secret `ofplens/grafana` (about
+   $0.40/month) and keeps the nightly teardown from reading it.
+
+   ```bash
+   export AWS_PROFILE=ofplens
+   cd infra/bootstrap
+   terraform plan        # expect: 2 to add (secret + first value), 1 to change (teardown policy)
+   terraform apply
+   ```
+
+2. **A token in Grafana Cloud** (grafana.com → your organization → **Access Policies**):
+   **Create access policy** named `ofplens-cluster`, realm: your stack, scopes **metrics:write**
+   and **logs:write** only. Then **Add token** on it, and copy the token (`glc_…`; shown once).
+   Don't use the onboarding wizard's command: it puts the token on the command line and turns
+   on remote configuration.
+3. **The addresses** (grafana.com → your stack → **Details** on each card):
+   - **Prometheus**: the remote write endpoint (ends in `/api/prom/push`) and the
+     username / instance id (a number).
+   - **Loki**: the URL plus `/loki/api/v1/push`, and its user (another number).
+4. Console → **Secrets Manager** → `ofplens/grafana` → **Retrieve secret value** → **Edit** →
+   five key/value rows, then Save:
+
+   | Key                | Value                                                 |
+   | ------------------ | ----------------------------------------------------- |
+   | `metrics-url`      | `https://prometheus-prod-….grafana.net/api/prom/push` |
+   | `metrics-username` | the Prometheus user id                                |
+   | `logs-url`         | `https://logs-prod-….grafana.net/loki/api/v1/push`    |
+   | `logs-username`    | the Loki user id                                      |
+   | `token`            | the `glc_…` token                                     |
+
+**Check it** (in a session):
+
+```bash
+kubectl --context ofplens-aws get pods -n monitoring           # alloy, kube-state-metrics, node-exporter ×2, operator
+kubectl --context ofplens-aws get externalsecret -n monitoring # grafana-cloud: SecretSynced
+kubectl --context ofplens-aws logs -n monitoring deploy/k8s-monitoring-alloy --tail=50   # no "401"/"403"
+```
+
+Then in Grafana (your stack) → **Observability → Kubernetes**: the cluster `ofplens`, its nodes
+and pods, a minute or two after start. Logs: **Explore** → Loki → `{namespace="ofplens"}`.
+
+| You want…                    | Do                                                                                                                       |
+| ---------------------------- | ------------------------------------------------------------------------------------------------------------------------ |
+| a session without monitoring | `NO_MONITORING=1 pnpm aws:up` (also removes it from a running cluster; the next plain `aws:up` puts it back)             |
+| to pick up a changed secret  | `kubectl --context ofplens-aws annotate externalsecret grafana-cloud -n monitoring force-sync="$(date +%s)" --overwrite` |
+| to replace the token         | new token in Grafana Cloud, edit `token` in `ofplens/grafana`, the command above, then delete the old token              |
+
+If `ofplens/grafana` is still empty, the collector runs but can't send anything, and its logs
+say so; nothing else is affected.
 
 ## If something is left
 
