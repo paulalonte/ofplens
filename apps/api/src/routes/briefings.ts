@@ -33,6 +33,8 @@ export interface BriefingRouteOptions {
   now?: () => Date;
   /** Starts per minute per pilot (on top of the daily limits). */
   rateLimit?: number | undefined;
+  /** Called once per finished run, done or failed (the app's metrics). */
+  onFinished?: (run: BriefingRun) => void;
 }
 
 const PlanParams = z.object({ id: z.uuid('Not a flight plan id') });
@@ -49,6 +51,7 @@ export const briefingRoutes: FastifyPluginCallbackZod<BriefingRouteOptions> = (
     globalDailyLimit,
     now = () => new Date(),
     rateLimit,
+    onFinished,
   },
   done,
 ) => {
@@ -144,6 +147,7 @@ export const briefingRoutes: FastifyPluginCallbackZod<BriefingRouteOptions> = (
         request.log.error({ err }, 'Briefing run crashed');
         run = crashedRun(config.model, err);
       }
+      onFinished?.(run);
 
       try {
         await briefings.finish(started.id, {

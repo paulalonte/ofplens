@@ -9,7 +9,7 @@ import {
   createWeatherRepository,
   pingDb,
 } from '@ofplens/db';
-import { buildApp } from './app';
+import { buildApp, loggerOptions } from './app';
 import { createProviders } from './auth/providers';
 import { isLocalUrl, loadEnv } from './env';
 
@@ -36,7 +36,7 @@ const app = await buildApp({
   briefingGlobalDailyLimit: env.BRIEFING_GLOBAL_DAILY_LIMIT,
   simbriefUrl: env.SIMBRIEF_URL,
   aviationWeatherUrl: env.AVIATION_WEATHER_URL,
-  logger: { level: env.LOG_LEVEL },
+  logger: loggerOptions(env.LOG_LEVEL),
 });
 app.addHook('onClose', closeDb);
 

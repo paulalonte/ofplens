@@ -1,0 +1,568 @@
+{
+  "title": "OFP Lens API",
+  "uid": "ofplens-api",
+  "description": "RED metrics, AI briefings, Node.js and warning logs of the OFP Lens API (deploy/grafana, OFP-58).",
+  "tags": ["ofplens"],
+  "timezone": "utc",
+  "schemaVersion": 39,
+  "time": {
+    "from": "now-1h",
+    "to": "now"
+  },
+  "refresh": "1m",
+  "editable": true,
+  "templating": {
+    "list": [
+      {
+        "name": "metrics",
+        "label": "Metrics",
+        "type": "datasource",
+        "query": "prometheus",
+        "current": {},
+        "hide": 0
+      },
+      {
+        "name": "logs",
+        "label": "Logs",
+        "type": "datasource",
+        "query": "loki",
+        "current": {},
+        "hide": 0
+      }
+    ]
+  },
+  "annotations": {
+    "list": []
+  },
+  "panels": [
+    {
+      "id": 1,
+      "type": "row",
+      "title": "Traffic (RED: rate, errors, duration)",
+      "collapsed": false,
+      "gridPos": {
+        "x": 0,
+        "y": 0,
+        "w": 24,
+        "h": 1
+      },
+      "panels": []
+    },
+    {
+      "id": 2,
+      "title": "Requests per second, by route",
+      "type": "timeseries",
+      "datasource": {
+        "type": "prometheus",
+        "uid": "${metrics}"
+      },
+      "gridPos": {
+        "x": 0,
+        "y": 1,
+        "w": 12,
+        "h": 8
+      },
+      "targets": [
+        {
+          "expr": "sum by (http_route) (rate(http_server_request_duration_seconds_count{job=\"ofplens-api\"}[$__rate_interval]))",
+          "range": true,
+          "instant": false,
+          "legendFormat": "{{http_route}}",
+          "refId": "A",
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${metrics}"
+          }
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "reqps"
+        },
+        "overrides": []
+      },
+      "options": {},
+      "description": "Rate: every request except health checks and scrapes, by route pattern."
+    },
+    {
+      "id": 3,
+      "title": "Server error ratio (5xx)",
+      "type": "timeseries",
+      "datasource": {
+        "type": "prometheus",
+        "uid": "${metrics}"
+      },
+      "gridPos": {
+        "x": 12,
+        "y": 1,
+        "w": 6,
+        "h": 8
+      },
+      "targets": [
+        {
+          "expr": "sum(rate(http_server_request_duration_seconds_count{job=\"ofplens-api\", http_response_status_code=~\"5..\"}[$__rate_interval])) / sum(rate(http_server_request_duration_seconds_count{job=\"ofplens-api\"}[$__rate_interval]))",
+          "range": true,
+          "instant": false,
+          "legendFormat": "5xx share",
+          "refId": "A",
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${metrics}"
+          }
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "percentunit"
+        },
+        "overrides": []
+      },
+      "options": {},
+      "description": "Errors: share of requests the API answered with 5xx. The alert fires above 5 % (see infra/aws/README.md, Monitoring)."
+    },
+    {
+      "id": 4,
+      "title": "Answers by status",
+      "type": "timeseries",
+      "datasource": {
+        "type": "prometheus",
+        "uid": "${metrics}"
+      },
+      "gridPos": {
+        "x": 18,
+        "y": 1,
+        "w": 6,
+        "h": 8
+      },
+      "targets": [
+        {
+          "expr": "sum by (http_response_status_code) (rate(http_server_request_duration_seconds_count{job=\"ofplens-api\"}[$__rate_interval]))",
+          "range": true,
+          "instant": false,
+          "legendFormat": "{{http_response_status_code}}",
+          "refId": "A",
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${metrics}"
+          }
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "reqps"
+        },
+        "overrides": []
+      },
+      "options": {},
+      "description": "4xx are usually the client's doing (401 signed out, 404 unknown plan, 429 limits); 5xx are ours."
+    },
+    {
+      "id": 5,
+      "title": "Latency p95, by route",
+      "type": "timeseries",
+      "datasource": {
+        "type": "prometheus",
+        "uid": "${metrics}"
+      },
+      "gridPos": {
+        "x": 0,
+        "y": 9,
+        "w": 12,
+        "h": 8
+      },
+      "targets": [
+        {
+          "expr": "histogram_quantile(0.95, sum by (le, http_route) (rate(http_server_request_duration_seconds_bucket{job=\"ofplens-api\"}[$__rate_interval])))",
+          "range": true,
+          "instant": false,
+          "legendFormat": "{{http_route}}",
+          "refId": "A",
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${metrics}"
+          }
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "s"
+        },
+        "overrides": []
+      },
+      "options": {},
+      "description": "Duration: 95 % of requests were faster than this. The briefing route includes the whole AI run."
+    },
+    {
+      "id": 6,
+      "title": "Latency p50 / p95 / p99, all routes",
+      "type": "timeseries",
+      "datasource": {
+        "type": "prometheus",
+        "uid": "${metrics}"
+      },
+      "gridPos": {
+        "x": 12,
+        "y": 9,
+        "w": 12,
+        "h": 8
+      },
+      "targets": [
+        {
+          "expr": "histogram_quantile(0.5, sum by (le) (rate(http_server_request_duration_seconds_bucket{job=\"ofplens-api\"}[$__rate_interval])))",
+          "range": true,
+          "instant": false,
+          "legendFormat": "p50",
+          "refId": "A",
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${metrics}"
+          }
+        },
+        {
+          "expr": "histogram_quantile(0.95, sum by (le) (rate(http_server_request_duration_seconds_bucket{job=\"ofplens-api\"}[$__rate_interval])))",
+          "range": true,
+          "instant": false,
+          "legendFormat": "p95",
+          "refId": "B",
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${metrics}"
+          }
+        },
+        {
+          "expr": "histogram_quantile(0.99, sum by (le) (rate(http_server_request_duration_seconds_bucket{job=\"ofplens-api\"}[$__rate_interval])))",
+          "range": true,
+          "instant": false,
+          "legendFormat": "p99",
+          "refId": "C",
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${metrics}"
+          }
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "s"
+        },
+        "overrides": []
+      },
+      "options": {}
+    },
+    {
+      "id": 7,
+      "type": "row",
+      "title": "AI briefings",
+      "collapsed": false,
+      "gridPos": {
+        "x": 0,
+        "y": 17,
+        "w": 24,
+        "h": 1
+      },
+      "panels": []
+    },
+    {
+      "id": 8,
+      "title": "Briefings in the time range",
+      "type": "stat",
+      "datasource": {
+        "type": "prometheus",
+        "uid": "${metrics}"
+      },
+      "gridPos": {
+        "x": 0,
+        "y": 18,
+        "w": 8,
+        "h": 6
+      },
+      "targets": [
+        {
+          "expr": "sum by (status) (increase(ofplens_briefings_total{job=\"ofplens-api\"}[$__range]))",
+          "range": false,
+          "instant": true,
+          "legendFormat": "{{status}}",
+          "refId": "A",
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${metrics}"
+          }
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "short"
+        },
+        "overrides": []
+      },
+      "options": {
+        "reduceOptions": {
+          "calcs": ["lastNotNull"],
+          "fields": "",
+          "values": false
+        },
+        "colorMode": "value",
+        "graphMode": "none",
+        "textMode": "auto"
+      }
+    },
+    {
+      "id": 9,
+      "title": "Claude cost in the time range",
+      "type": "stat",
+      "datasource": {
+        "type": "prometheus",
+        "uid": "${metrics}"
+      },
+      "gridPos": {
+        "x": 8,
+        "y": 18,
+        "w": 8,
+        "h": 6
+      },
+      "targets": [
+        {
+          "expr": "sum(increase(ofplens_briefing_cost_usd_total{job=\"ofplens-api\"}[$__range]))",
+          "range": false,
+          "instant": true,
+          "legendFormat": "USD",
+          "refId": "A",
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${metrics}"
+          }
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "currencyUSD"
+        },
+        "overrides": []
+      },
+      "options": {
+        "reduceOptions": {
+          "calcs": ["lastNotNull"],
+          "fields": "",
+          "values": false
+        },
+        "colorMode": "value",
+        "graphMode": "none",
+        "textMode": "auto"
+      }
+    },
+    {
+      "id": 10,
+      "title": "Briefing duration p50 / p95",
+      "type": "timeseries",
+      "datasource": {
+        "type": "prometheus",
+        "uid": "${metrics}"
+      },
+      "gridPos": {
+        "x": 16,
+        "y": 18,
+        "w": 8,
+        "h": 6
+      },
+      "targets": [
+        {
+          "expr": "histogram_quantile(0.5, sum by (le) (rate(ofplens_briefing_duration_seconds_bucket{job=\"ofplens-api\"}[$__rate_interval])))",
+          "range": true,
+          "instant": false,
+          "legendFormat": "p50",
+          "refId": "A",
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${metrics}"
+          }
+        },
+        {
+          "expr": "histogram_quantile(0.95, sum by (le) (rate(ofplens_briefing_duration_seconds_bucket{job=\"ofplens-api\"}[$__rate_interval])))",
+          "range": true,
+          "instant": false,
+          "legendFormat": "p95",
+          "refId": "B",
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${metrics}"
+          }
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "s"
+        },
+        "overrides": []
+      },
+      "options": {}
+    },
+    {
+      "id": 11,
+      "type": "row",
+      "title": "Node.js, per pod",
+      "collapsed": false,
+      "gridPos": {
+        "x": 0,
+        "y": 24,
+        "w": 24,
+        "h": 1
+      },
+      "panels": []
+    },
+    {
+      "id": 12,
+      "title": "Event loop delay p99",
+      "type": "timeseries",
+      "datasource": {
+        "type": "prometheus",
+        "uid": "${metrics}"
+      },
+      "gridPos": {
+        "x": 0,
+        "y": 25,
+        "w": 8,
+        "h": 7
+      },
+      "targets": [
+        {
+          "expr": "max by (pod) (nodejs_eventloop_lag_p99_seconds{job=\"ofplens-api\"})",
+          "range": true,
+          "instant": false,
+          "legendFormat": "{{pod}}",
+          "refId": "A",
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${metrics}"
+          }
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "s"
+        },
+        "overrides": []
+      },
+      "options": {},
+      "description": "How long work waited for the single JavaScript thread. Rising: something blocks it (CPU-heavy code)."
+    },
+    {
+      "id": 13,
+      "title": "Memory (resident)",
+      "type": "timeseries",
+      "datasource": {
+        "type": "prometheus",
+        "uid": "${metrics}"
+      },
+      "gridPos": {
+        "x": 8,
+        "y": 25,
+        "w": 8,
+        "h": 7
+      },
+      "targets": [
+        {
+          "expr": "max by (pod) (process_resident_memory_bytes{job=\"ofplens-api\"})",
+          "range": true,
+          "instant": false,
+          "legendFormat": "{{pod}}",
+          "refId": "A",
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${metrics}"
+          }
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "bytes"
+        },
+        "overrides": []
+      },
+      "options": {},
+      "description": "Compare with the pod's memory limit (384 MiB): above it the pod is OOMKilled."
+    },
+    {
+      "id": 14,
+      "title": "CPU",
+      "type": "timeseries",
+      "datasource": {
+        "type": "prometheus",
+        "uid": "${metrics}"
+      },
+      "gridPos": {
+        "x": 16,
+        "y": 25,
+        "w": 8,
+        "h": 7
+      },
+      "targets": [
+        {
+          "expr": "sum by (pod) (rate(process_cpu_seconds_total{job=\"ofplens-api\"}[$__rate_interval]))",
+          "range": true,
+          "instant": false,
+          "legendFormat": "{{pod}}",
+          "refId": "A",
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${metrics}"
+          }
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "percentunit"
+        },
+        "overrides": []
+      },
+      "options": {}
+    },
+    {
+      "id": 15,
+      "type": "row",
+      "title": "Logs",
+      "collapsed": false,
+      "gridPos": {
+        "x": 0,
+        "y": 32,
+        "w": 24,
+        "h": 1
+      },
+      "panels": []
+    },
+    {
+      "id": 16,
+      "title": "Warnings and errors",
+      "type": "logs",
+      "datasource": {
+        "type": "loki",
+        "uid": "${logs}"
+      },
+      "gridPos": {
+        "x": 0,
+        "y": 33,
+        "w": 24,
+        "h": 10
+      },
+      "targets": [
+        {
+          "expr": "{namespace=\"ofplens\", container=\"api\"} | json | level=~\"warn|error|fatal\"",
+          "refId": "A",
+          "datasource": {
+            "type": "loki",
+            "uid": "${logs}"
+          }
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {},
+        "overrides": []
+      },
+      "options": {
+        "showTime": true,
+        "wrapLogMessage": true,
+        "sortOrder": "Descending",
+        "enableLogDetails": true
+      }
+    }
+  ]
+}

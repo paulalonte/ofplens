@@ -105,6 +105,8 @@ there is no build step between packages.
 - Tests sit next to the code as `*.test.ts(x)`. Database tests are `*.int.test.ts` and use
   `createTestDatabase()` from `@ofplens/db/testing`: a fresh, migrated database per file.
   Never point tests at the dev database.
+- **Metrics** (`apps/api/src/plugins/metrics.ts`, `/metrics`): label by route pattern or a
+  small fixed set of values, never ids, URLs or pilot names (each value is a new series).
 - API routes are tested with `app.inject()` and
   injected dependencies (e.g. `pingDb`), not a live server.
 - Every page shows that the app is for simulation use only.

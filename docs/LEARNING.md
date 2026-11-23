@@ -1220,3 +1220,99 @@ Secrets, never on a command line, and the configuration is pinned and in git rat
 pulled from a SaaS UI. Because the backend is outside the cluster, history survives our nightly
 teardown. I keep cardinality in check with allow lists and never put unbounded values into
 labels."
+
+---
+
+## Step 7 — Operations, part 2c: the app's own metrics, a dashboard and an alert
+
+**What was built**
+
+- `GET /metrics` on the API (`apps/api/src/plugins/metrics.ts`, with `prom-client`): request
+  rate, errors and duration per route, AI briefings (count, duration, cost) and Node.js runtime
+  metrics. The API pods' annotations (`k8s.grafana.com/scrape: "true"`) tell Alloy to scrape
+  it every minute; the series carry `job="ofplens-api"`.
+- Quieter, clearer logs: `/api/health` logs only at `warn` (the probes call it about 20 times a
+  minute per pod), and the level is a word (`"level":"info"`) so Loki recognises it.
+- A dashboard as code (`deploy/grafana/ofplens-api-dashboard.json`), imported into Grafana, and
+  one alert: more than 5 % server errors for five minutes → email.
+
+**Concepts**
+
+- **White-box vs black-box monitoring:** part 2b watched the API from the outside (CPU, memory,
+  restarts). Only the app knows how many requests failed, which route is slow, or what Claude
+  cost today. Production needs both: black-box tells you *something* is wrong with the pod,
+  white-box tells you *what* is wrong for users.
+- **RED** (for request-driven services): **R**ate, **E**rrors, **D**uration. One **histogram**
+  gives all three: its `_count` is the rate, `_count` filtered by status the errors, and its
+  `_bucket`s the latency percentiles. (Its sibling for resources is **USE**: Utilization,
+  Saturation, Errors, for CPUs, disks, queues.)
+- **Metric types:** a **counter** only goes up (requests, cost), and you read it with `rate()` or
+  `increase()`, which also handles restarts (a counter going back to 0). A **gauge** goes up
+  and down (memory). A **histogram** counts observations into buckets (≤5 ms, ≤10 ms, …), so
+  percentiles can be computed later across all pods: `histogram_quantile(0.95, sum by (le)
+  (rate(…_bucket[5m])))`. Averages hide the slow requests; p95/p99 show what the unlucky users
+  see.
+- **Pull model and cardinality:** the app only keeps numbers in memory and shows them at
+  `/metrics`; the collector pulls them. Each **label combination is a series**, so labels must
+  come from a small fixed set: the route *pattern* `/api/flight-plans/:id`, not the URL with an
+  id; never a pilot id or name. Unknown URLs all become `http_route="unmatched"`, so a scanner
+  trying 10,000 paths adds one series, not 10,000.
+- **Don't expose `/metrics` publicly:** it reveals routes, traffic and internals. Here it's on
+  the API's port but outside `/api`, which is all the load balancer and nginx forward. Some
+  setups use a separate port that no Service exposes.
+- **Logging what matters:** health checks are the most frequent request and the least
+  interesting. Per-route log levels keep the signal (a failing database still logs a warning)
+  and drop the noise and its cost.
+- **Alerting on symptoms, not causes:** "5xx above 5 %" is what users feel. "CPU at 80 %" may be
+  fine. Good alerts are few, actionable, have a **pending period** (no paging for a blip), a
+  **minimum traffic** guard (1 error in 2 requests is not an outage), and say what to do (a
+  runbook link: OFP-59). The usual production form is an **SLO** (say, 99.5 % of requests
+  succeed over 30 days) with **burn-rate** alerts on how fast the error budget is being used.
+- **Dashboards as code:** a dashboard built by clicking is lost or silently changed. The JSON
+  in git is reviewed, versioned and restorable; in production it's provisioned automatically
+  (Terraform's Grafana provider, Grafana's provisioning files or a Grafana operator) and so are
+  alert rules.
+
+**Production pitfalls this avoids (and what production adds)**
+
+| Risk | Here | Production |
+| --- | --- | --- |
+| A series explosion from labels | Route patterns, fixed label sets, convention in CLAUDE.md | The same, plus cardinality limits and usage alerts |
+| Averages hiding slow requests | Histograms, p95/p99 | The same; SLOs on latency too |
+| Paging on noise | 5-minute pending period, ≥10 requests, symptom-based | SLO burn-rate alerts (fast and slow windows), on-call rotation |
+| Health checks drowning the logs | `logLevel: 'warn'` on the route | The same, or dropped in the collector; log sampling |
+| `/metrics` public | Not routed from outside | Separate port or network policy |
+| Dashboards and alerts lost or drifted | Dashboard JSON in git; alert written down step by step | Both provisioned from git (Terraform Grafana provider) |
+
+**Try it**
+
+Locally, with `pnpm dev`:
+
+```bash
+curl -s localhost:3000/metrics | grep -E '^(http_server|ofplens_)' | head
+```
+
+Click around the app and run it again: the counts per route go up. In a session on AWS, open
+the **OFP Lens API** dashboard, use the app, and watch the rate and latency panels; then follow
+"See it fire" in infra/aws/README.md to get the alert's email.
+
+PromQL worth knowing (Grafana → Explore → `…-prom`):
+
+```promql
+# Requests per second per route
+sum by (http_route) (rate(http_server_request_duration_seconds_count{job="ofplens-api"}[5m]))
+# p95 latency of all routes
+histogram_quantile(0.95, sum by (le) (rate(http_server_request_duration_seconds_bucket{job="ofplens-api"}[5m])))
+# What briefings cost today
+sum(increase(ofplens_briefing_cost_usd_total[1d]))
+```
+
+**Interview**
+
+"The API exposes Prometheus metrics with prom-client: a request-duration histogram labelled by
+route pattern, method and status, which gives us RED, plus business metrics like AI briefing
+cost. Labels come from a fixed set, so cardinality stays bounded, and `/metrics` isn't routed
+from outside. Alloy discovers the pods by annotation and pushes to Grafana Cloud. The dashboard
+lives in git as JSON, and we alert on the symptom, the 5xx ratio, with a pending period and a
+minimum-traffic guard so a single failed request doesn't page anyone. Next I'd turn that into an
+SLO with burn-rate alerts and provision the alert rules from code as well."

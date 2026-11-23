@@ -179,6 +179,15 @@ describe('POST /api/flight-plans/:id/briefings', () => {
 
     // Stored: the latest briefing for the plan.
     expect((await latest(a)).json()).toEqual({ briefing: done });
+
+    // Counted in the app's metrics: one done briefing, its cost and duration.
+    const metrics = (await a.inject({ method: 'GET', url: '/metrics' })).body;
+    expect(metrics).toContain('ofplens_briefings_total{status="done"} 1');
+    expect(metrics).toContain('ofplens_briefing_duration_seconds_count 1');
+    expect(metrics).toMatch(/^ofplens_briefing_cost_usd_total 0\.00145$/m);
+    expect(metrics).toContain(
+      'http_server_request_duration_seconds_count{http_request_method="POST",http_route="/api/flight-plans/:id/briefings",http_response_status_code="200"} 1',
+    );
   });
 
   it('stores and streams a briefing the guardrails rejected as failed', async () => {
