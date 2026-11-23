@@ -388,7 +388,59 @@ and pods, a minute or two after start. Logs: **Explore** → Loki → `{namespac
 | to replace the token         | new token in Grafana Cloud, edit `token` in `ofplens/grafana`, the command above, then delete the old token              |
 
 If `ofplens/grafana` is still empty, the collector runs but can't send anything, and its logs
-say so; nothing else is affected.
+say so; nothing else is affected. HTTP **405** in its logs means `logs-url` doesn't end in
+`/loki/api/v1/push`; **401/403** means the token or a user id is wrong.
+
+### The API's own metrics, dashboard and alert
+
+The API serves Prometheus metrics at `/metrics` (inside the cluster only: the load balancer and
+nginx forward just `/api`). Its pods carry the `k8s.grafana.com/scrape` annotation, so the
+collector finds them by itself; the series have `job="ofplens-api"`. What's in there:
+[docs/LEARNING.md](../../docs/LEARNING.md), step 7 part 2c.
+
+**The dashboard** (once; it stays in Grafana Cloud): Grafana → **Dashboards** → **New** →
+**Import** → upload [deploy/grafana/ofplens-api-dashboard.json](../../deploy/grafana/ofplens-api-dashboard.json)
+→ Import. At the top, pick your stack's Prometheus (`…-prom`) and Loki (`…-logs`) data sources.
+To change it: edit in Grafana, then **Export** → **Export as JSON** and replace the file in a PR,
+so git stays the source of truth.
+
+**The alert** (once): Grafana → **Alerts & IRM** → **Alerting** → **Alert rules** → **New alert
+rule**:
+
+1. Name: `OFP Lens API: server errors above 5 %`.
+2. Query: your `…-prom` data source, **Code** mode:
+
+   ```promql
+   (
+     sum(rate(http_server_request_duration_seconds_count{job="ofplens-api", http_response_status_code=~"5.."}[5m]))
+   /
+     sum(rate(http_server_request_duration_seconds_count{job="ofplens-api"}[5m]))
+   )
+   and on() sum(increase(http_server_request_duration_seconds_count{job="ofplens-api"}[5m])) >= 10
+   ```
+
+   The last line keeps 1 failed request out of 2 from paging anyone: at least 10 requests in
+   5 minutes.
+
+3. Expressions: **Threshold**, input A, **is above** `0.05`.
+4. Folder `OFP Lens`, evaluation group `ofplens-api` every **1m**, pending period **5m** (it
+   must stay above for five minutes).
+5. **Configure no data and error handling**: no data → **Normal** (no traffic, or the cluster is
+   down, is not an outage here).
+6. Contact point: the default email one (Alerting → **Contact points** → **Test** sends a test
+   mail to you).
+7. Summary: `{{ $values.A.Value | humanizePercentage }} of API requests failed with 5xx`. Save.
+
+**See it fire** (in a session): edit the rule, change `5..` to `4..`, save, then make requests
+that answer 401 (signed out) for six minutes:
+
+```bash
+for i in $(seq 360); do curl -s -o /dev/null https://ofplens.app/api/pilot; sleep 1; done
+```
+
+The rule goes **Pending**, then **Firing** after five minutes, and you get an email; a few
+minutes after the loop stops it's **Normal** again, with a "resolved" email. Change `4..` back
+to `5..`.
 
 ## If something is left
 

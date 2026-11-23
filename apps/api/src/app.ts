@@ -31,6 +31,7 @@ import {
   type Authenticate,
 } from './auth/sessions';
 import { registerErrorHandling } from './plugins/errors';
+import { registerMetrics } from './plugins/metrics';
 import { DEFAULT_RATE_LIMITS, registerRateLimits, type RateLimits } from './rateLimits';
 import { authRoutes } from './routes/auth';
 import { briefingRoutes } from './routes/briefings';
@@ -88,6 +89,18 @@ export interface AppDeps {
   logger?: FastifyServerOptions['logger'];
 }
 
+/**
+ * How the API logs: JSON lines on stdout, one per event, collected in the cluster and sent to
+ * Grafana Cloud (Loki). The level is written as a word ("level":"info", not pino's 30), so
+ * Loki recognises it.
+ */
+export function loggerOptions(level: string) {
+  return {
+    level,
+    formatters: { level: (label: string) => ({ level: label }) },
+  } satisfies FastifyServerOptions['logger'];
+}
+
 /** Builds the Fastify app without listening, so tests can drive it with `app.inject()`. */
 export async function buildApp(deps: AppDeps) {
   const app = Fastify({
@@ -98,6 +111,7 @@ export async function buildApp(deps: AppDeps) {
   app.setValidatorCompiler(validatorCompiler);
   app.setSerializerCompiler(serializerCompiler);
   registerErrorHandling(app);
+  const metrics = registerMetrics(app);
 
   await app.register(cookie);
   registerSessions(app, {
@@ -184,6 +198,7 @@ export async function buildApp(deps: AppDeps) {
     globalDailyLimit: deps.briefingGlobalDailyLimit ?? 50,
     ...(deps.now && { now: deps.now }),
     rateLimit: limits.briefing,
+    onFinished: (run) => metrics.briefingFinished(run),
   });
 
   return app;

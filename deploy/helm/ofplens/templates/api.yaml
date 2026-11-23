@@ -23,6 +23,13 @@ spec:
         app.kubernetes.io/component: api
       annotations:
         checksum/config: {{ include (print $.Template.BasePath "/api-configmap.yaml") . | sha256sum }}
+        # The API's /metrics (OFP-58), for a collector that discovers pods by annotation, like
+        # Grafana's k8s-monitoring on AWS (deploy/aws/monitoring-values.yaml). Harmless where
+        # nothing looks for it (kind). job names the series: {job="ofplens-api"}.
+        k8s.grafana.com/scrape: "true"
+        k8s.grafana.com/job: ofplens-api
+        k8s.grafana.com/metrics.portName: http
+        k8s.grafana.com/metrics.path: /metrics
     spec:
       serviceAccountName: {{ include "ofplens.name" . }}
       securityContext:

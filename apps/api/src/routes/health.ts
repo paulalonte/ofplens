@@ -18,7 +18,12 @@ export const healthRoutes: FastifyPluginCallbackZod<HealthRouteOptions> = (app, 
 
   app.get(
     '/api/health',
-    { schema: { response: { 200: HealthResponse, 503: HealthResponse } } },
+    {
+      schema: { response: { 200: HealthResponse, 503: HealthResponse } },
+      // Kubernetes and the load balancer call this every few seconds per pod: logged only when
+      // something is wrong (the warning below), not as two info lines per check.
+      logLevel: 'warn',
+    },
     async (request, reply) => {
       try {
         await withTimeout(opts.pingDb(), timeoutMs);

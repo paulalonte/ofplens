@@ -659,6 +659,18 @@ check and per prompt version, so prompt or model changes are measured, not guess
   node-exporter. Addresses, user ids and token come from `ofplens/grafana` (bootstrap, filled in
   by hand) through External Secrets. No Fleet Management. `NO_MONITORING=1 pnpm aws:up` skips it.
 
+
+### OFP-58 · The API's own metrics, a dashboard and an alert
+- **Done when:** Grafana shows the API's request rate, 5xx ratio and p95 latency per route, AI
+  briefings and their cost, from a dashboard kept in git; an alert emails when more than 5 % of
+  requests fail for five minutes; health checks no longer fill the logs.
+- *As built:* `prom-client` in `plugins/metrics.ts`: `http_server_request_duration_seconds`
+  (route pattern, method, status; health and `/metrics` not counted), `ofplens_briefings_total`,
+  `ofplens_briefing_duration_seconds`, `ofplens_briefing_cost_usd_total` and Node.js defaults at
+  `/metrics` (not routed from outside). Pod annotations for Alloy's autodiscovery
+  (`job="ofplens-api"`). `/api/health` logs at warn only; log levels as words.
+  `deploy/grafana/ofplens-api-dashboard.json`; the alert is set up by hand from
+  infra/aws/README.md.
 ---
 
 ## Later phases (not ticketed yet)
