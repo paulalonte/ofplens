@@ -234,7 +234,8 @@ and watch the first deploy.
   survives (snapshot storage costs cents). Done in OFP-52.
 - Live CPU and memory (`kubectl top`, metrics-server: OFP-56), and metrics and logs you can
   search and graph afterwards in Grafana Cloud's free tier (OFP-57).
-- A short runbook: start, stop, deploy, roll back, restore the database, rotate the Claude key.
+- A short runbook ([RUNBOOK.md](RUNBOOK.md), OFP-59): start, stop, deploy, roll back, restore
+  the database, rotate keys, and what to do when the alert fires.
 
 **You do:** practise the runbook once: destroy, create, restore, roll back.
 
