@@ -8,7 +8,8 @@
 # Each step prints the command it runs, so you can also run them one by one.
 #
 # The database comes back from the newest snapshot that `pnpm aws:down` took, with your flight
-# history. FRESH_DB=1 pnpm aws:up starts with an empty one instead (the snapshots are kept).
+# history. FRESH_DB=1 pnpm aws:up starts with an empty one instead (the snapshots are kept);
+# DB_SNAPSHOT=<name> pnpm aws:up restores that snapshot instead of the newest (docs/RUNBOOK.md).
 # NO_MONITORING=1 pnpm aws:up leaves out the Grafana monitoring (infra/aws/monitoring.tf), or
 # removes it if it's running; the next run without it puts it back.
 source "$(dirname "$0")/common.sh"
@@ -17,9 +18,21 @@ source "$(dirname "$0")/common.sh"
 #    The first run takes 15-20 minutes (the cluster and the database).
 TF_VARS=()
 if db_exists; then
-  : # Already running: the snapshot only matters when the database is created.
+  # Already running: the snapshot only matters when the database is created.
+  if [[ -n "${DB_SNAPSHOT:-}${FRESH_DB:-}" ]]; then
+    echo "The database is already running, so DB_SNAPSHOT/FRESH_DB change nothing. Restore = pnpm aws:down first (docs/RUNBOOK.md)." >&2
+    exit 1
+  fi
 elif [[ "${FRESH_DB:-}" == 1 ]]; then
   echo "FRESH_DB=1: the database starts empty." >&2
+elif [[ -n "${DB_SNAPSHOT:-}" ]]; then
+  if ! db_snapshots | grep -qx "$DB_SNAPSHOT"; then
+    echo "No snapshot named '$DB_SNAPSHOT'. The ones there are, oldest first:" >&2
+    db_snapshots | sed 's/^/  /' >&2
+    exit 1
+  fi
+  echo "DB_SNAPSHOT: the database will be restored from $DB_SNAPSHOT." >&2
+  TF_VARS=(-var "db_snapshot=$DB_SNAPSHOT")
 elif SNAPSHOT="$(db_snapshots | tail -n 1)" && [[ -n "$SNAPSHOT" ]]; then
   echo "The database will be restored from $SNAPSHOT (the last session's data)." >&2
   TF_VARS=(-var "db_snapshot=$SNAPSHOT")

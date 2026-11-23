@@ -5,6 +5,10 @@ for a session and destroyed afterwards. What it teaches: [docs/LEARNING.md](../.
 step 4b. The kept, cheap part (budget, state bucket, image repositories, your app keys) is
 [infra/bootstrap](../bootstrap).
 
+**Just want to run it?** [docs/RUNBOOK.md](../../docs/RUNBOOK.md) has the steps: start, check,
+stop, deploy, roll back, restore, rotate keys, and what to do when the alert fires. This page
+explains the setup behind them.
+
 ## Cost: read this first
 
 | While the cluster exists                            | Per hour   |
@@ -429,7 +433,9 @@ rule**:
    down, is not an outage here).
 6. Contact point: the default email one (Alerting → **Contact points** → **Test** sends a test
    mail to you).
-7. Summary: `{{ $values.A.Value | humanizePercentage }} of API requests failed with 5xx`. Save.
+7. Summary: `{{ $values.A.Value | humanizePercentage }} of API requests failed with 5xx`.
+   Runbook URL: `https://github.com/paulalonte/ofplens/blob/main/docs/RUNBOOK.md#8-the-alert-fired-server-errors-above-5-`
+   (the email links to what to do). Save.
 
 **See it fire** (in a session): edit the rule, change `5..` to `4..`, save, then make requests
 that answer 401 (signed out) for six minutes:
@@ -462,6 +468,9 @@ To see everything the project still costs: **Billing → Cost Explorer**, filter
 `Project = ofplens` (cost data appears about a day later).
 
 ## When things go wrong
+
+For problems with the running app (errors, slow pages, the alert), see
+[docs/RUNBOOK.md](../../docs/RUNBOOK.md). This table is about the setup itself.
 
 | Symptom                                                               | Likely cause and fix                                                                                                                         |
 | --------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------- |

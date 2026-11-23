@@ -1316,3 +1316,48 @@ from outside. Alloy discovers the pods by annotation and pushes to Grafana Cloud
 lives in git as JSON, and we alert on the symptom, the 5xx ratio, with a pending period and a
 minimum-traffic guard so a single failed request doesn't page anyone. Next I'd turn that into an
 SLO with burn-rate alerts and provision the alert rules from code as well."
+
+---
+
+## Step 7 — Operations, part 3: the runbook
+
+**What was built**
+
+- [docs/RUNBOOK.md](RUNBOOK.md): a quick-reference table, then numbered procedures (start,
+  health check, stop, deploy, roll back, restore, rotate a key), alert triage from symptom to
+  cause, a symptom table, and a drill to practise all of it once.
+- `DB_SNAPSHOT=<name> pnpm aws:up` restores a chosen snapshot; `aws:up` refuses a restore while a
+  database is still running, instead of silently ignoring it.
+- The alert links to its section of the runbook (Grafana's Runbook URL).
+
+**Concepts**
+
+- **A runbook is for the worst moment:** tired, stressed, maybe someone else on call. So it gives
+  exact commands to copy, the expected output ("done when the leftover list is empty"), and
+  decisions in order. Explanations live elsewhere (README, LEARNING) and are linked.
+- **Mitigate first, then investigate:** a deploy shortly before the errors? Roll back first,
+  find the bug afterwards. Users care that it works again, not why it broke. That's why
+  rollback is one command, and why the lasting fix (a revert) is a normal PR.
+- **Rollback vs restore:** a rollback swaps code; data stays as it is. A migration that broke
+  data needs a restore. And because a rollback doesn't undo migrations, schema changes are
+  made **backwards compatible** (expand, then contract) so the previous version still runs.
+- **Triage from symptom to cause:** is it real (users see it?), where (which route, since
+  when?), what changed (deploys), dependencies (database, SimBrief, Claude), the platform
+  (crashing pods, OOMKilled). The same order works for most web incidents.
+- **Blameless notes:** after an incident, write what happened, why, and what prevents it next
+  time, about systems and steps, not people. Fix the runbook in the same PR when it was wrong.
+- **Drills:** a runbook nobody has followed is a guess. Practising it (a "game day") finds the
+  missing step before a real incident does, just like a backup you've never restored isn't a
+  backup.
+- **Toil and automation:** each manual step a runbook repeats often is a candidate for a script
+  (here: `aws:up`, `aws:down`, the leftover check, the nightly teardown). Runbooks shrink as
+  automation grows; what remains is judgement.
+
+**Interview**
+
+"We have a runbook for the AWS environment: start, health check, stop, deploy, roll back,
+restore and key rotation as copy-paste procedures with expected output, plus alert triage that
+goes from symptom to cause. The alert links straight to it. The rule is to mitigate first:
+if a deploy just went out, roll back, then investigate. Rollbacks don't undo migrations, so
+schema changes are backwards compatible, and data problems are a snapshot restore instead. I've
+run the whole runbook as a drill, and anything that was wrong got fixed in the same PR."

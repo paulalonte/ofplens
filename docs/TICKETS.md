@@ -671,6 +671,15 @@ check and per prompt version, so prompt or model changes are measured, not guess
   (`job="ofplens-api"`). `/api/health` logs at warn only; log levels as words.
   `deploy/grafana/ofplens-api-dashboard.json`; the alert is set up by hand from
   infra/aws/README.md.
+
+### OFP-59 · Runbook
+- **Done when:** `docs/RUNBOOK.md` covers start, health check, stop, deploy, roll back, restore,
+  key rotation and the 5xx alert, and you have done its drill once on AWS (deployment step 7,
+  part 3: with that, step 7 is done).
+- *As built:* the runbook (quick reference, numbered procedures, alert triage from symptom to
+  cause, a symptom table, the drill checklist); `DB_SNAPSHOT=<name> pnpm aws:up` restores a
+  chosen snapshot, and `up.sh` refuses `DB_SNAPSHOT`/`FRESH_DB` while a database is running.
+  Linked from infra/aws/README.md and from the alert (Runbook URL).
 ---
 
 ## Later phases (not ticketed yet)
