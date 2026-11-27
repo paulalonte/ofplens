@@ -237,7 +237,9 @@ and watch the first deploy.
 - A short runbook ([RUNBOOK.md](RUNBOOK.md), OFP-59): start, stop, deploy, roll back, restore
   the database, rotate keys, and what to do when the alert fires.
 
-**You do:** practise the runbook once: destroy, create, restore, roll back.
+**You do:** practise the runbook once: destroy, create, restore, roll back. Done on
+2026-11-27; the drill met a real incident (a late nightly teardown that also exposed a destroy
+ordering bug), and its findings were fixed in OFP-60.
 
 **Done when:** you can bring the app up and down from the runbook alone, and the budget alarm
 and nightly teardown are tested.

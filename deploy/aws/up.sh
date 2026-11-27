@@ -86,7 +86,8 @@ fi
 # 5. The app, at https://ofplens.app (api.publicUrl and ingress.host in values-aws.yaml).
 run helm upgrade --install ofplens deploy/helm/ofplens --kube-context "$CONTEXT" \
   --namespace "$NAMESPACE" -f deploy/helm/ofplens/values-aws.yaml \
-  --set image.registry="$REGISTRY" --set image.tag="$TAG" --wait --timeout 10m
+  --set image.registry="$REGISTRY" --set image.tag="$TAG" --description "$TAG (aws:up)" \
+  --wait --timeout 10m
 
 echo
 k get pods -n "$NAMESPACE" -o wide

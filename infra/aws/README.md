@@ -29,7 +29,7 @@ explains the setup behind them.
 **The $20 budget does not stop anything.** It only emails you. What stops the bill:
 
 1. **`pnpm aws:down`** at the end of every session (you).
-2. **The nightly teardown** at 01:00 UTC: a GitHub Actions job that runs the same script, in
+2. **The nightly teardown**, scheduled for 01:23 UTC: a GitHub Actions job that runs the same script, in
    case you forgot ([below](#nightly-teardown)). Worst case, a forgotten cluster costs one
    evening (~$1–2), not a month.
 
@@ -282,8 +282,8 @@ the site keeps serving the previous version and the run fails with the reason.
 ## Nightly teardown
 
 [.github/workflows/nightly-teardown.yml](../../.github/workflows/nightly-teardown.yml) runs
-`deploy/aws/down.sh` every night at 01:00 UTC (02:00 German winter time), and can be started by
-hand: GitHub → Actions → Nightly teardown → Run workflow. It signs in through GitHub OIDC: no
+`deploy/aws/down.sh` every night, scheduled for 01:23 UTC (02:23 German winter time), and can be
+started by hand: GitHub → Actions → Nightly teardown → Run workflow. It signs in through GitHub OIDC: no
 AWS keys are stored in GitHub, only the role's ARN, and the role trusts only workflows on
 `main` of this repository.
 
@@ -292,6 +292,11 @@ AWS keys are stored in GitHub, only the role's ARN, and the role trusts only wor
 | to keep the cluster for one night | `gh variable set KEEP_CLUSTER --body true`                             |
 | the nightly teardown back         | `gh variable delete KEEP_CLUSTER` (do it the next morning)             |
 | to see last night's run           | `gh run list --workflow nightly-teardown.yml`, then `gh run view <id>` |
+
+GitHub starts scheduled runs late, often by hours: in November 2026 they started around
+09:30 UTC, in the middle of a morning session. So a scheduled run **skips a cluster younger than
+4 hours** (a session going on, not a forgotten one; the run's summary says so) and checks again
+the next night. A run started by hand always tears down.
 
 The nightly teardown takes the same final snapshot, so a session it ends keeps its data too.
 
@@ -404,8 +409,11 @@ collector finds them by itself; the series have `job="ofplens-api"`. What's in t
 
 **The dashboard** (once; it stays in Grafana Cloud): Grafana → **Dashboards** → **New** →
 **Import** → upload [deploy/grafana/ofplens-api-dashboard.json](../../deploy/grafana/ofplens-api-dashboard.json)
-→ Import. At the top, pick your stack's Prometheus (`…-prom`) and Loki (`…-logs`) data sources.
-To change it: edit in Grafana, then **Export** → **Export as JSON** and replace the file in a PR,
+→ Import. The **Metrics** and **Logs** dropdowns at the top only offer data sources whose names
+end in `-prom` and `-logs` (a Grafana Cloud stack also has `-usage`, `-alert-state-history` and
+`-usage-insights`, which hold Grafana's own data and leave every panel empty). Check they show
+your stack's, then **Edit** → **Save dashboard** with **Update default variable values** ticked,
+so they stay picked. To change it: edit in Grafana, then **Export** → **Export as JSON** and replace the file in a PR,
 so git stays the source of truth.
 
 **The alert** (once): Grafana → **Alerts & IRM** → **Alerting** → **Alert rules** → **New alert
@@ -416,23 +424,34 @@ rule**:
 
    ```promql
    (
-     sum(rate(http_server_request_duration_seconds_count{job="ofplens-api", http_response_status_code=~"5.."}[5m]))
-   /
-     sum(rate(http_server_request_duration_seconds_count{job="ofplens-api"}[5m]))
+     (
+       sum(rate(http_server_request_duration_seconds_count{job="ofplens-api", http_response_status_code=~"5.."}[5m]))
+     /
+       sum(rate(http_server_request_duration_seconds_count{job="ofplens-api"}[5m]))
+     )
+     and on() sum(increase(http_server_request_duration_seconds_count{job="ofplens-api"}[5m])) >= 10
    )
-   and on() sum(increase(http_server_request_duration_seconds_count{job="ofplens-api"}[5m])) >= 10
+   or on() vector(0)
    ```
 
-   The last line keeps 1 failed request out of 2 from paging anyone: at least 10 requests in
-   5 minutes.
+   The `and on()` line keeps 1 failed request out of 2 from paging anyone: at least 10
+   requests in 5 minutes. `or on() vector(0)` makes it 0 instead of nothing when there is no
+   traffic or no error, so the rule never goes to "No data" for a quiet app.
 
-3. Expressions: **Threshold**, input A, **is above** `0.05`.
+3. Alert condition: **is above** `0.05` (the simple form; with **Advanced options**, a
+   **Threshold** on input A).
 4. Folder `OFP Lens`, evaluation group `ofplens-api` every **1m**, pending period **5m** (it
    must stay above for five minutes).
-5. **Configure no data and error handling**: no data → **Normal** (no traffic, or the cluster is
-   down, is not an outage here).
-6. Contact point: the default email one (Alerting → **Contact points** → **Test** sends a test
-   mail to you).
+5. Expand **Configure no data and error handling**. Two dropdowns that look alike:
+   - **Alert state if no data or all values are null** → **Normal** (no traffic, or the cluster
+     is down, is not an outage here). Left on "No Data", it emails you an alert named
+     `DatasourceNoData` that looks like this one.
+   - **Alert state if execution error or timeout** → **Error** (the default): if the query
+     can't run, you hear about it instead of the alert going quietly blind.
+6. Contact point: a new stack has none that emails you (only `empty` and an internal
+   webhook). Alerting → **Contact points** → **+ Add contact point**: name `ofplens-email`,
+   integration **Email**, your address, **Test** (check the mail arrives), Save. Then pick it
+   here.
 7. Summary: `{{ $values.A.Value | humanizePercentage }} of API requests failed with 5xx`.
    Runbook URL: `https://github.com/paulalonte/ofplens/blob/main/docs/RUNBOOK.md#8-the-alert-fired-server-errors-above-5-`
    (the email links to what to do). Save.
@@ -444,9 +463,11 @@ that answer 401 (signed out) for six minutes:
 for i in $(seq 360); do curl -s -o /dev/null https://ofplens.app/api/pilot; sleep 1; done
 ```
 
-The rule goes **Pending**, then **Firing** after five minutes, and you get an email; a few
-minutes after the loop stops it's **Normal** again, with a "resolved" email. Change `4..` back
-to `5..`.
+If curl prints `000` instead of `401`, your Mac can't resolve `ofplens.app` yet (see "When
+things go wrong"). The rule goes **Pending**, then **Firing** after five minutes, and you get an
+email whose `alertname` is the rule's name (not `DatasourceNoData`: that one means step 5 isn't
+set); a few minutes after the loop stops it's **Normal** again, with a "resolved" email. Change
+`4..` back to `5..`.
 
 ## If something is left
 
@@ -472,13 +493,16 @@ To see everything the project still costs: **Billing → Cost Explorer**, filter
 For problems with the running app (errors, slow pages, the alert), see
 [docs/RUNBOOK.md](../../docs/RUNBOOK.md). This table is about the setup itself.
 
-| Symptom                                                               | Likely cause and fix                                                                                                                         |
-| --------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------- |
-| `Not signed in to AWS (or the session expired)`                       | `aws sso login`, then run the command again                                                                                                  |
-| Token expired in the middle of `apply` or `destroy`                   | `aws sso login` and run it again. Terraform continues where it stopped                                                                       |
-| `Error acquiring the state lock`                                      | Another run is still going (or was killed). Wait; only if you're sure nothing runs: `terraform force-unlock <id>`                            |
-| `kubectl wait externalsecret…` times out                              | `kubectl --context ofplens-aws describe externalsecret ofplens-secrets -n ofplens`: the event says which secret or permission                |
-| Pods `ImagePullBackOff`                                               | `kubectl describe pod`: wrong tag, or an image built for Intel (the nodes are ARM)                                                           |
-| Address answers `502`/`503` for a few minutes                         | Normal right after install: the load balancer's health checks haven't passed yet                                                             |
-| `up.sh` stops: `ofplens.app points at '…', not the load balancer '…'` | ExternalDNS couldn't create the record. Its log says why: `kubectl --context ofplens-aws logs -n external-dns deploy/external-dns --tail=20` |
-| `Kubernetes cluster unreachable` during `destroy`                     | The cluster was deleted outside Terraform. Ask before going further: the fix depends on what's left                                          |
+| Symptom                                                                                                                                                                | Likely cause and fix                                                                                                                                                                                                                                                                                                             |
+| ---------------------------------------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `Not signed in to AWS (or the session expired)`                                                                                                                        | `aws sso login`, then run the command again                                                                                                                                                                                                                                                                                      |
+| Token expired in the middle of `apply` or `destroy`                                                                                                                    | `aws sso login` and run it again. Terraform continues where it stopped                                                                                                                                                                                                                                                           |
+| `Error acquiring the state lock`                                                                                                                                       | Another run is still going (or was killed). Wait; only if you're sure nothing runs: `terraform force-unlock <id>`                                                                                                                                                                                                                |
+| `kubectl wait externalsecret…` times out                                                                                                                               | `kubectl --context ofplens-aws describe externalsecret ofplens-secrets -n ofplens`: the event says which secret or permission                                                                                                                                                                                                    |
+| Pods `ImagePullBackOff`                                                                                                                                                | `kubectl describe pod`: wrong tag, or an image built for Intel (the nodes are ARM)                                                                                                                                                                                                                                               |
+| Address answers `502`/`503` for a few minutes                                                                                                                          | Normal right after install: the load balancer's health checks haven't passed yet                                                                                                                                                                                                                                                 |
+| `up.sh` stops: `ofplens.app points at '…', not the load balancer '…'`                                                                                                  | ExternalDNS couldn't create the record. Its log says why: `kubectl --context ofplens-aws logs -n external-dns deploy/external-dns --tail=20`                                                                                                                                                                                     |
+| `Kubernetes cluster unreachable` during `destroy`                                                                                                                      | The cluster was deleted outside Terraform. Ask before going further: the fix depends on what's left                                                                                                                                                                                                                              |
+| `destroy` fails: `job k8s-monitoring-remove-alloy-and-finalizer failed: DeadlineExceeded`, and the internet gateway: `DependencyViolation … mapped public address(es)` | The internet route was deleted before the cluster, so the nodes couldn't pull the cleanup job's image (fixed in OFP-60; seen on 2026-11-27). Run `pnpm aws:up` to put the route back, finish the uninstall (next row), then `pnpm aws:down`                                                                                      |
+| `aws:up` fails: `Upgrade failed: "k8s-monitoring" has no deployed releases`                                                                                            | A failed uninstall left the release `uninstalling` (`helm status k8s-monitoring -n monitoring`). `kubectl --context ofplens-aws delete job k8s-monitoring-remove-alloy-and-finalizer -n monitoring`, then `helm uninstall k8s-monitoring -n monitoring --kube-context ofplens-aws --wait --timeout 5m`, then `pnpm aws:up` again |
+| `Could not resolve host: ofplens.app` on your Mac right after `aws:up`, though `dig +short ofplens.app @1.1.1.1` answers                                               | Your Mac or router still remembers "no such name" from while the cluster was down. `sudo dscacheutil -flushcache; sudo killall -HUP mDNSResponder`, or wait a few minutes                                                                                                                                                        |

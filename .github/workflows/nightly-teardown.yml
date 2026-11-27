@@ -5,8 +5,9 @@ name: Nightly teardown
 # keep the cluster for a night, and how to run this by hand (Actions → Nightly teardown → Run).
 on:
   schedule:
-    # 01:00 UTC: 02:00 in Germany in winter, 03:00 in summer. GitHub may start it a little late.
-    - cron: '0 1 * * *'
+    # 01:23 UTC: 02:23 in Germany in winter, 03:23 in summer. GitHub starts scheduled runs late,
+    # often by hours (around 09:30 UTC in November 2026); an odd minute avoids the busiest slot.
+    - cron: '23 1 * * *'
   workflow_dispatch:
 
 permissions:
@@ -40,7 +41,30 @@ jobs:
           aws-region: eu-central-1
           mask-aws-account-id: true
 
+      # Because GitHub may start this in the morning, it could stop a session that just began
+      # (it did on 2026-11-27, OFP-60). A cluster younger than MIN_AGE_HOURS is a session going
+      # on, not a forgotten one: skip it tonight; it is checked again tomorrow. Runs started by
+      # hand always tear down.
+      - name: Is a session going on?
+        id: session
+        if: github.event_name == 'schedule'
+        env:
+          MIN_AGE_HOURS: 4
+        run: |
+          created=$(aws eks describe-cluster --name ofplens --query cluster.createdAt --output text 2>/dev/null || true)
+          if [[ -z "$created" ]]; then
+            echo "No cluster; tearing down anyway, in case something else was left."
+            exit 0
+          fi
+          age=$(( ($(date -u +%s) - $(date -u -d "$created" +%s)) / 3600 ))
+          echo "The cluster was created $created, ${age} h ago."
+          if (( age < MIN_AGE_HOURS )); then
+            echo "skip=true" >> "$GITHUB_OUTPUT"
+            echo "Skipped: the cluster is ${age} h old (under ${MIN_AGE_HOURS} h), so a session is likely going on. Run this workflow by hand to tear it down anyway." >> "$GITHUB_STEP_SUMMARY"
+          fi
+
       - uses: hashicorp/setup-terraform@v4
+        if: steps.session.outputs.skip != 'true'
         with:
           terraform_version: ~1.17.0
           # The wrapper rewrites terraform's output; the script reads it plainly.
@@ -48,6 +72,7 @@ jobs:
 
       # kubectl and helm come with the runner image.
       - name: Tear down (deploy/aws/down.sh)
+        if: steps.session.outputs.skip != 'true'
         run: deploy/aws/down.sh
         env:
           AUTO_APPROVE: '1'

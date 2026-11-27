@@ -40,7 +40,7 @@ Before saying a change is done, run `pnpm format:check && pnpm lint && pnpm type
 
 GitHub Actions (`.github/workflows/`): `ci.yml` on every PR and push to `main`; `deploy.yml` after
 CI passes on `main` (pushes images tagged with the commit to ECR, `helm upgrade` if the app runs on
-AWS); `nightly-teardown.yml` at 01:00 UTC (`pnpm aws:down`). Both AWS workflows use GitHub OIDC
+AWS); `nightly-teardown.yml` nightly (`pnpm aws:down`; skips a cluster under 4 h old). Both AWS workflows use GitHub OIDC
 roles from `infra/bootstrap`; nothing in the repo holds AWS keys.
 
 ## Layout

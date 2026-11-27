@@ -40,3 +40,18 @@ module "vpc" {
     "kubernetes.io/role/elb" = "1"
   }
 }
+
+# The public subnets, handed to the cluster only together with their way out to the internet
+# (the route to the internet gateway and the subnets' link to that route table). Terraform
+# orders a destroy by references, and the subnet ids alone don't mention the route: so it used to
+# delete the route in parallel with the cluster's add-ons, and the nodes (no NAT, see above) lost
+# the internet while Helm's cleanup jobs still had images to pull (the nightly teardown of
+# 2026-11-27, OFP-60). Through this, the cluster (and everything installed on it) is created after
+# the route and destroyed before it.
+resource "terraform_data" "public_subnets_online" {
+  input = {
+    subnet_ids = module.vpc.public_subnets
+    route      = module.vpc.public_internet_gateway_route_id
+    links      = module.vpc.public_route_table_association_ids
+  }
+}
