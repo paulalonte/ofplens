@@ -18,8 +18,10 @@ module "eks" {
   # Whoever runs `terraform apply` (your SSO role) becomes a cluster admin (an EKS access entry).
   enable_cluster_creator_admin_permissions = true
 
+  # The subnets come through public_subnets_online (network.tf), not module.vpc.public_subnets:
+  # that keeps the internet route alive until the cluster is gone.
   vpc_id     = module.vpc.vpc_id
-  subnet_ids = module.vpc.public_subnets
+  subnet_ids = terraform_data.public_subnets_online.output.subnet_ids
 
   # Pods get AWS permissions through EKS Pod Identity (addons.tf), not IRSA, so the cluster
   # needs no OIDC provider in IAM.

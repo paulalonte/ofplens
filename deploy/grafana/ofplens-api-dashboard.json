@@ -19,7 +19,8 @@
         "type": "datasource",
         "query": "prometheus",
         "current": {},
-        "hide": 0
+        "hide": 0,
+        "regex": "/-prom$/"
       },
       {
         "name": "logs",
@@ -27,7 +28,8 @@
         "type": "datasource",
         "query": "loki",
         "current": {},
-        "hide": 0
+        "hide": 0,
+        "regex": "/-logs$/"
       }
     ]
   },
@@ -100,7 +102,7 @@
       },
       "targets": [
         {
-          "expr": "sum(rate(http_server_request_duration_seconds_count{job=\"ofplens-api\", http_response_status_code=~\"5..\"}[$__rate_interval])) / sum(rate(http_server_request_duration_seconds_count{job=\"ofplens-api\"}[$__rate_interval]))",
+          "expr": "(sum(rate(http_server_request_duration_seconds_count{job=\"ofplens-api\", http_response_status_code=~\"5..\"}[$__rate_interval])) or vector(0)) / sum(rate(http_server_request_duration_seconds_count{job=\"ofplens-api\"}[$__rate_interval]))",
           "range": true,
           "instant": false,
           "legendFormat": "5xx share",
@@ -118,7 +120,7 @@
         "overrides": []
       },
       "options": {},
-      "description": "Errors: share of requests the API answered with 5xx. The alert fires above 5 % (see infra/aws/README.md, Monitoring)."
+      "description": "Errors: share of requests the API answered with 5xx; 0 when there were requests but no errors, empty when there were none at all. The alert fires above 5 % (see infra/aws/README.md, Monitoring)."
     },
     {
       "id": 4,

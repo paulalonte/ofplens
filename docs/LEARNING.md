@@ -1361,3 +1361,64 @@ goes from symptom to cause. The alert links straight to it. The rule is to mitig
 if a deploy just went out, roll back, then investigate. Rollbacks don't undo migrations, so
 schema changes are backwards compatible, and data problems are a snapshot restore instead. I've
 run the whole runbook as a drill, and anything that was wrong got fixed in the same PR."
+
+## Step 7 — Operations, part 4: the drill, and a real incident in it (OFP-60)
+
+**What happened (2026-11-27, times UTC)**
+
+| Time | Event |
+| --- | --- |
+| 09:00 | `aws:up`. AWS has no t4g.medium left in eu-central-1a, so both nodes start in 1b |
+| 09:08 | Capacity is back: the Auto Scaling group adds a node in 1a and removes one in 1b (zone rebalancing). One API and one web pod move; users notice nothing |
+| 09:29 | The **nightly teardown**, scheduled for 01:00, starts 8.5 hours late and begins deleting the live session |
+| 09:33 | `terraform destroy` deletes the **internet route** in parallel with the monitoring chart's uninstall. The nodes (public subnets, no NAT) are cut off; the uninstall's cleanup job can't pull its image |
+| 09:38 | RDS is deleted, with its final snapshot |
+| 09:53 | The teardown fails: cleanup job past its deadline, internet gateway still in use by the nodes' public IPs |
+| After    | Recovery: `aws:up` puts the route and database back, then stops on the stuck release (`has no deployed releases`); delete the failed job, `helm uninstall` (succeeds now: the route is back), `aws:up` again. The plan imported before the incident is still there |
+
+**Root causes and fixes**
+
+- **A hidden dependency:** the nodes need the internet route, but Terraform only knew they
+  needed the subnets. Terraform orders creates and destroys by *references*, so it saw no reason
+  to keep the route until the cluster was gone. Fix: the cluster takes its subnet ids from a
+  `terraform_data` that also references the route, so the route is created first and destroyed
+  last. It only bit now because the cleanup job landed on the *new* node, which had never pulled
+  that image: a race that earlier teardowns won by luck.
+- **An unreliable clock:** GitHub runs scheduled workflows "best effort"; every recent run
+  started 8–10 hours late. A destructive scheduled job needs a guard of its own: it now skips a
+  cluster younger than 4 hours (likely in use). A clock-based guard ("skip if late") wouldn't
+  work, because then it would never run.
+
+**Concepts**
+
+- **Implicit vs explicit dependencies:** whatever a resource needs at *runtime* (network routes,
+  DNS, IAM) but doesn't *reference* is invisible to Terraform. `depends_on`, or passing the value
+  through something that references it, makes it explicit. Destroys find these bugs more often
+  than creates, because nobody tests them as often.
+- **Helm release states:** `deployed`, `failed`, `uninstalling`, `pending-*`. An upgrade needs a
+  previous `deployed` revision; a release stuck in `uninstalling` must be finished (or removed)
+  first. Hooks (pre-delete jobs) run *inside* the cluster, so they need everything a pod needs:
+  nodes, network, images.
+- **Capacity is finite:** "insufficient capacity" happens even on-demand, per instance type and
+  zone. Several instance types (or Karpenter) and more zones make it rarer.
+- **Healthy isn't resilient:** for six minutes both nodes were in one zone; every dashboard was
+  green, but one zone's outage would have taken the site down.
+- **Collect evidence early:** Kubernetes keeps events for about an hour, and failed pods get
+  cleaned up. The Auto Scaling group's activity history and the GitHub Actions log kept the
+  rest.
+- **Negative DNS caching:** a name looked up while it didn't exist is remembered as missing for
+  a while (the zone's SOA says how long), so a freshly created record can look broken from one
+  machine and fine from another.
+- **No data isn't an error:** an alert query that returns nothing when all is well makes Grafana
+  send `DatasourceNoData`. `or vector(0)` gives it a number to judge instead.
+
+**Interview**
+
+"During a planned drill, our nightly teardown job started eight and a half hours late and
+began tearing down the live environment. Its destroy then failed halfway: Terraform had
+deleted the VPC's internet route before the cluster, because nothing in the code said the
+nodes needed it, and an in-cluster cleanup job couldn't pull its image. I traced it through the
+Actions log, Helm's release status and the Auto Scaling activity history, recovered without
+losing data thanks to the final snapshot, and fixed both causes: an explicit dependency so the
+route outlives the cluster, and a guard so the scheduled teardown leaves a recently started
+cluster alone. Then I added the failure and its recovery to the runbook."

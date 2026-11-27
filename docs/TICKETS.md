@@ -680,6 +680,19 @@ check and per prompt version, so prompt or model changes are measured, not guess
   cause, a symptom table, the drill checklist); `DB_SNAPSHOT=<name> pnpm aws:up` restores a
   chosen snapshot, and `up.sh` refuses `DB_SNAPSHOT`/`FRESH_DB` while a database is running.
   Linked from infra/aws/README.md and from the alert (Runbook URL).
+
+### OFP-60 · Fixes from the drill
+- **Done when:** what the runbook drill of 2026-11-27 found is fixed: `aws:down` no longer
+  deletes the internet route before the cluster, the nightly teardown doesn't end a session
+  that just started, and the docs cover what was missing or wrong.
+- *As built:* the cluster gets its subnets through `terraform_data.public_subnets_online`, which
+  references the internet route, so Terraform destroys the cluster (and its Helm releases)
+  first; a scheduled teardown skips a cluster under 4 hours old (a run by hand never skips), at
+  01:23 instead of 01:00 UTC; the dashboard only offers `-prom`/`-logs` data sources and shows
+  0 % 5xx instead of nothing; the alert query returns 0 when quiet (no `DatasourceNoData`
+  emails); Helm revisions are described with the image tag; README and runbook rows for the
+  failed teardown and its recovery, `has no deployed releases`, DNS negative caching, a node
+  replaced by AZ rebalancing, the missing email contact point and the two no-data dropdowns.
 ---
 
 ## Later phases (not ticketed yet)

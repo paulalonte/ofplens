@@ -105,6 +105,7 @@ jobs:
           helm upgrade ofplens deploy/helm/ofplens --kube-context ofplens-aws --namespace ofplens \
             -f deploy/helm/ofplens/values-aws.yaml \
             --set image.registry="$REGISTRY" --set image.tag="$TAG" \
+            --description "$TAG (deploy, run ${{ github.run_id }})" \
             --rollback-on-failure --wait --timeout 10m
 
       - name: Smoke test

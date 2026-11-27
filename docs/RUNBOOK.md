@@ -88,8 +88,10 @@ Kept snapshots: ofplens-final-… (the newest one is from just now)
 
 If anything is listed, see [infra/aws/README.md, "If something is left"](../infra/aws/README.md#if-something-is-left).
 
-**Overnight:** the nightly teardown stops a forgotten cluster around 08:00 UTC (GitHub starts
-scheduled runs late). To keep it for one night: `gh variable set KEEP_CLUSTER --body true`, and
+**Overnight:** the nightly teardown stops a forgotten cluster, often only around 09:30 UTC
+(GitHub starts scheduled runs late). It leaves a cluster younger than 4 hours alone, so it won't
+end a morning session, but a cluster you start in the morning and forget runs until the next
+night's teardown. To keep it for one night: `gh variable set KEEP_CLUSTER --body true`, and
 the next morning `gh variable delete KEEP_CLUSTER`.
 
 ## 4. Deploy
@@ -184,7 +186,10 @@ reads the new value.
 
 ## 8. The alert fired: server errors above 5 %
 
-The email says what share of API requests failed with 5xx. Work from symptom to cause:
+The email says what share of API requests failed with 5xx. An email whose `alertname` is
+`DatasourceNoData` or `DatasourceError` is about the rule, not the app: its query returned
+nothing, or couldn't run (infra/aws/README.md, "The API's own metrics", step 5). Work from symptom
+to cause:
 
 1. **Is it real?** https://ofplens.app: does a page load, can you open a plan? Grafana →
    **OFP Lens API** → "Server error ratio" and "Answers by status".
@@ -231,7 +236,9 @@ The alert resolves by itself (with an email) once the error ratio stays under 5 
 | Briefings fail, the rest works                           | Dashboard → "Briefings in the time range" (`failed`); logs: `{namespace="ofplens", container="api"} \|= "Briefing"`; status.anthropic.com |
 | Slow pages                                               | Dashboard → "Latency p95, by route"; `kubectl top pods`; "Event loop delay" rising = the API's thread is busy                           |
 | A budget email from AWS                                  | Billing → Cost Explorer by service; is a cluster still running? `pnpm aws:down`; see [3](#3-stop)                                       |
-| The nightly teardown failed (email from GitHub)          | `gh run list --workflow nightly-teardown.yml`, `gh run view <id> --log-failed`; then `pnpm aws:down` by hand                          |
+| The nightly teardown failed (email from GitHub)          | `gh run list --workflow nightly-teardown.yml`, `gh run view <id> --log-failed`. The error is usually in infra/aws/README.md, "When things go wrong" (a failed monitoring uninstall needs `aws:up` first); then `pnpm aws:down` by hand |
+| Three API pod names in the dashboard, though there are two replicas | A node was replaced; the pods on it moved. Right after `aws:up` this is usually the Auto Scaling group balancing the nodes across zones (AWS had no capacity in one zone at first): `aws autoscaling describe-scaling-activities --max-items 6`. Harmless with two replicas |
+| https://ofplens.app doesn't resolve on your Mac only     | `dig +short ofplens.app @1.1.1.1` answers but your Mac doesn't: it remembers the name as missing from before the start. Flush: `sudo dscacheutil -flushcache; sudo killall -HUP mDNSResponder` |
 | Grafana shows nothing new                                | `kubectl --context ofplens-aws logs -n monitoring deploy/k8s-monitoring-alloy --tail=30`: 401/403 = token, 405 = `logs-url`           |
 
 ---
